@@ -23,15 +23,17 @@ pipeline {
                 }
             }
         }
-        stage('Deploy to Kubernetes') {
-            steps {
-                withKubeConfig([credentialsId: 'kubeconfig']) {
-                    sh "sed -i 's|NEXUS_REPO/nodejs-app:BUILD_NUMBER|${NEXUS_REGISTRY}/${IMAGE_NAME}:${BUILD_NUMBER}|g' k8s-deployment.yaml"
-                    sh "kubectl apply -f k8s-deployment.yaml"
-                    sh "kubectl rollout status deployment/nodejs-app"
-                }
-            }
-        }
+stage('Deploy to Kubernetes') {
+    steps {
+        sh """
+        sed -i 's|NEXUS_REPO/nodejs-app:BUILD_NUMBER|${NEXUS_REGISTRY}/${IMAGE_NAME}:${BUILD_NUMBER}|g' k8s-deployment.yaml
+
+        /usr/bin/kubectl apply -f k8s-deployment.yaml --kubeconfig=/var/lib/jenkins/.kube/config
+
+        /usr/bin/kubectl rollout status deployment/nodejs-app --kubeconfig=/var/lib/jenkins/.kube/config
+        """
+    }
+}
     }
     post {
         success {
