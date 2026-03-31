@@ -11,6 +11,7 @@ app.get('/', (req, res) => {
         <h1>🚀 DevOps Pipeline Demo</h1>
         <p>Version: 1.0.0</p>
         <p>Built with Jenkins | Stored in Nexus | Deployed on Kubernetes</p>
+        <p>Project built by Lakshmikanth</p>
       </body>
     </html>
   `);
