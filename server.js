@@ -19,7 +19,7 @@ app.get('/', (req, res) => {
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #12eb24 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #DC143C 0%, #008080 100%);
             color: #333;
             min-height: 100vh;
             overflow-x: hidden;
