@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: nodejs-app
-          image: 44.200.221.65:8082/nodejs-app:16
+          image: NEXUS_REPO/nodejs-app:BUILD_NUMBER
           ports:
             - containerPort: 3000
 
