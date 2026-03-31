@@ -87,7 +87,7 @@ app.get('/', (req, res) => {
         }
 
         .stage {
-            background: linear-gradient(135deg, #DC143C 0%, #008080 100%);
+            background: linear-gradient(135deg, #008080  0%, #DC143C 100%);
             color: white;
             padding: 30px 20px;
             border-radius: 15px;
