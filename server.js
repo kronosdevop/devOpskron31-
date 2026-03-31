@@ -6,7 +6,7 @@ const port = 3000;
 app.get('/', (req, res) => {
   res.send(`
     <html>
-      <head><title>DevOps Demo</title></head>
+      <head><title>DevOps Demo with docker kubernetes and </title></head>
       <body style="font-family: Arial; text-align: center; padding: 50px;">
         <h1>🚀 DevOps Pipeline Demo</h1>
         <p>Version: 1.0.67</p>
