@@ -73,7 +73,7 @@ app.get('/', (req, res) => {
 
         .pipeline-title {
             font-size: 2rem;
-            color: #667eea;
+            color: #DC143C;
             margin-bottom: 30px;
             text-align: center;
             font-weight: 600;
@@ -87,7 +87,7 @@ app.get('/', (req, res) => {
         }
 
         .stage {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #DC143C 0%, #008080 100%);
             color: white;
             padding: 30px 20px;
             border-radius: 15px;
@@ -196,7 +196,7 @@ app.get('/', (req, res) => {
 
         .modal-title {
             font-size: 2rem;
-            color: #667eea;
+            color: #DC143C;
             font-weight: 700;
         }
 
@@ -228,7 +228,7 @@ app.get('/', (req, res) => {
         }
 
         .modal-section h3 {
-            color: #764ba2;
+            color: #008080;
             font-size: 1.3rem;
             margin-bottom: 10px;
             display: flex;
@@ -238,7 +238,7 @@ app.get('/', (req, res) => {
         .modal-section h3::before {
             content: '▶';
             margin-right: 10px;
-            color: #667eea;
+            color: #DC143C;
         }
 
         .modal-section p, .modal-section ul {
@@ -287,11 +287,11 @@ app.get('/', (req, res) => {
         .tech-card:hover {
             transform: translateY(-10px);
             box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-            border-color: #667eea;
+            border-color: #DC143C;
         }
 
         .tech-card.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #DC143C 0%, #008080 100%);
             color: white;
             transform: translateY(-10px) scale(1.05);
         }
@@ -304,7 +304,7 @@ app.get('/', (req, res) => {
         .tech-icon {
             width: 60px;
             height: 60px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #DC143C 0%, #008080 100%);
             border-radius: 12px;
             display: flex;
             align-items: center;
@@ -325,7 +325,7 @@ app.get('/', (req, res) => {
         .tech-name {
             font-size: 1.5rem;
             font-weight: 600;
-            color: #667eea;
+            color: #DC143C;
             margin-bottom: 10px;
             transition: color 0.3s ease;
         }
@@ -587,7 +587,7 @@ app.get('/', (req, res) => {
         </div>
 
         <div class="metrics">
-            <div class="metric-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" data-tooltip="Our system maintains 99.9% uptime">
+            <div class="metric-card" style="background: linear-gradient(135deg, #DC143C 0%, #008080 100%);" data-tooltip="Our system maintains 99.9% uptime">
                 <div class="metric-value">99.9%</div>
                 <div class="metric-label">Uptime</div>
             </div>
@@ -1122,8 +1122,8 @@ app.get('/', (req, res) => {
         }
 
         // Log startup
-        console.log('%c🚀 DevOps Pipeline Interactive Demo Loaded!', 'color: #667eea; font-size: 16px; font-weight: bold;');
-        console.log('%cClick on any stage or technology card to learn more!', 'color: #764ba2; font-size: 14px;');
+        console.log('%c🚀 DevOps Pipeline Interactive Demo Loaded!', 'color: #DC143C; font-size: 16px; font-weight: bold;');
+        console.log('%cClick on any stage or technology card to learn more!', 'color: #008080; font-size: 14px;');
     </script>
 </body>
 </html>
