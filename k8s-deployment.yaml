@@ -13,10 +13,14 @@ spec:
         app: nodejs-app
     spec:
       containers:
-      - name: nodejs-app
-        image: NEXUS_REPO/nodejs-app:BUILD_NUMBER
-        ports:
-        - containerPort: 3000
+        - name: nodejs-app
+          image: 44.200.221.65:8082/nodejs-app:16
+          ports:
+            - containerPort: 3000
+
+      imagePullSecrets:
+        - name: nexus-secret
+
 ---
 apiVersion: v1
 kind: Service
@@ -27,6 +31,6 @@ spec:
   selector:
     app: nodejs-app
   ports:
-  - port: 3000
-    targetPort: 3000
-    nodePort: 30001
+    - port: 3000
+      targetPort: 3000
+      nodePort: 30001
