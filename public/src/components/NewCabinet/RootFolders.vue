@@ -183,7 +183,7 @@
                   item.folderType == 'Root' &&
                   $store.getters.GetUserObj?.user?.user_email_id &&
                   item.folder_created_by_email ==
-                    $store.getters.GetUserObj.user?.user_email_id
+                    $store.getters.GetUserObj.user.user_email_id
                 "
                 >mdi-account</v-icon
               >
@@ -248,7 +248,7 @@
                     v-if="
                       item.folderType == 'Root' &&
                       item.folder_created_by_email !=
-                        $store.getters.GetUserObj.user?.user_email_id
+                        $store.getters.GetUserObj.user.user_email_id
                     "
                     @click.stop="leave_folder(item)"
                     style="font-size: 12px"
@@ -279,7 +279,7 @@
                       item.folderType == 'Root' &&
                       $store.getters.GetUserObj?.user?.user_email_id &&
                       item.folder_created_by_email ==
-                        $store.getters.GetUserObj.user?.user_email_id
+                        $store.getters.GetUserObj.user.user_email_id
                     "
                     @click.stop="cabinet_transfer_ownership(item)"
                     style="font-size: 12px"
@@ -298,7 +298,7 @@
                       item.folderType == 'Root' &&
                       $store.getters.GetUserObj?.user?.user_email_id &&
                       item.folder_created_by_email ==
-                        $store.getters.GetUserObj.user?.user_email_id &&
+                        $store.getters.GetUserObj.user.user_email_id &&
                       item.folder_visibility.visible_type !== 'ALL_MEMBERS'
                     "
                     @click.stop="add_member(item)"
@@ -318,7 +318,7 @@
                       item.folderType == 'Root' &&
                       $store.getters.GetUserObj?.user?.user_email_id &&
                       item.folder_created_by_email ==
-                        $store.getters.GetUserObj.user?.user_email_id
+                        $store.getters.GetUserObj.user.user_email_id
                     "
                     @click.stop="delete_folder(item)"
                     style="font-size: 12px"
@@ -776,7 +776,7 @@ export default {
                 }
                 if (
                   item.folder_visibility.visible_members.includes(
-                    this.$store.getters.GetUserObj.user?.user_id
+                    this.$store.getters.GetUserObj.user.user_id
                   )
                 ) {
                   return true;

@@ -194,7 +194,7 @@ export default {
       const currentUser = this.userAppSubscribers.find(
         (element) =>
           element.client_id ==
-          this.$store.getters.GetUserObj.user?.user_email_id
+          this.$store.getters.GetUserObj.user.user_email_id
       );
       
       // If no current user found, return empty array
@@ -223,11 +223,11 @@ export default {
       let response = JSON.parse(result.data.list_user_app_subscribers);
       if (response.Status == "SUCCESS") {
         this.userAppSubscribers = response.data;
-        // console.log(this.$store.getters.GetUserObj.user?.user_email_id);
+        // console.log(this.$store.getters.GetUserObj.user.user_email_id);
         let currentUser = this.userAppSubscribers.find(
           (element) =>
             element.client_id ==
-            this.$store.getters.GetUserObj.user?.user_email_id
+            this.$store.getters.GetUserObj.user.user_email_id
         );
         // console.log(currentUser);
       } else {

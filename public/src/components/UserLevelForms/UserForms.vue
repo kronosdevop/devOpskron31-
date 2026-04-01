@@ -173,7 +173,7 @@
     </v-card>
 
     <!-- Dialogs -->
-    <div>
+    <div v-if="componentCheck == 1">
       <ViewForm :formDialog="formDialog" :formInfo="formInfo" :formActionType="formActionType"
         v-on:errorMsg="error_info" v-on:successMsg="success_info" v-on:validateData="validate_message"
         @clicked="formDialog = false" />
@@ -223,6 +223,7 @@ export default {
       tableLoading: false,
       formInfo: {},
       formDialog: false,
+      componentCheck: 0,
       formActionType: "initiate",
       SnackBarComponent: {},
       isVisible: false,
@@ -232,7 +233,6 @@ export default {
       itemsPerPage: 20,
       totalItems: 0,
       windowHeight: 0,
-        routeWorkflowId: null,
 
       //Screenshot Values
       DialogCreateTicket: false,
@@ -296,17 +296,11 @@ export default {
     },
   },
 
-created() {
-  this.windowHeight = window.innerHeight - 220;
-  this.isVisible = true;
-
-  // ✅ Get from localStorage instead of route
-  this.routeWorkflowId = localStorage.getItem("AUTO_OPEN_WORKFLOW_ID");
-
-  console.log("FINAL WORKFLOW ID:", this.routeWorkflowId);
-
-  this.get_all_flows();
-},
+  created() {
+    this.windowHeight = window.innerHeight - 220;
+    this.isVisible = true;
+    this.get_all_flows();
+  },
 
   methods: {
     refresh_list() {
@@ -334,104 +328,53 @@ created() {
     back_call() {
       this.$router.push("/home/DashboardView");
     },
-async get_all_flows() {
-  this.tableLoading = true;
 
-  const data = this.$store.getters.GetUserObj;
+    async get_all_flows() {
+      this.tableLoading = true;
+      var data = this.$store.getters.GetUserObj;
+      const variables = {
+        organization_id: data.organization.organization_id,
+        limit: 1000,
+        nextToken: null,
+        user_id: data.user.user_id,
+      };
+      this.tableData = [];
+      this.fetchData(list_workflow, variables)
+        .then(() => {
+          var response = JSON.parse(this.queryResponse.data.list_workflow);
+          this.tableLoading = false;
+          this.tableData = response.details;
+          this.tableData = this.tableData.filter(
+            (obj) =>
+              (obj.workflow_design_type === "DEFAULT" ||
+                obj.workflow_design_type === undefined) &&
+              obj.workflow_deploy_status === "DEPLOY"
+          );
 
-  const variables = {
-    organization_id: data.organization.organization_id,
-    limit: 1000,
-    nextToken: null,
-    user_id: data.user.user_id,
-  };
+          // Update total items for pagination
+          this.totalItems = this.tableData.length;
 
-  this.tableData = [];
+          localStorage.setItem(
+            "workflowList",
+            JSON.stringify(response.details)
+          );
+        })
+        .catch((error) => {
+          this.tableLoading = false;
+          console.error("Error fetching data:", error);
+        });
+    },
 
-  try {
-    await this.fetchData(list_workflow, variables);
-
-    const rawData = this.queryResponse.data.list_workflow;
-
-    console.log("TYPE:", typeof rawData);
-
-    let parsedData = {};
-
-    if (typeof rawData === "string") {
-      parsedData = JSON.parse(rawData);
-    } else {
-      parsedData = rawData;
-    }
-
-    const fullList = parsedData.details || [];
-
-    console.log("FULL LIST LENGTH:", fullList.length);
-    console.log("FULL LIST FIRST ITEM:", fullList[0]);
-
-    const storedWorkflowId = localStorage.getItem("AUTO_OPEN_WORKFLOW_ID");
-
-    console.log("FINAL WORKFLOW ID:", storedWorkflowId);
-
-    const matchedWorkflow = fullList.find(
-      (item) => String(item.workflow_id) === String(storedWorkflowId)
-    );
-
-    console.log("FOUND ITEM:", matchedWorkflow);
-
-    // ✅ FILTER
-    this.tableData = fullList.filter(
-      (obj) =>
-        (obj.workflow_design_type === "DEFAULT" ||
-          obj.workflow_design_type === undefined) &&
-        obj.workflow_deploy_status === "DEPLOY"
-    );
-
-    this.totalItems = this.tableData.length;
-
-    this.tableLoading = false;
-
-    // ✅ OPEN DIALOG
-  if (matchedWorkflow) {
-  console.log("AUTO OPEN TRIGGERED");
-
-  // ✅ Step 1: set form data
-  this.formInfo = matchedWorkflow;
-
-  // ✅ Step 2: render ViewForm
-
-  // ✅ Step 3: open dialog AFTER render
-  this.$nextTick(() => {
-    this.formDialog = true;
-  });
-
-  localStorage.removeItem("AUTO_OPEN_WORKFLOW_ID");
-}
-    else {
-      console.warn("❌ MATCH FAILED");
-    }
-  } catch (error) {
-    this.tableLoading = false;
-    console.error("Error fetching data:", error);
-  }
-},
     fetch_value(val) {
       return format_Date(val);
     },
 
-  handle_row_click(click, value) {
-  console.log("OPENING FORM:", value.item.workflow_id);
-
-  this.formInfo = value.item;
-
-  // Step 1: render ViewForm component
-
-  // Step 2: wait and open dialog
-  this.$nextTick(() => {
-    setTimeout(() => {
+    handle_row_click(click, value) {
+      this.formInfo = value.item;
+      this.componentCheck = 1;
       this.formDialog = true;
-    }, 100);
-  });
-},
+    },
+
     error_info(val) {
       this.SnackBarComponent = {
         SnackbarVmodel: true,

@@ -134,14 +134,14 @@ export default {
               element.team_visibility != undefined &&
               element.team_visibility == "RESTRICTED" &&
               element.team_created_by !=
-                self.$store.getters.GetUserObj.user?.user_email_id
+                self.$store.getters.GetUserObj.user.user_email_id
             ) {
               arraynew.push(element);
               // console.log(arraynew);
               this.tableData = arraynew.filter(
                 (item) =>
                   !item.restricted_users.includes(
-                    this.$store.getters.GetUserObj.user?.user_id
+                    this.$store.getters.GetUserObj.user.user_id
                   )
               );
             }

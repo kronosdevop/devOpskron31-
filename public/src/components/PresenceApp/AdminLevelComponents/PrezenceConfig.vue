@@ -24,9 +24,12 @@
         rounded="lg"
         style="overflow-y: auto"
         class="mt-n3"
+        :height="CommonVuetifyObj.height - 195"
       >
         <v-card-text>
-        
+          <div class="font-weight-bold">
+            Configure different color codes for different Attendance duration
+          </div>
           <v-row class="mt-1">
             <!-- Configure different color-->
             <v-col cols="6">
@@ -35,11 +38,8 @@
                 elevation="6"
                 rounded="lg"
                 class="pa-2"
+                height="62vh"
               >
-              <div class="font-weight-bold mt-6">
-                <v-icon color="primary" class="mr-2">mdi-cog</v-icon>
-            Configure different color codes for different Attendance duration
-          </div>
                 <v-form ref="form">
                   <v-row>
                     <v-col cols="3">
@@ -47,7 +47,7 @@
                         style="max-width: 200px"
                         density="compact"
                         variant="outlined"
-                        class="ml-4 mt-4"
+                        class="ml-4 mt-2"
                         label="From Hr"
                         v-model="from_hr"
                         @change="setduration"
@@ -59,7 +59,7 @@
                         style="max-width: 200px"
                         density="compact"
                         variant="outlined"
-                        class="ml-4 mt-4"
+                        class="ml-4 mt-2"
                         label="To Hr"
                         v-model="to_hr"
                         :rules="[
@@ -73,7 +73,7 @@
                     </v-col>
                     <v-col cols="1">
                       <v-btn
-                        class="mx-2 mt-4"
+                        class="mx-2 mt-2"
                         fab
                         @click="colordailog()"
                         height="40"
@@ -84,7 +84,7 @@
                     <v-col cols="2">
                       <v-btn
                         @click="add_action()"
-                        class="elevation-0 ml-8 mt-4 cardCss"
+                        class="elevation-0 ml-8 mt-2 cardCss"
                         height="40"
                       >
                         <v-icon color="white" dark> mdi-plus </v-icon>
@@ -94,6 +94,7 @@
                 </v-form>
                 <v-card-text elevation="0">
                   <v-data-table
+                    :height="CommonVuetifyObj.height - 380"
                     :fixed-header="fixed"
                     :headers="headers"
                     :items="tableData"
@@ -123,9 +124,7 @@
                       >
                     </template>
                   </v-data-table>
-               
                 </v-card-text>
-         
               </v-card>
             </v-col>
 
@@ -133,11 +132,11 @@
             <v-col cols="6">
               <!--Attendance Report Configuration-->
               <div class="font-weight-bold mt-n9">
+                Attendance Report Configuration
               </div>
-              <v-card elevation="6" rounded="lg" height="46vh" class="mt-8">
-                <v-toolbar density="compact" color="transparent" height="100">
-                  <div class="font-weight-bold ml-3">  <v-icon color="primary" class="mr-2">mdi-file-document-outline</v-icon>            Attendance Report Configuration
-</div>
+              <v-card elevation="6" rounded="lg" height="35vh" class="mt-4">
+                <v-toolbar density="compact" color="transparent">
+                  <div class="font-weight-bold ml-3">Report Settings</div>
                   <v-spacer></v-spacer>
 
                   <!--Daily and Monthly Time Pickers-->
@@ -274,113 +273,56 @@
                   </v-col>
                 </v-row>
               </v-card>
-<v-row>
-  <v-col>
-    
-  </v-col>
-</v-row>
-        
+
+              <!--Holiday Settings-->
+              <div class="font-weight-bold ml-1 mt-4">Holiday Setting</div>
+              <v-card elevation="6" class="mt-3 pa-2" rounded="lg" height="7vh">
+                <v-radio-group
+                  v-model="location_holiday"
+                  inline
+                  color="primary"
+                  class="ml-3"
+                >
+                  <v-radio
+                    label="Default holiday list"
+                    value="defaultholiday"
+                  ></v-radio>
+                  <v-radio
+                    label="Holiday list based on location"
+                    value="locationholiday"
+                  ></v-radio>
+                </v-radio-group>
+              </v-card>
+
+              <!--Scan Settings-->
+              <div class="font-weight-bold mt-4">Scan Setting</div>
+              <v-card elevation="6" class="mt-3" rounded="lg" height="7vh">
+                <v-row class="pa-4">
+                  <v-switch
+                    v-model="faceScan"
+                    :label="
+                      faceScan ? 'Face Scan Enabled' : 'Face Scan Disabled'
+                    "
+                    class="ml-4"
+                    color="primary"
+                    @change="toggleSwitch('face')"
+                  ></v-switch>
+                  <v-switch
+                    v-model="doorScan"
+                    :label="
+                      doorScan ? 'Door Scan Enabled' : 'Door Scan Disabled'
+                    "
+                    class="ml-10 mt-n1"
+                    color="primary"
+                    @change="toggleSwitch('door')"
+                  ></v-switch>
+                </v-row>
+              </v-card>
             </v-col>
           </v-row>
-<v-row class="mt-4">
-
-  <!-- Holiday -->
-  <v-col cols="12" md="6">
-    <v-card elevation="6" rounded="xl" class="pa-4 modern-card h-100">
-      
-      <!-- Header -->
-      <div class="d-flex align-center mb-3">
-        <v-icon color="primary" class="mr-2">mdi-calendar</v-icon>
-        <div class="text-subtitle-1 font-weight-bold">
-          Holiday Setting
-        </div>
-      </div>
-
-      <!-- Options -->
-      <v-radio-group
-        v-model="location_holiday"
-        color="primary"
-      >
-        <v-radio
-          label="Default holiday list"
-          value="defaultholiday"
-        />
-        <v-radio
-          label="Location-based holiday list"
-          value="locationholiday"
-        />
-      </v-radio-group>
-
-    </v-card>
-  </v-col>
-
-
-  <!-- Scan -->
-  <v-col cols="12" md="6">
-    <v-card elevation="6" rounded="xl" class="pa-4 modern-card h-100">
-
-      <!-- Header -->
-      <div class="d-flex align-center mb-3">
-        <v-icon color="primary" class="mr-2">mdi-scan-helper</v-icon>
-        <div class="text-subtitle-1 font-weight-bold">
-          Scan Settings
-        </div>
-      </div>
-
-      <!-- Switches -->
-      <div class="d-flex align-center justify-space-between mb-3">
-        <span>Face Scan</span>
-        <v-switch
-          v-model="faceScan"
-          color="primary"
-          hide-details
-          @change="toggleSwitch('face')"
-        />
-      </div>
-
-      <div class="d-flex align-center justify-space-between mb-3">
-        <span>Door Scan</span>
-        <v-switch
-          v-model="doorScan"
-          color="primary"
-          hide-details
-          @change="toggleSwitch('door')"
-        />
-      </div>
-
-      <!-- Divider -->
-      <v-divider class="my-3"></v-divider>
-
-      <!-- Scan Tolerance -->
-      <div class="d-flex align-center justify-space-between">
-        <div class="d-flex align-center">
-          <v-icon size="18" color="grey" class="mr-2">mdi-pound</v-icon>
-          <span class="text-body-2 text-medium-emphasis">
-            Scan Tolerance
-          </span>
-          <v-tooltip text="Edit Scan Tolerance" content-class="custom_tooltip">
-            <template #activator="{ props }">
-              <v-icon v-bind="props" @click="EditScanDialog" color="blue" size="x-small" class="ml-3">mdi-pencil</v-icon>
-            </template>
-          </v-tooltip>
-        </div>
-        <div class="font-weight-medium">
-          <v-select :items="itemsData" v-model="scanTolerance" label="Scan Tolerance" v-if="ScanEdit"></v-select>
-       <div v-else>
-         {{ scanTolerance || "N/A" }}
-       </div>
-        </div>
-      </div>
-
-    </v-card>
-  </v-col>
-
-</v-row>
-
         </v-card-text>
       </v-card>
     </v-container>
-     
 
     <!--Color Picker-->
     <v-dialog
@@ -434,7 +376,6 @@ export default {
 
   components: {
     SnackBar,
-    
   },
 
   data() {
@@ -444,7 +385,7 @@ export default {
       monthly_report_members_array: [],
       scanTolerance: "",
       color: "#191A1BFF",
-ScanEdit : false,
+
       height: 0,
       from_hr: 0,
       to_hr: 0,
@@ -461,6 +402,7 @@ ScanEdit : false,
       fixed: true,
       dailyTimeMenu: false,
       monthlyTimeMenu: false,
+
       SnackBarComponent: {},
       CommonVuetifyObj: {},
 
@@ -569,9 +511,7 @@ ScanEdit : false,
 
   async mounted() {
     this.CommonVuetifyObj = useDisplay();
-const data = this.$store.getters.GetOrgDetails;
 
-this.scanTolerance = data?.organization?.organization_scan_tolerance || "";
     await this.GetAllDailyReportMembersMethod();
     await this.GetAllListMonthlyReportMembersMethod();
     await this.get_all_org_users();
@@ -632,9 +572,6 @@ this.scanTolerance = data?.organization?.organization_scan_tolerance || "";
   },
 
   methods: {
-    EditScanDialog(){
-      this.ScanEdit = true;
-    },
     async validate_user() {
       const newData = this.tableData.map(
         ({ color_code, from_duration, to_duration }) => ({
@@ -692,7 +629,6 @@ this.scanTolerance = data?.organization?.organization_scan_tolerance || "";
         this.loading = false;
         var response = JSON.parse(result.data.edit_organization);
         if (response.Status == "SUCCESS") {
-          this.ScanEdit = false;
           this.SnackBarComponent = {
             SnackbarVmodel: true,
             SnackbarColor: "green",
@@ -807,24 +743,9 @@ this.scanTolerance = data?.organization?.organization_scan_tolerance || "";
 
 <style scoped>
 .combobox-fixed :deep(.v-field__input) {
+  max-height: 120px;
   overflow-y: auto;
   align-items: flex-start !important;
   padding-bottom: 8px;
 }
-.modern-card {
-  background: #ffffff;
-  border-radius: 16px;
-  transition: all 0.25s ease;
-}
-
-.modern-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 24px rgba(0,0,0,0.08);
-}
-.h-100 {
-  height: 100%;
-}
-:deep(.custom_tooltip) {
-  background: linear-gradient(135deg, #fdf2f8, #eef2ff);
-  color: #333;}
 </style>

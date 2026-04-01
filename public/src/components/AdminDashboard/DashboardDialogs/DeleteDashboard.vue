@@ -18,7 +18,7 @@
         v-if="
           dashboarditems.dashboard_type == 'CUSTOM' &&
           dashboarditems.dashboard_created_by !=
-            $store.getters.GetUserObj.user?.user_email_id
+            $store.getters.GetUserObj.user.user_email_id
         "
       >
         <v-card-text class="text-left mt-4 pb-8"

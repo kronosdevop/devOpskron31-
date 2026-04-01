@@ -24,12 +24,6 @@ const routes = [
     component: () => import("../views/QRLogin.vue"),
     meta: { requiresAuth: false },
   },
-  {
-    path:"/MicrosoftLogin",
-    name: "Microsoft",
-    component : () => import ("@/views/MicrosoftLogin.vue")
-  },
-
 
   {
     name: "ReportView",
@@ -139,18 +133,13 @@ const routes = [
         component: () => import("../views/FileInput.vue"),
         meta: { requiresAuth: true },
       },
-      {
-       name:"PowForms",
-       path:'PowForms',
-       component: () => import("@/components/PresenceApp/PopUps/PowForms.vue"),
-      },
 
-      // {
-      //   name: "AdminApps",
-      //   path: "AdminLevelApps",
-      //   component: () => import("../components/AdminLevelApps.vue"),
-      //   meta: { requiresAuth: true },
-      // },
+      {
+        name: "AdminApps",
+        path: "AdminLevelApps",
+        component: () => import("../components/AdminLevelApps.vue"),
+        meta: { requiresAuth: true },
+      },
 
       {
         name: "MemberManagement",
@@ -492,12 +481,6 @@ const routes = [
             "../components/SloatBooking/UserSlotsBooking/AllResourceList.vue"
           ),
         meta: { requiresAuth: true },
-      },
-      {
-        name:"ReportiesAttendance",
-        path:"ReportiesAttendance",
-        component: ()=> import("@/components/Teams/ReportiesAttend.vue")
-          
       },
       {
         name: "BroadcastChatview",
@@ -844,12 +827,6 @@ const routes = [
         component: () => import("@/components/VendorManagement/VendorSub.vue"),
         meta: { requiresAuth: true },
       },
-      {
-        name : "Inventory_latest",
-        path:"Inventory_latest",
-        component: () => import ("@/components/NewInventory/InventoryPage.vue"),
-        meta:{requiresAuth: true}
-      },
 
       {
         name: "Inventory",
@@ -928,13 +905,8 @@ const routes = [
       {
         name: "BulkUploadInventory",
         path: "BulkUploadInventory",
-        component: () => import("@/components/NewInventory/BulkUpload.vue"),
+        component: () => import("@/components/Inventorys/ItemsBulkUpload.vue"),
         meta: { requiresAuth: true },
-      },
-      {
-        name : "ProofofWork",
-        path:"ProofofWork",
-        component : () => import("@/components/PresenceApp/PopUps/Proofofwork.vue")
       },
       {
         name: "PresentReport",

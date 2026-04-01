@@ -23,7 +23,7 @@
         <!--Form Fields-->
         <v-row class="pa-5">
           <!--Category-->
-          <v-col cols="6" class="mt-n4">
+          <v-col cols="6">
             <div class="font-weight-bold">Category</div>
             <v-text-field
               v-model="category"
@@ -31,12 +31,11 @@
               density="compact"
               rounded="lg"
               prepend-inner-icon="mdi-view-list"
-              class="mt-2"
             />
           </v-col>
 
           <!--Question Interval-->
-          <v-col cols="6" class="mt-n4">
+          <v-col cols="6">
             <div class="font-weight-bold">Question Interval</div>
             <v-select
               v-model="interval"
@@ -44,7 +43,6 @@
               density="compact"
               rounded="lg"
               prepend-inner-icon="mdi-clock-outline"
-              class="mt-2"
               :items="intervalItems"
             />
           </v-col>
@@ -101,12 +99,14 @@
 <script>
 import { create_list_edit_delete_splay_categories } from "@/graphql/mutations";
 import { API, graphqlOperation } from "aws-amplify";
-import { uploadImgS3 } from "@/mixins/S3Upload.js";
+import { uploadToS3 } from "@/mixins/uploadToS3.js";
 
 import SnackBar from "../SnackBar.vue";
 
 export default {
   props: { DialogCreateCategory: Boolean },
+
+  mixins: [uploadToS3],
 
   components: { SnackBar },
 
@@ -144,12 +144,16 @@ export default {
   methods: {
     async CreateCategory() {
       this.loading = true;
+
       try {
         let uploadedImageUrl = null;
+
         if (this.selectedFile) {
           const key = `categories/${Date.now()}-${this.selectedFile.name}`;
-          uploadedImageUrl = await uploadImgS3(this.selectedFile, key);
+
+          uploadedImageUrl = await uploadToS3(this.selectedFile, key);
         }
+
         const result = await API.graphql(
           graphqlOperation(create_list_edit_delete_splay_categories, {
             input: {
@@ -161,9 +165,11 @@ export default {
             },
           }),
         );
+
         const resultObj = JSON.parse(
           result.data.create_list_edit_delete_splay_categories,
         );
+
         if (resultObj.Status === "SUCCESS") {
           this.SnackBarComponent = {
             SnackbarVmodel: true,
@@ -171,8 +177,11 @@ export default {
             SnackbarText: resultObj.Message,
           };
         }
+
         this.DialogCreateCategoryEmit(2);
       } catch (error) {
+        console.error(error);
+
         this.SnackBarComponent = {
           SnackbarVmodel: true,
           SnackbarColor: "red",

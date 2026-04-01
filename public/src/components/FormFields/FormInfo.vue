@@ -1055,7 +1055,7 @@ export default {
       await Auth.currentCredentials();
       const orgDetails = this.$store.getters.GetOrgDetails;
 
-      const userId = this.$store.getters.GetUserObj.user?.user_id;
+      const userId = this.$store.getters.GetUserObj.user.user_id;
 
       const key =
         "workflow" +
@@ -1122,7 +1122,7 @@ export default {
     //       "/" +
     //       deatils.organization.organization_id +
     //       "/" +
-    //       self.$store.getters.GetUserObj.user?.user_id +
+    //       self.$store.getters.GetUserObj.user.user_id +
     //       "/" +
     //       Date.now() +
     //       "/" +
@@ -1670,45 +1670,34 @@ export default {
       const appendedValues = {};
       const otherValues = {};
 
-Object.keys(obj).forEach((key) => {
-  if (key.endsWith("_text")) {
-    const originalKey = key.replace("_text", "");
-    const value = obj[key];
+      Object.keys(obj).forEach((key) => {
+        if (key.endsWith("_text")) {
+          const originalKey = key.slice(0, -5);
 
-    if (value) {
-      // ✅ If original key exists → map text to original key (for dropdowns)
-      if (obj.hasOwnProperty(originalKey)) {
-        appendedValues[originalKey] = value;
-      } 
-      // ✅ If no original key → keep _text (for sub_category)
-      else {
-        appendedValues[key] = value;
-      }
-    }
-  } else {
-    otherValues[key] = obj[key];
-  }
-});
+          if (obj.hasOwnProperty(originalKey)) {
+            const appendedTextValue = obj[key];
+            // console.log("appendedTextValue", appendedTextValue);
+            // console.log(appendedTextValue);
+            appendedValues[originalKey] = appendedTextValue;
+          }
+        } else {
+          otherValues[key] = obj[key];
+          // console.log("elsee", otherValues);
+        }
+      });
       const concatenatedObject = Object.assign({}, otherValues, appendedValues);
 
-     for (var i = 0; i < array.length; i++) {
-  const templateKey = array[i].key.toLowerCase();
-
-  const matchedKey = Object.keys(concatenatedObject).find(
-    (k) => k.toLowerCase() === templateKey
-  );
-
-  if (matchedKey) {
-    array[i].respectiveValue = concatenatedObject[matchedKey];
-  }
-}
-
+      for (var i = 0; i < array.length; i++) {
+        for (let data in concatenatedObject) {
+          if (array[i].key == `${data}`) {
+            array[i].respectiveValue = `${concatenatedObject[data]}`;
+          }
+        }
+      }
       const replacedArray = array.map((obj) => ({
         ...obj,
-      respectiveValue:
-  obj.respectiveValue && obj.respectiveValue !== "null"
-    ? obj.respectiveValue
-    : "N/A",
+        respectiveValue:
+          obj.respectiveValue !== undefined ? obj.respectiveValue : "N/A",
       }));
       const details = this.$store.getters.GetOrgDetails;
       const updatedData = await Promise.all(

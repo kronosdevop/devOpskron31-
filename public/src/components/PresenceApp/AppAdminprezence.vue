@@ -255,13 +255,6 @@ export default {
           route: "/home/DataCorrection",
           color: "#FF6B6B",
         },
-             {
-          label: "Proof of Work",
-          icon:"mdi-shield-check",
-          subtitle :"Track, verify, and manage all work activities efficiently",
-          route :"/home/ProofofWork",
-          color:"#F8C304"
-        },
         {
           label: "Reports",
           icon: "mdi-chart-box",
@@ -270,7 +263,6 @@ export default {
           route: "/home/AllReport",
           color: "#4ECDC4",
         },
-   
         
         // {
         //   label: "Visitor Logs",

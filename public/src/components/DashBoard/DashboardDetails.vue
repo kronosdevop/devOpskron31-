@@ -120,7 +120,7 @@ export default {
     isUserDashboardCreator() {
       return (
         this.dashboardDetails.dashboard_created_by ===
-        this.$store.getters.GetUserObj.user?.user_email_id
+        this.$store.getters.GetUserObj.user.user_email_id
       );
     },
     visibleTabs() {
@@ -141,7 +141,7 @@ export default {
           condition:
             this.dashboardDetails.dashboard_publish_type !== "FEED" &&
             this.dashboardDetails.dashboard_created_by ===
-              this.$store.getters.GetUserObj.user?.user_email_id,
+              this.$store.getters.GetUserObj.user.user_email_id,
         },
         { name: "API", component: "DashboardApi", condition: true },
 

@@ -22,7 +22,7 @@
             </div></v-toolbar-title
           >
           <v-spacer />
-          <v-icon class="icon-class mr-5"  @click="close_dialog()">mdi-close</v-icon>
+          <v-icon class="icon-class" @click="close_dialog()">mdi-close</v-icon>
         </v-toolbar>
         <v-toolbar
           v-if="forwardAction == true"
@@ -45,7 +45,7 @@
           >
             mdi-download</v-icon
           > -->
-          <v-icon class="icon-class mr-6" @click="back_data()"
+          <v-icon class="icon-class" @click="back_data()"
             >mdi-arrow-left-bold</v-icon
           >
         </v-toolbar>
@@ -433,7 +433,6 @@
                   <v-row no-gutters>
                     <v-col cols="12">
                       <v-autocomplete
-                        :key="forwardAction"
                         label="Select User"
                         :rules="[(v) => !!v || 'Required']"
                         item-title="full_user_name"
@@ -1004,7 +1003,7 @@ export default {
       this.uploadload = true;
       const orgDetails = this.$store.getters.GetOrgDetails;
 
-      const userId = this.$store.getters.GetUserObj.user?.user_id;
+      const userId = this.$store.getters.GetUserObj.user.user_id;
 
       const Key = [
         "workflow",
@@ -1087,7 +1086,7 @@ export default {
     //       "/" +
     //       deatils.organization.organization_id +
     //       "/" +
-    //       self.$store.getters.GetUserObj.user?.user_id +
+    //       self.$store.getters.GetUserObj.user.user_id +
     //       "/" +
     //       Date.now() +
     //       "/" +
@@ -1412,14 +1411,11 @@ export default {
       this.forwardUser = "";
       this.forwardAction = false;
       this.getimage = false;
-        this.forwardList = [];
-
     },
 
     fetch_master_lists() {
       var data = this.$store.getters.GetUserObj;
-      this.forwardList = []
-            this.orgUsers.forEach((element) => {
+      this.orgUsers.forEach((element) => {
         if (
           element.user_type != "CHATBOT" &&
           element.user_status != "DEACTIVE"
@@ -1657,7 +1653,6 @@ export default {
     },
 
     async forward_data() {
-    
       this.forwardLoading = true;
       this.$store.commit("Setnamesearch", this.search);
       await this.get_all_org_users();

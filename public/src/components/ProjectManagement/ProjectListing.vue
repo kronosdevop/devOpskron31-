@@ -36,12 +36,10 @@
           variant="outlined"
           density="compact"
           hide-details
-          class="search-field mt-n1"
+          class="search-field"
           clearable
-          style="min-width: 280px; max-width: 280px"
+          style="min-width: 280px; max-width: 320px"
         />
-
-        <!--Status Tracker-->
         <v-select
           density="compact"
           variant="outlined"
@@ -52,11 +50,11 @@
             { title: 'COMPLETED', value: 'COMPLETED' },
             { title: 'SUSPENDED', value: 'SUSPENDED' },
           ]"
+          label="Filter By Status"
           @update:model-value="filterProjects(projectStatusTrack)"
           class="filter-select"
           style="min-width: 200px; max-width: 250px; margin-top: 15px"
         />
-
         <v-switch
           v-model="toggle_exclusive"
           :label="toggle_exclusive ? 'Grid View' : 'List View'"
@@ -65,63 +63,10 @@
           hide-details
           density="compact"
         />
-
-        <v-menu v-model="actionsMenuOpen" :close-on-content-click="false">
-          <template #activator="{ props }">
-            <v-btn
-              v-bind="props"
-              class="mr-4"
-              variant="flat"
-              color="primary"
-              elevation="3"
-            >
-              Actions
-            </v-btn>
-          </template>
-
-          <v-list density="compact" nav class="action-menu">
-            <!-- Export -->
-            <v-tooltip
-              text="Export all projects"
-              location="left"
-              content-class="tooltip"
-            >
-              <template #activator="{ props }">
-                <v-list-item
-                  @click="export_project('ALL')"
-                  :disabled="exportLoading"
-                >
-                  <template #prepend>
-                    <v-progress-circular
-                      v-if="exportLoading"
-                      indeterminate
-                      size="16"
-                      width="2"
-                      color="primary"
-                      class="mr-10"
-                    />
-                    <v-icon v-else color="primary" size="18">
-                      mdi-export
-                    </v-icon>
-                  </template>
-
-                  <v-list-item-title>
-                    {{ exportLoading ? "Exporting…" : "Export" }}
-                  </v-list-item-title>
-                </v-list-item>
-              </template>
-            </v-tooltip>
-
-            <v-divider />
-
-            <v-list-item @click="create_project">
-              <template #prepend>
-                <v-icon color="primary" size="18">mdi-plus</v-icon>
-              </template>
-              <v-list-item-title>Create Project</v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-menu>
+        <v-btn @click="create_project" class="action-btn" size="small">
+          <v-icon>mdi-plus</v-icon>
+          <span>Create Project</span>
+        </v-btn>
       </div>
     </v-app-bar>
 
@@ -198,7 +143,7 @@
                         class="ml-2"
                         v-show="
                           item.project_created_by ==
-                          $store.getters.GetUserObj.user?.user_email_id
+                          $store.getters.GetUserObj.user.user_email_id
                         "
                       >
                         mdi-account
@@ -337,11 +282,7 @@
                 <span class="caption">
                   {{
                     item.project_type == "EXTERNAL"
-                      ? this.masterCustomers.find(
-                          (customer) =>
-                            customer.customer_email_id ===
-                            item.internal_project_sponser,
-                        )?.legal_name || item.internal_project_sponser
+                      ? this.masterCustomers.find(customer => customer.customer_email_id === item.internal_project_sponser)?.legal_name || item.internal_project_sponser
                       : "-"
                   }}
                 </span>
@@ -361,66 +302,42 @@
 
               <!-- Actions -->
               <template v-slot:[`item.actions`]="{ item }">
-                <v-menu
-                  location="bottom end"
-                  v-model="rowExportMenu[item.project_id]"
-                  :close-on-content-click="false"
-                >
-                  <template #activator="{ props }">
-                    <v-btn v-bind="props" icon size="small" variant="text">
-                      <v-icon color="primary">mdi-dots-vertical</v-icon>
-                    </v-btn>
-                  </template>
-
-                  <v-list density="compact" nav>
-                    <!-- Update Status -->
-                    <v-list-item @click="update_project_status(item)">
-                      <template #prepend>
-                        <v-icon color="primary">mdi-pencil-outline</v-icon>
-                      </template>
-                      <v-list-item-title>Update Status</v-list-item-title>
-                    </v-list-item>
-
-                    <!-- Transfer Owner -->
-                    <v-list-item
-                      v-if="
-                        item.project_created_by ===
-                          $store.getters.GetUserObj.user?.user_email_id &&
-                        item.project_progress === 'LIVE'
-                      "
-                      @click="update_owner(item)"
-                    >
-                      <template #prepend>
-                        <v-icon color="primary">mdi-swap-horizontal</v-icon>
-                      </template>
-                      <v-list-item-title>Transfer Owner</v-list-item-title>
-                    </v-list-item>
-
-                    <v-divider />
-
-                    <!-- Export -->
-                    <v-list-item
-                      @click="export_project(item)"
-                      :disabled="exportLoading"
-                    >
-                      <template #prepend>
-                        <v-progress-circular
-                          v-if="exportLoading"
-                          indeterminate
-                          size="16"
-                          width="2"
-                          color="primary"
-                          class="mr-10"
-                        />
-                        <v-icon v-else color="primary"> mdi-download </v-icon>
-                      </template>
-
-                      <v-list-item-title>
-                        {{ exportLoading ? "Exporting…" : "Export Report" }}
-                      </v-list-item-title>
-                    </v-list-item>
-                  </v-list>
-                </v-menu>
+                <div class="d-flex align-center">
+                  <v-tooltip location="top">
+                    <template v-slot:activator="{ props }">
+                      <v-icon
+                        v-bind="props"
+                        size="small"
+                        color="primary"
+                        class="mr-2"
+                        @click.stop="update_project_status(item)"
+                      >
+                        mdi-pencil-outline
+                      </v-icon>
+                    </template>
+                    <span>Update Status</span>
+                  </v-tooltip>
+                  <v-tooltip
+                    location="top"
+                    v-if="
+                      item.project_created_by ==
+                        $store.getters.GetUserObj.user.user_email_id &&
+                      item.project_progress === 'LIVE'
+                    "
+                  >
+                    <template v-slot:activator="{ props }">
+                      <v-icon
+                        v-bind="props"
+                        size="small"
+                        color="orange"
+                        @click.stop="update_owner(item)"
+                      >
+                        mdi-swap-horizontal
+                      </v-icon>
+                    </template>
+                    <span>Transfer Owner</span>
+                  </v-tooltip>
+                </div>
               </template>
             </v-data-table>
 
@@ -545,7 +462,7 @@
                           @click="update_owner(project)"
                           v-if="
                             project.project_created_by ==
-                            $store.getters.GetUserObj.user?.user_email_id
+                            $store.getters.GetUserObj.user.user_email_id
                           "
                           prepend-icon="mdi-account-switch-outline"
                           class="py-2"
@@ -805,14 +722,11 @@ import SnackBar from "@/components/SnackBar.vue";
 import { formatdisplayDate } from "@/JsonFiles/DateFormate.js";
 import { get_all_org_users } from "@/mixins/GetUsersDropdown.js";
 import { list_all_user_projects } from "@/graphql/queries.js";
-import { generate_multiple_projects_reports } from "@/graphql/mutations.js";
 import { API, graphqlOperation } from "aws-amplify";
 import ViewProjectMember from "./ProjectDialogues/ViewProjectMember.vue";
 import html2canvas from "html2canvas";
 import CreateExternalTicketDialog from "../Tickets/CreateExternalTicketDialog.vue";
-const FileSaver = require("file-saver");
-import * as XLSX from "xlsx";
-import axios from "axios";
+
 export default {
   components: {
     CreateProjectNew,
@@ -828,9 +742,6 @@ export default {
   data() {
     return {
       fixed: true,
-      exportLoading: false,
-      actionsMenuOpen: false,
-      rowExportMenu: {},
       tableLoading: false,
       taskPercentage: 0,
       tableData: [],
@@ -1000,7 +911,7 @@ export default {
             ? String(project.project_completion_percentage)
                 .toLowerCase()
                 .includes(searchTerm)
-            : false),
+            : false)
       );
     },
     totalItems() {
@@ -1054,95 +965,6 @@ export default {
   },
 
   methods: {
-    async export_project(payload) {
-      if (this.exportLoading) return;
-
-      this.exportLoading = true;
-
-      try {
-        let project_ids = [];
-
-        if (payload === "ALL") {
-          project_ids = ["ALL"];
-        } else if (payload?.project_id) {
-          project_ids = [payload.project_id];
-        }
-
-        if (!project_ids.length) {
-          this.error_msg("No project selected for export");
-          return;
-        }
-
-        const result = await API.graphql(
-          graphqlOperation(generate_multiple_projects_reports, {
-            input: { project_ids },
-          }),
-        );
-
-        const response = JSON.parse(
-          result.data.generate_multiple_projects_reports,
-        );
-
-        if (response.Status === "SUCCESS" && response.download_url) {
-          await this.download_items(response.download_url, response.FileName);
-
-          // ✅ CLOSE row menu
-          if (payload?.project_id) {
-            this.rowExportMenu[payload.project_id] = false;
-          }
-
-          this.SnackBarComponent = {
-            SnackbarVmodel: true,
-            SnackbarColor: "green",
-            SnackbarText:
-              payload === "ALL"
-                ? "All project reports exported successfully"
-                : "Project report exported successfully",
-            timeout: 4000,
-            Top: true,
-          };
-        } else {
-          throw new Error(response.Message || "Export failed");
-        }
-      } catch (error) {
-        this.SnackBarComponent = {
-          SnackbarVmodel: true,
-          SnackbarColor: "red",
-          SnackbarText: error.message || "Export failed",
-          timeout: 5000,
-          Top: true,
-        };
-      } finally {
-        this.exportLoading = false;
-      }
-    },
-
-    async download_items(url, fileNameFromApi) {
-      let teamId =
-        this.$store.getters.GetUserObj?.organization?.organization_team_id ||
-        "";
-
-      let fileName = fileNameFromApi
-        ? `${teamId}_${fileNameFromApi}`
-        : `${teamId}_Project_Report.xlsx`;
-
-      try {
-        const response = await axios({
-          url,
-          method: "GET",
-          responseType: "blob",
-        });
-
-        const blob = new Blob([response.data], {
-          type: response.headers["content-type"] || "application/octet-stream",
-        });
-
-        FileSaver.saveAs(blob, fileName);
-      } catch (error) {
-        console.error("Download failed:", error);
-      }
-    },
-
     async TakeScreenshot() {
       const target = document.body;
       const canvas = await html2canvas(target, {
@@ -1164,10 +986,10 @@ export default {
     userRole(item) {
       let useremail = item.project_visible_members.find(
         (user) =>
-          user.email == this.$store.getters.GetUserObj.user?.user_email_id,
+          user.email == this.$store.getters.GetUserObj.user.user_email_id
       );
 
-      return useremail?.role;
+      return useremail.role;
     },
     update_owner(item) {
       this.componentCheck = 4;
@@ -1335,13 +1157,12 @@ export default {
         }
 
         let result = await API.graphql(
-          graphqlOperation(list_all_user_projects, { input }),
+          graphqlOperation(list_all_user_projects, { input })
         );
         this.overlay = false;
         this.tableLoading = false;
         this.tableData = [];
         var response = JSON.parse(result.data.list_all_user_projects);
-
         if (response.Status == "ERROR") {
           this.overlay = false;
           this.tableLoading = false;
@@ -1350,6 +1171,7 @@ export default {
           this.overlay = false;
           this.tableLoading = false;
           this.tableData = response.data;
+          // console.log(this.tableData);
         }
       } catch (error) {
         this.overlay = false;
@@ -1685,35 +1507,5 @@ export default {
   height: 100% !important;
   object-fit: cover !important;
   object-position: center !important;
-}
-::v-deep(.tooltip) {
-  background: linear-gradient(135deg, #0f569a, #da4c77) !important;
-  color: white !important;
-  border-radius: 10px !important;
-  font-weight: 500;
-}
-.action-menu {
-  min-width: 200px;
-}
-
-.action-item {
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-
-.action-item:hover {
-  background-color: rgba(219, 76, 119, 0.08);
-}
-
-.action-title {
-  font-weight: 500;
-  font-size: 14px;
-}
-
-.action-icon-wrapper {
-  width: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 </style>

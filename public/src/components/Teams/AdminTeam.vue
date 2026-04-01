@@ -49,6 +49,27 @@
           />
         </div>
 
+        <!--Add Members Button-->
+        <v-btn
+          v-if="toggle_exclusive == 'teams'"
+          class="action-btn add-btn"
+          @click="add_members()"
+        >
+          <v-icon>mdi-plus</v-icon>
+          <span>Add</span>
+        </v-btn>
+
+        <!--Export Members Button-->
+        <v-btn
+          v-if="toggle_exclusive == 'teams'"
+          class="action-btn export-btn"
+          :loading="exportload"
+          @click="export_members()"
+        >
+          <v-icon>mdi-download</v-icon>
+          <span>Export</span>
+        </v-btn>
+
         <!--Filter Members Button-->
         <v-btn
           v-if="toggle_exclusive == 'teams'"
@@ -70,17 +91,12 @@
         </v-btn>
 
         <!--Actions Button-->
-        <v-menu
-          v-model="actionsMenuOpen"
-          :close-on-content-click="false"
-          offset-y
-          class="actions-menu"
-        >
+        <v-menu offset-y class="actions-menu">
           <template #activator="{ props }">
             <v-btn
               v-if="toggle_exclusive === 'teams'"
               v-bind="props"
-              class="action-btn mr-6"
+              class="action-btn"
               size="small"
             >
               <v-icon>mdi-dots-vertical</v-icon>
@@ -89,12 +105,6 @@
           </template>
 
           <v-list density="compact" class="actions-list">
-            <v-list-item @click="add_members()">
-              <template #prepend>
-                <v-icon color="primary">mdi-plus</v-icon>
-              </template>
-              <v-list-item-title>Add Members</v-list-item-title>
-            </v-list-item>
             <v-list-item @click="handleDownloadTemplate">
               <template #prepend>
                 <v-icon color="primary">mdi-download</v-icon>
@@ -104,7 +114,7 @@
 
             <v-divider class="my-1" />
 
-            <v-list-item class="mb-1">
+            <v-list-item>
               <template #prepend>
                 <v-icon color="primary">mdi-import</v-icon>
               </template>
@@ -112,27 +122,6 @@
                 :on-success="handleSuccess"
                 :before-upload="beforeUpload"
               />
-            </v-list-item>
-            <v-list-item
-              :disabled="exportload"
-              @click="!exportload && export_members()"
-            >
-              <template #prepend>
-                <!-- Loader replaces icon -->
-                <v-progress-circular
-                  v-if="exportload"
-                  indeterminate
-                  size="18"
-                  width="2"
-                  color="primary"
-                  class="export-loader"
-                />
-                <v-icon v-else color="primary"> mdi-download </v-icon>
-              </template>
-
-              <v-list-item-title>
-                {{ exportload ? "Exporting…" : "Export Members" }}
-              </v-list-item-title>
             </v-list-item>
           </v-list>
         </v-menu>
@@ -156,14 +145,9 @@
           <v-tab value="team_visibility" class="tab-btn">
             Team Visibility
           </v-tab>
-          <v-tab
-            value="reporties_list"
-            class="tab-btn"
-            v-if="$store.getters.GetUserObj?.user?.is_reporting_manager"
-            v-model="toggle_exclusive"
-          >
-            Reportees
-          </v-tab>
+           <!-- <v-tab value="reporties_list" class="tab-btn">
+            Reporties
+          </v-tab> -->
         </v-tabs>
       </template></v-toolbar
     >
@@ -293,7 +277,6 @@ export default {
   // Data
   data() {
     return {
-      fullTableData: [],
       // Array properties
       headers: [
         { text: "Profile", value: "user_profile_pic_url", sortable: false },
@@ -335,7 +318,6 @@ export default {
         itemsPerPage: 20,
         page: 1,
       },
-      actionsMenuOpen: false,
 
       // String properties
       search: "",
@@ -379,9 +361,6 @@ export default {
     this.fetch_admin_apps();
     this.get_my_team();
     this.height = window.innerHeight - 290;
-    if (this.$route.query.tab) {
-      this.toggle_exclusive = this.$route.query.tab;
-    }
   },
 
   mounted() {
@@ -390,15 +369,18 @@ export default {
 
   // Watchers
   watch: {
-    "$store.state.attendenceBack"(val) {
-      if (val) {
-        this.toggle_exclusive = "reporties";
-      }
-    },
     toggle_exclusive() {
       this.addmember = false;
     },
-
+    search() {
+      if (this.search != "") {
+        if (this.search.length >= 3) {
+          this.get_my_team();
+        }
+      } else {
+        this.get_my_team();
+      }
+    },
   },
 
   // Computed properties
@@ -423,26 +405,12 @@ export default {
     handleActiveFiltersCount(count) {
       this.activeFiltersCount = count;
     },
-handleSearchChange(value) {
-  this.searchValue = value;
 
-  if (!value) {
-    this.tableData = this.fullTableData;
-    return;
-  }
-
-  const search = value.toLowerCase();
-
-  this.tableData = this.fullTableData.filter((item) => {
-    return (
-      item.full_user_name?.toLowerCase().includes(search) ||
-      item.member_id?.toLowerCase().includes(search) ||
-      item.user_contact_number?.toLowerCase().includes(search) ||
-      item.department?.toLowerCase().includes(search) ||
-      item.location?.toLowerCase().includes(search)
-    );
-  });
-},
+    handleSearchChange(value) {
+      // console.log('Search changed:', value);
+      this.searchValue = value;
+      // The child component will handle the search through the prop watcher
+    },
 
     handleFilterClick() {
       // console.log('handleFilterClick called');
@@ -473,7 +441,7 @@ handleSearchChange(value) {
               organization_id: data.organization.organization_id,
               user_email_id: data.user.user_email_id,
               limit: this.search != "" ? 1000 : 100,
-              name_search: "",
+              name_search: this.search,
               nextToken: this.search != "" ? null : this.next_token,
             },
           }),
@@ -495,8 +463,6 @@ handleSearchChange(value) {
           }
 
           let array = this.tableData.concat(dataArray);
-          this.fullTableData = array;
-
           this.tableData = array;
           const uniqueArrayOfObjects = this.tableData.filter(
             (obj, index, self) => {
@@ -533,44 +499,55 @@ handleSearchChange(value) {
 
     // Export and download methods
     async export_members() {
-      if (this.exportload) return;
-
+      this.addmember = false;
       this.exportload = true;
 
+      var data = this.$store.getters.GetUserObj;
       try {
-        const data = this.$store.getters.GetUserObj;
-
-        const result = await API.graphql(
+        let result = await API.graphql(
           graphqlOperation(export_users, {
             input: {
               organization_id: data.organization.organization_id,
               user_status: this.defaultStatus,
-              department_name: this.groupName || undefined,
-              location_name: this.locationName || undefined,
+              department_name:
+                this.groupName == "" ? undefined : this.groupName,
+              location_name:
+                this.locationName == "" ? undefined : this.locationName,
             },
           }),
         );
 
-        const response = JSON.parse(result.data.export_users);
+        var response = JSON.parse(result.data.export_users);
 
-        if (response.Status === "SUCCESS") {
-          await this.download_invoice(response.url);
-
-          // ✅ Close menu only after export completes
-          this.actionsMenuOpen = false;
+        if (response.Status == "SUCCESS") {
+          this.download_invoice(response.url);
+          this.groupName = "";
+          this.locationName = "";
+        } else {
+          this.exportload = false;
+          this.SnackBarComponent = {
+            SnackbarVmodel: true,
+            SnackbarColor: "red",
+            SnackbarText: response.Message,
+            timeout: 5000,
+            Top: true,
+          };
+          this.groupName = "";
+          this.locationName = "";
         }
       } catch (error) {
         this.SnackBarComponent = {
           SnackbarVmodel: true,
           SnackbarColor: "red",
-          SnackbarText: "Export failed",
+          SnackbarText: error.errors[0].message,
           timeout: 5000,
           Top: true,
         };
-      } finally {
+
         this.exportload = false;
       }
     },
+
     async download_invoice(url) {
       this.exportload = false;
       let firstName =
@@ -903,22 +880,5 @@ handleSearchChange(value) {
 
 .actions-list :deep(.v-divider) {
   border-color: #e0e0e0 !important;
-}
-.spin-icon {
-  animation: spin 1s linear infinite;
-  transform-origin: center;
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-.export-loader,
-.export-icon {
-  margin-right: 50px;
 }
 </style>

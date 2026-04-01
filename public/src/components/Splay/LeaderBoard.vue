@@ -1,10 +1,9 @@
 <template>
   <v-card-text>
-    <!--Data Table-->
     <v-data-table
       :height="windowHeight"
       :headers="TableHeaders"
-      :items="paginatedItems"
+      :items="ListLeaderBoard"
       :loading="loading"
       class="modern-data-table mt-n2"
       hide-default-footer
@@ -48,24 +47,6 @@
           />
         </div>
       </template>
-
-      <!--Users-->
-      <template #[`item.user_email_id`]="{ item }">
-        <div class="d-flex align-center">
-          <v-avatar>
-            <v-img :src="item.profile_pic" />
-          </v-avatar>
-
-          <div class="ml-3">
-            <div class="font-weight-medium">
-              {{ item.full_name }}
-            </div>
-            <div class="text-caption" style="color: #888">
-              {{ item.user_email_id }}
-            </div>
-          </div>
-        </div>
-      </template>
     </v-data-table>
 
     <!--Pagination-->
@@ -74,7 +55,7 @@
         {{
           totalItems === 0
             ? "No Results"
-            : `Showing ${paginatedItems.length} of ${totalItems} members`
+            : `Showing ${paginatedItems.length} of ${totalItems} created tickets`
         }}
       </div>
       <div class="pagination-controls">
@@ -123,8 +104,6 @@
 <script>
 import { GetLeaderBoard } from "@/mixins/GetLeaderBoard";
 import { Vue3Lottie } from "vue3-lottie";
-import { my_team_user_list } from "@/graphql/queries.js";
-import { API, graphqlOperation } from "aws-amplify";
 
 import GoldBadge from "@/assets/GoldBadge.json";
 import secondPosition from "@/assets/secondPosition.json";
@@ -132,7 +111,7 @@ import thirdPosition from "@/assets/thirdPosition.json";
 import confetti from "canvas-confetti";
 
 export default {
-  props: { status: String, search: String },
+  props: { status: String },
 
   mixins: [GetLeaderBoard],
 
@@ -147,8 +126,6 @@ export default {
     secondPosition,
     thirdPosition,
 
-    // ListLeaderBoard: [],
-    TeamsList: [],
     TableHeaders: [
       { title: "Rank", value: "rank" },
       { title: "Email", value: "user_email_id" },
@@ -161,40 +138,32 @@ export default {
 
   watch: {
     status(val) {
-      if (val) this.GetLeaderBoardMethod();
-    },
-    search() {
-      this.currentPage = 1;
+      if (val) {
+        this.GetLeaderBoardMethod();
+      }
     },
   },
 
   computed: {
-    searchItems() {
-      const text = (this.search || "").toLowerCase();
-      return this.mergedLeaderboard.filter((item) =>
-        item.user_email_id?.toLowerCase().includes(text),
-      );
+    totalItems() {
+      return this.ListLeaderBoard.length;
     },
     paginatedItems() {
-      const filtered = this.searchItems;
-
       const start = (this.currentPage - 1) * this.itemsPerPage;
       const end = start + this.itemsPerPage;
-
-      return filtered.slice(start, end);
-    },
-    totalItems() {
-      return this.searchItems.length;
+      return this.ListLeaderBoard.slice(start, end);
     },
     pageCount() {
-      return Math.ceil(this.searchItems.length / this.itemsPerPage);
+      return Math.ceil(this.ListLeaderBoard.length / this.itemsPerPage);
     },
     visiblePages() {
       const totalPages = this.pageCount;
       const current = this.currentPage;
       const delta = 2;
+
       let start = Math.max(1, current - delta);
       let end = Math.min(totalPages, current + delta);
+
       if (end - start < 4) {
         if (start === 1) {
           end = Math.min(totalPages, start + 4);
@@ -208,55 +177,15 @@ export default {
       }
       return pages;
     },
-    mergedLeaderboard() {
-      const teamMap = Object.fromEntries(
-        (this.TeamsList || []).map((user) => [
-          user.user_email_id,
-          {
-            profile_pic: user.user_profile_pic_url || null,
-            full_name: user.full_user_name || user.first_name || "",
-          },
-        ]),
-      );
-      return (this.ListLeaderBoard || []).map((item) => ({
-        ...item,
-        profile_pic: teamMap[item.user_email_id]?.profile_pic || null,
-        full_name: teamMap[item.user_email_id]?.full_name || item.user_email_id,
-      }));
-    },
   },
 
   async mounted() {
     this.windowHeight = window.innerHeight - 240;
-
     await this.GetLeaderBoardMethod();
-    await this.GetTeams();
-
     this.launchConfetti();
   },
 
   methods: {
-    async GetTeams() {
-      try {
-        const data = this.$store.getters.GetUserObj;
-        const result = await API.graphql(
-          graphqlOperation(my_team_user_list, {
-            input: {
-              name_search: "",
-              organization_id: data.organization.organization_id,
-              user_email_id: data.user.user_email_id,
-              nextToken: null,
-              limit: 1000,
-            },
-          }),
-        );
-        const resultObj = JSON.parse(result.data.my_team_user_list);
-        this.TeamsList =
-          resultObj.Status === "SUCCESS" ? resultObj.user || [] : [];
-      } catch (error) {
-        this.TeamsList = [];
-      }
-    },
     ConvertMs(ms) {
       if (!ms && ms !== 0) return "-";
       return (ms / 1000).toFixed(2) + " s";
@@ -264,12 +193,19 @@ export default {
     launchConfetti() {
       const duration = 2 * 1000;
       const end = Date.now() + duration;
+
       const frame = () => {
-        confetti({ particleCount: 6, spread: 70, origin: { y: 0.1 } });
+        confetti({
+          particleCount: 6,
+          spread: 70,
+          origin: { y: 0.1 },
+        });
+
         if (Date.now() < end) {
           requestAnimationFrame(frame);
         }
       };
+
       frame();
     },
   },

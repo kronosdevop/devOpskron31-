@@ -477,8 +477,8 @@ export default {
       return new Intl.DateTimeFormat("en-US", options).format(date);
     },
     onuserinput(value) {
-      if (!value.includes(this.$store.getters.GetUserObj.user?.user_id)) {
-        value.push(this.$store.getters.GetUserObj.user?.user_id);
+      if (!value.includes(this.$store.getters.GetUserObj.user.user_id)) {
+        value.push(this.$store.getters.GetUserObj.user.user_id);
       }
       this.userDetails = value;
       this.search = "";
@@ -491,7 +491,7 @@ export default {
       this.orgUsers.forEach((element) => {
         if (
           element.user_status == "ACTIVE" &&
-          this.$store.getters.GetUserObj.user?.user_id != element.user_id
+          this.$store.getters.GetUserObj.user.user_id != element.user_id
         ) {
           this.visibilityUsers.push({
             full_user_name: element.full_user_name,
@@ -518,7 +518,7 @@ export default {
           }
           // }
         });
-        this.userDetails.push(this.$store.getters.GetUserObj.user?.user_id);
+        this.userDetails.push(this.$store.getters.GetUserObj.user.user_id);
       }
     },
 
@@ -547,7 +547,7 @@ export default {
           tenant_id: this.tenant_id,
         };
         // if (this.dashboardVisbility == "RESTRICTED_MEMBERS") {
-        //   this.userDetails.push(this.$store.getters.GetUserObj.user?.user_id);
+        //   this.userDetails.push(this.$store.getters.GetUserObj.user.user_id);
         // }
         (this.visibilityobject = {
           visible_type: this.dashboardVisbility,

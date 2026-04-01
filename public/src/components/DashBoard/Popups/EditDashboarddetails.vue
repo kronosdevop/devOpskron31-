@@ -460,8 +460,8 @@ export default {
       return new Intl.DateTimeFormat("en-US", options).format(date);
     },
     onuserinput(value) {
-      if (!value.includes(this.$store.getters.GetUserObj.user?.user_id)) {
-        value.push(this.$store.getters.GetUserObj.user?.user_id);
+      if (!value.includes(this.$store.getters.GetUserObj.user.user_id)) {
+        value.push(this.$store.getters.GetUserObj.user.user_id);
       }
       this.userDetails = value;
       this.search = "";
@@ -482,7 +482,7 @@ export default {
       this.userDetails =
         this.detailsdashboard.dashboard_visibility.visible_members;
       // this.userDetails = this.userDetails.filter(
-      //   (id) => id !== this.$store.getters.GetUserObj.user?.user_id
+      //   (id) => id !== this.$store.getters.GetUserObj.user.user_id
       // );
       if (this.detailsdashboard != undefined) {
         const acc = this.detailsdashboard.dashboard_account_details || {};
@@ -509,7 +509,7 @@ export default {
           }
           // }
         });
-        this.userDetails.push(this.$store.getters.GetUserObj.user?.user_id);
+        this.userDetails.push(this.$store.getters.GetUserObj.user.user_id);
       }
     },
     close_dialog() {
@@ -519,7 +519,7 @@ export default {
     const {valid} = await this.$refs.form.validate();
       if (valid) {
         // if (this.dashboardVisbility == "RESTRICTED_MEMBERS") {
-        //   const userId = this.$store.getters.GetUserObj.user?.user_id;
+        //   const userId = this.$store.getters.GetUserObj.user.user_id;
         //   if (!this.userDetails.includes(userId)) {
         //     this.userDetails.push(userId);
         //   }

@@ -125,7 +125,7 @@
                           class="ml-2"
                           v-show="
                             item.project_created_by ==
-                            $store.getters.GetUserObj.user?.user_email_id
+                            $store.getters.GetUserObj.user.user_email_id
                           "
                         >
                           mdi-account
@@ -292,7 +292,7 @@
                       location="top"
                       v-if="
                         item.project_created_by ==
-                          $store.getters.GetUserObj.user?.user_email_id &&
+                          $store.getters.GetUserObj.user.user_email_id &&
                         item.project_progress === 'LIVE'
                       "
                     >
@@ -432,7 +432,7 @@
                           @click="update_owner(project)"
                           v-if="
                             project.project_created_by ==
-                            $store.getters.GetUserObj.user?.user_email_id
+                            $store.getters.GetUserObj.user.user_email_id
                           "
                           prepend-icon="mdi-account-switch-outline"
                           class="py-2"
@@ -903,7 +903,7 @@ export default {
     userRole(item) {
       let useremail = item.project_visible_members.find(
         (user) =>
-          user.email == this.$store.getters.GetUserObj.user?.user_email_id
+          user.email == this.$store.getters.GetUserObj.user.user_email_id
       );
 
       return useremail.role;

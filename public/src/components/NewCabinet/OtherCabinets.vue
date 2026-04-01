@@ -221,13 +221,13 @@ export default {
             if (
               element.folder_visibility.visible_type == "RESTRICTED_MEMBERS" &&
               element.folder_created_by_email !=
-                this.$store.getters.GetUserObj.user?.user_email_id
+                this.$store.getters.GetUserObj.user.user_email_id
             ) {
               arraynew.push(element);
               this.tableData = arraynew.filter(
                 (item) =>
                   !item.folder_visibility.visible_members.includes(
-                    this.$store.getters.GetUserObj.user?.user_id
+                    this.$store.getters.GetUserObj.user.user_id
                   )
               );
             }

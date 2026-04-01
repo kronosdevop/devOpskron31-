@@ -1,6 +1,11 @@
 <template>
   <v-card-text class="pa-0">
     <!--Component Imports-->
+    <CreateQuestion
+      :DialogCreateQuestion="DialogCreateQuestion"
+      :StoreObj="CategoryObj"
+      @clicked="DialogCreateQuestionEmit"
+    />
     <EditQuestion
       :DialogEditQuestion="DialogEditQuestion"
       :StoreObj="EditQuestionObj"
@@ -12,34 +17,50 @@
       @clicked="DialogDeleteQuestionEmit"
     />
 
-    <!--Title-->
-    <div class="text-primary mt-n2">
-      Questions for {{ StoreObj.splay_category_name }}
-    </div>
+    <!--Title and Buttons-->
+    <v-row class="mt-n3">
+      <div class="header-title font-weight-bold text-primary ml-3">
+        Questions for - {{ StoreObj.splay_category_name }}
+      </div>
+      <v-spacer></v-spacer>
+      <!--Create Question Button-->
+      <v-tooltip text="Create Question">
+        <template #activator="{ props }">
+          <v-btn
+            v-bind="props"
+            variant="flat"
+            rounded="lg"
+            color="primary"
+            size="small"
+            class="mr-4"
+            @click="OpenDialogCreateQuestion(StoreObj)"
+          >
+            Create
+          </v-btn>
+        </template>
+      </v-tooltip>
+      <!--Back Button-->
+      <v-btn
+        variant="flat"
+        rounded="lg"
+        color="primary"
+        size="small"
+        class="mr-4"
+        @click="QuestionPageEmit(1)"
+      >
+        Back
+      </v-btn>
+    </v-row>
 
     <!--Data Table-->
     <v-data-table
       :height="windowHeight"
       :headers="TableHeaders"
-      :items="paginatedItems"
+      :items="ListAllQuestions"
       :loading="loading"
-      :items-per-page="itemsPerPage"
-      class="modern-data-table mt-3"
+      class="modern-data-table mt-5"
       hide-default-footer
     >
-      <!--No data-->
-      <template #no-data>
-        <div class="text-center py-8">
-          <v-icon size="64" color="grey-lighten-1" class="mb-4"
-            >mdi-controller</v-icon
-          >
-          <div class="text-h6 text-grey mb-2">
-            No custom questions at the moment!
-          </div>
-          <div class="text-body-2 text-grey">Create one to start</div>
-        </div>
-      </template>
-
       <!--Actions-->
       <template #[`item.actions`]="{ item }">
         <div class="d-flex justify-start">
@@ -133,6 +154,7 @@
 </template>
 
 <script>
+import CreateQuestion from "./CreateQuestion.vue";
 import EditQuestion from "./EditQuestion.vue";
 import DeleteQuestion from "./DeleteQuestion.vue";
 
@@ -141,15 +163,14 @@ import { ListQuestions } from "@/mixins/ListQuestions";
 export default {
   props: { StoreObj: Object },
 
-  components: { EditQuestion, DeleteQuestion },
+  components: { CreateQuestion, EditQuestion, DeleteQuestion },
 
   mixins: [ListQuestions],
 
   data: () => ({
     windowHeight: 0,
-    currentPage: 1,
-    itemsPerPage: 15,
 
+    DialogCreateQuestion: false,
     DialogEditQuestion: false,
     DialogDeleteQuestion: false,
 
@@ -170,7 +191,7 @@ export default {
   }),
 
   async mounted() {
-    this.windowHeight = window.innerHeight - 260;
+    this.windowHeight = window.innerHeight - 265;
     await this.ListQuestionsMethod();
   },
 
@@ -212,6 +233,16 @@ export default {
   methods: {
     QuestionPageEmit(Toggle) {
       this.$emit("clicked", Toggle);
+    },
+    OpenDialogCreateQuestion(item) {
+      this.CategoryObj = item;
+      this.DialogCreateQuestion = true;
+    },
+    DialogCreateQuestionEmit(Toggle) {
+      this.DialogCreateQuestion = false;
+      if (Toggle === 2) {
+        this.ListQuestionsMethod();
+      }
     },
     OpenDialogEditQuestion(item) {
       this.EditQuestionObj = item;

@@ -489,7 +489,7 @@ export default {
       if (!this.currentObject || !this.currentObject.user) {
         console.warn("User data not available for logout");
         // Still proceed with basic logout
-        await Auth.signOut();
+        await Auth.signOut({ global: true });
         this.$store.commit("SetAuth", false);
         this.$router.push("/");
         return;
@@ -519,7 +519,7 @@ export default {
         this.$emit("unsubcribe", combinedArray[i]);
         // this.unsubscribeToTopicMethod(combinedArray[i]);
       }
-      // this.$emit("endMqqt", 0);
+      this.$emit("endMqqt", 0);
       // this.clearAllStores();
       this.emailCheckCom = true;
       var data = {
@@ -529,7 +529,7 @@ export default {
       };
 
       this.$store.commit("SetAuditActions", data);
-      await Auth.signOut();
+      await Auth.signOut({ global: true });
       // console.log("Signed out globally");
       // await Auth.signOut(this.currentObject.user.user_email_id);
 

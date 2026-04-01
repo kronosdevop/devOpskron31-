@@ -89,7 +89,7 @@
               small
               v-if="
                 item.directory_created_by ==
-                $store.getters.GetUserObj.user?.user_email_id
+                $store.getters.GetUserObj.user.user_email_id
               "
               >mdi-account</v-icon
             > -->
@@ -111,7 +111,7 @@
               v-if="
                 item.is_default != 'TRUE' &&
                 item.team_created_by ==
-                  $store.getters.GetUserObj.user?.user_email_id
+                  $store.getters.GetUserObj.user.user_email_id
               "
               @click.stop="channel_delete(item)"
               color="red"
@@ -121,7 +121,7 @@
               v-if="
                 item.is_default != 'TRUE' &&
                 item.team_created_by !=
-                  $store.getters.GetUserObj.user?.user_email_id
+                  $store.getters.GetUserObj.user.user_email_id
               "
             >
               -
@@ -132,7 +132,7 @@
               v-if="
                 item.is_default != 'TRUE' &&
                 item.team_created_by ==
-                  $store.getters.GetUserObj.user?.user_email_id
+                  $store.getters.GetUserObj.user.user_email_id
               "
               @click.stop="transfer_ownership(item)"
               color="primaryColor"
@@ -292,7 +292,7 @@ export default {
         let result = await API.graphql(
           graphqlOperation(list_broadcast_channels, {
             input: {
-              user_email_id: this.$store.getters.GetUserObj.user?.user_email_id,
+              user_email_id: this.$store.getters.GetUserObj.user.user_email_id,
             },
           })
         );

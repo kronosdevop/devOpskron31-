@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-app-bar class="modern-header-section" elevation="0">
+    <v-app-bar class="modern-header-section">
       <div class="header-left">
         <div class="header-icon-container">
           <div class="header-icon-bg">
@@ -43,7 +43,7 @@
         <v-btn
           v-if="toggle_exclusive == 'userassets'"
           @click="request_asset()"
-          class="action-btn mr-4"
+          class="action-btn"
           size="small"
         >
           <v-icon>mdi-plus</v-icon>
@@ -74,25 +74,13 @@
           class="actions-menu"
         >
           <template #activator="{ props }">
-            <v-btn v-bind="props" class="action-btn mr-4" size="small">
+            <v-btn v-bind="props" class="action-btn" size="small">
               <v-icon>mdi-dots-vertical</v-icon>
               <span>Actions</span>
             </v-btn>
           </template>
 
           <v-list density="compact" class="actions-list">
-            <v-list-item
-              v-if="toggle_exclusive == 'adminasset'"
-              @click="add_asset()"
-            >
-              <template #prepend>
-                <v-icon color="primary">mdi-plus</v-icon>
-              </template>
-              <v-list-item-title>Add Asset</v-list-item-title>
-            </v-list-item>
-
-            <v-divider class="my-1" />
-            
             <v-list-item
               v-if="toggle_exclusive == 'adminasset'"
               @click="downloadFile(assetTemplateUrl, 'Asset_Template.xlsx')"
@@ -119,14 +107,22 @@
         </v-menu>
         <v-btn
           v-if="toggle_exclusive == 'assetReports'"
-          class="action-btn mr-4"
+          class="action-btn"
           @click="export_asset_reports()"
           size="small"
         >
           <v-icon>mdi-download</v-icon>
           <span>Export</span>
         </v-btn>
-
+        <v-btn
+          v-if="toggle_exclusive == 'adminasset'"
+          class="action-btn add-btn mr-4"
+          @click="add_asset()"
+          size="small"
+        >
+          <v-icon>mdi-plus</v-icon>
+          <span>Add Asset</span>
+        </v-btn>
         <!-- <v-btn
           v-if="adminAppExists"
           class="action-btn back-btn"
@@ -818,6 +814,7 @@ export default {
       return true;
     },
     handleSuccessAsset({ results, header }) {
+      alert(11);
       this.excelTableData = results;
       this.excelHeaders = header;
       this.uploadAssetDialog = true;

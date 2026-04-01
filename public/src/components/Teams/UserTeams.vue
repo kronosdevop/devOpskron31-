@@ -3,6 +3,7 @@
     <v-card flat class="">
       <div>
         <SnackBar :SnackBarComponent="SnackBarComponent" />
+
         <div class="card-container" style="position: relative">
           <v-card class="" flat>
             <v-card-text class="pa-4">
@@ -141,12 +142,9 @@
                 </template>
 
                 <!-- Reporting Manager -->
-             <template v-slot:[`item.reporting_manager`]="{ item }">
-  <span class="custom-cell">
-    {{ getReportingManagerName(item.reporting_manager) }}
-  </span>
-</template>
-
+                <template v-slot:[`item.reporting_manager`]="{ item }">
+                  <span class="custom-cell">{{ item.reporting_manager }}</span>
+                </template>
 
                 <!-- Actions -->
                 <template v-slot:[`item.actions`]="{ item }">
@@ -256,7 +254,6 @@ export default {
         { title: "Actions", key: "actions", sortable: false },
       ],
       tableData: [],
-      fullTableData: [],
       originalTableData: [],
       roles: [],
       statuses: [],
@@ -319,50 +316,19 @@ export default {
 
   // Computed properties
   computed: {
-    filteredItems() {
-  if (!this.searchValue) return this.tableData;
+    searchReadyItems() {
+      const text = this.searchValue.toLowerCase();
 
-  const text = this.searchValue.toLowerCase();
-
-  return this.tableData.filter((item) => {
-    return (
-      item.full_user_name?.toLowerCase().includes(text) ||
-      item.user_email_id?.toLowerCase().includes(text) ||
-      item.member_id?.toLowerCase().includes(text) ||
-      item.location?.toLowerCase().includes(text) ||
-      item.department?.toLowerCase().includes(text) ||
-      item.reporting_manager?.toLowerCase().includes(text)
-    );
-  });
-},
-   searchReadyItems() {
-  if (!this.searchValue) {
-    return this.sortedAndPaginatedItems;
-  }
-
-  const text = this.searchValue.toLowerCase();
-
-  // ✅ STEP 1: FILTER FULL DATA
-  const filtered = this.tableData.filter((item) => {
-    return (
-      item.full_user_name?.toLowerCase().includes(text) ||
-      item.user_email_id?.toLowerCase().includes(text) ||
-      item.member_id?.toLowerCase().includes(text) ||
-      item.location?.toLowerCase().includes(text) ||
-      item.department?.toLowerCase().includes(text) ||
-      item.reporting_manager?.toLowerCase().includes(text)
-    );
-  });
-
-  // ✅ STEP 2: RESET PAGE
-  this.currentPage = 1;
-
-  // ✅ STEP 3: APPLY PAGINATION AFTER FILTER
-  const start = (this.currentPage - 1) * this.itemsPerPage;
-  const end = start + this.itemsPerPage;
-
-  return filtered.slice(start, end);
-},
+      return this.sortedAndPaginatedItems?.filter(
+        (item) =>
+          item.full_user_name.toLowerCase().includes(text) ||
+          item.user_email_id.toLowerCase().includes(text) ||
+          item.member_id.toLowerCase().includes(text) ||
+          item.location.toLowerCase().includes(text) ||
+          item.department.toLowerCase().includes(text) ||
+          item.reporting_manager.toLowerCase().includes(text),
+      );
+    },
     sortedAndPaginatedItems() {
       const sortedItems = this.tableData.slice().sort((a, b) => {
         const aValue = a.full_user_name ? a.full_user_name : "";
@@ -405,12 +371,6 @@ export default {
 
   // Methods
   methods: {
-    getReportingManagerName(email) {
- if(!email || email === "N/A") return "_";
- const manager = this.originalTableData.find((u) => u.user_email_id === email);
- return manager?.full_user_name || email;
-}
-,
     // Admin methods
     fetch_admin_apps() {
       const userObj = this.$store.getters.GetUserObj;

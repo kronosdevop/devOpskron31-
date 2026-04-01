@@ -110,7 +110,8 @@
                   label="Select Date"
                   :rules="dailyCheck == true ? [(v) => !!v || 'Required'] : []"
                   :items="timeSheetdateitems"
-                  @update:model-value="getdaily_duration($event)"
+                  @update:model-value="getdaily_duration()"
+               
                 />
               </v-col>
               <v-col :cols="dailyCheck == true ? 3 : 4">
@@ -125,6 +126,7 @@
                   :items="timesheetitemsProject"
                   return-object
                   @update:model-value="handleProjectChange"
+                
                 />
               </v-col>
               <v-col :cols="dailyCheck == true ? 3 : 4">
@@ -144,7 +146,7 @@
                   class=""
                   auto-grow
                   v-model="commentstimesheet"
-                  rows="1"
+                  rows="0"
                   maxlength="500"
                   label="Comments"
                 ></v-textarea>
@@ -195,41 +197,11 @@
                   "
                 />
               </v-col>
-              <v-col cols="4">
-                <v-file-input
-                  v-model="attachments"
-                  label="Upload Files (Max 3)"
-                  variant="outlined"
-                  density="compact"
-                  multiple
-                  class="mt-n4"
-                  accept="image/*,.pdf,.doc,.docx"
-                >
-                  <template v-slot:selection>
-                    <div class="d-flex flex-wrap">
-                      <v-chip
-                        v-for="(file, index) in attachments"
-                        :key="file.name"
-                        class="ma-1"
-                        closable
-                        size="small"
-                        @click:close="removeAttachment(file)"
-                      >
-                        <v-icon start size="16">
-                          {{ getFileIcon(file.name) }}
-                        </v-icon>
-                        {{ file.name }}
-                      </v-chip>
-                    </div>
-                  </template>
-                </v-file-input>
-              </v-col>
 
               <v-col cols="2">
                 <v-btn
                   variant="flat"
                   @click="add_mutation()"
-                  :loading="addLoading"
                   color="primary"
                   size="small"
                   class="text-capitalize ml-2 mt-n4 cardCss"
@@ -274,53 +246,17 @@
                 >mdi-delete</v-icon
               >
             </template>
-            <template v-slot:[`item.timesheet_images`]="{ item }">
-              <div class="d-flex flex-wrap">
-                <v-chip
-                  v-for="(img, index) in (item.timesheet_images || []).filter(
-                    (i) => i
-                  )"
-                  :key="index"
-                  size="x-small"
-                  class="ma-1"
-                  color="primary"
-                  variant="tonal"
-                  @click="openAttachment(img)"
-                >
-                  <v-icon start size="14">mdi-paperclip</v-icon>
-                  File {{ index + 1 }}
-                </v-chip>
-
-                <span
-                  v-if="
-                    !item.timesheet_images || item.timesheet_images.length === 0
-                  "
-                  class="text-grey"
-                >
-                  -
-                </span>
-              </div>
-            </template>
           </v-data-table>
         </v-card-text>
         <v-card-actions class="justify-end">
-          <v-btn
-            @click="validate_data('SUBMIT_DRAFT')"
-            :loading="draftLoading"
+                    <v-btn
+           dark
+            @click="validate_data()"
             v-if="timefilleditems.length != 0"
-            class="text-capitalize cardBtn button-corner text-white"
-          >
-            Save As Draft
-          </v-btn>
-
-          <v-btn
-            @click="validate_data('UPDATE_DETAILS')"
-            :loading="submitLoading"
-            v-if="timefilleditems.length != 0"
+            :loading="loading"
             class="text-capitalize cardCss button-corner text-white"
+            >Save</v-btn
           >
-            Submit Timesheet
-          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -333,7 +269,7 @@ import { update_timesheet } from "@/graphql/mutations.js";
 import { API, graphqlOperation } from "aws-amplify";
 import { get_projects } from "@/graphql/queries.js";
 import { get_project_list } from "@/mixins/GetProjectList.js";
-import { uploadToS3 } from "@/mixins/TicketsS3Upload.js";
+
 export default {
   mixins: [get_project_list],
   props: {
@@ -345,6 +281,7 @@ export default {
       minDate: new Date().toISOString().substr(0, 10),
       date: "",
       menu: false,
+      loading: false,
       daterangeSelected: false,
       dailyCheck: false,
       timeSheetdate: "",
@@ -367,11 +304,6 @@ export default {
       weekoffdata: [],
       attedencedata: [],
       projectdata: [],
-      attachments: [],
-      orgDetails: {
-        bucket_name: "stichh-medias",
-        region: "us-east-1",
-      },
       timeSheetHeaders: [
         // {
         //   text: "Date",
@@ -389,95 +321,70 @@ export default {
         // { text: "Actions", value: "actions", sortable: false },
       ],
       totalDuration: "",
-      addLoading: false,
-      draftLoading: false,
-      submitLoading: false,
     };
   },
- watch: {
-  timesheetEdition: {
-    async handler() {
-      if (this.timesheetEdition == true) {
-        this.dailyCheck =
-          this.$store.getters.GetOrgDetails.organization
-            .is_daily_timesheet_required == undefined
-            ? true
-            : this.$store.getters.GetOrgDetails.organization
-                .is_daily_timesheet_required;
+  watch: {
+    timesheetEdition: {
+      async handler() {
+        if (this.timesheetEdition == true) {
+          this.dailyCheck =
+            this.$store.getters.GetOrgDetails.organization
+              .is_daily_timesheet_required == undefined
+              ? true
+              : this.$store.getters.GetOrgDetails.organization
+                  .is_daily_timesheet_required;
 
-        this.getTimesheetHeaders(this.dailyCheck);
+          this.getTimesheetHeaders(this.dailyCheck);
+          this.date = [];
+          this.daterangeSelected = false;
 
-        this.date = [];
-        this.daterangeSelected = false;
-        this.timefilleditems = [];
+          this.timefilleditems = [];
 
-        this.date.push(this.timesheetitems.timesheet_from_date);
-        this.date.push(this.timesheetitems.timesheet_to_date);
+          this.date.push(this.timesheetitems.timesheet_from_date),
+            this.date.push(this.timesheetitems.timesheet_to_date);
+          await this.limitDateRange();
+          await this.updatedaterange();
+          var recored = this.timesheetitems.timesheet_details;
+          this.timefilleditems = recored;
 
-        await this.limitDateRange();
-        await this.updatedaterange(); // <-- get_duration called inside this
-
-        var recored = this.timesheetitems.timesheet_details;
-        this.timefilleditems = [...recored];
-
-        await this.get_project_list();
-
-        this.timesheetitemsProject = this.ProjectList.slice()
-          .sort((a, b) => a.project_name.localeCompare(b.project_name))
-          .map((element) => ({
-            text: element.project_name,
-            value: element.project_id,
-          }));
-      } else {
-        await this.fetch_projectes();
-      }
-
-      this.timesheetitemshour = Array.from({ length: 19 }, (_, i) => {
-        return { title: i.toString(), value: i };
-      });
+          // await this.fetch_projectes();
+          await this.get_project_list();
+          if (this.ProjectList && this.ProjectList.length > 0) {
+            this.timesheetitemsProject = this.ProjectList.map((element) => ({
+              text: element.project_name,
+              value: element.project_id,
+            }));
+          } else {
+            await this.fetch_projectes();
+          }
+          // this.timesheetitemsmin = Array.from({ length: 60 }, (_, i) => {
+          //   const formattedMinute = i.toString().padStart(2, "0");
+          //   return { text: formattedMinute, value: formattedMinute };
+          // });
+          // this.timesheetitemshour = Array.from({ length: 18 }, (_, i) => {
+          //   const hour = i + 1;
+          //   return { text: hour.toString(), value: hour };
+          // });
+          this.timesheetitemshour = Array.from({ length: 19 }, (_, i) => {
+            return { text: i.toString(), value: i };
+          });
+        }
+      },
+      immediate: true,
     },
-    immediate: true, // ✅ MUST be here
-  },
-
-  timesheetProject: {
-    handler(newVal) {
-      if (!newVal || !newVal.text) {
-        this.timesheetactivity = "";
-        this.timesheetitemsactivity = [];
-      }
-    },
-  },
-},
-  timesheetProject: {
-    handler(newVal, oldVal) {
-      // Reset activity when project changes or becomes null
-      if (!newVal || !newVal.text) {
-        this.timesheetactivity = "";
-        this.timesheetitemsactivity = [];
-      }
-    },
-    immediate: false,
+    timesheetProject: {
+      handler(newVal, oldVal) {
+        // Reset activity when project changes or becomes null
+        if (!newVal || !newVal.text) {
+          this.timesheetactivity = "";
+          this.timesheetitemsactivity = [];
+        }
+      },
+      immediate: false
+    }
   },
 
   methods: {
-    removeAttachment(file) {
-      this.attachments = this.attachments.filter((f) => f !== file);
-    },
-
-    openAttachment(url) {
-      window.open(url, "_blank");
-    },
-
-    getFileIcon(name) {
-      const ext = name.split(".").pop().toLowerCase();
-
-      if (["png", "jpg", "jpeg", "gif", "webp"].includes(ext))
-        return "mdi-image";
-      if (ext === "pdf") return "mdi-file-pdf-box";
-      if (["doc", "docx"].includes(ext)) return "mdi-file-word";
-
-      return "mdi-file";
-    },
     safeFormReset() {
       if (this.$refs.form && this.daterangeSelected) {
         this.$refs.form.reset();
@@ -535,7 +442,6 @@ export default {
         { title: "Activity", key: "activity_name", sortable: false },
         { title: "Time Spent", key: "work_duartion", sortable: false },
         { title: "Comments", key: "comments", sortable: false },
-        { title: "Attachments", key: "timesheet_images" }, // important
         { title: "Actions", key: "actions", sortable: false },
       ];
 
@@ -621,29 +527,28 @@ export default {
         this.$emit("errorMsg", error.errors[0].message);
       }
     },
-    async getdaily_duration(date) {
-      if (!date) return;
-
+    async getdaily_duration() {
       var data = this.$store.getters.GetUserObj;
-
       try {
         let result = await API.graphql(
           graphqlOperation(get_total_work_duartion, {
             input: {
               organization_id: data.organization.organization_id,
               user_id: data.user.user_id,
-              timesheet_from_date: date,
+              timesheet_from_date: this.timeSheetdate,
+              // timesheet_to_date: daterange[daterange.length - 1],
               action_type: "DAILY",
             },
           })
         );
-
         var response = JSON.parse(result.data.get_total_work_duartion);
 
         if (response.Status == "SUCCESS") {
           this.userdailyduartion = this.removeSeconds(
             response.data.user_daily_worked_data
           );
+        } else {
+          this.$emit("errorMsg", response.Message);
         }
       } catch (error) {
         this.$emit("errorMsg", error.errors[0].message);
@@ -705,7 +610,7 @@ export default {
 
       // Check if projectId is null or undefined
       if (!projectId || !projectId.text) {
-        console.warn("Project ID is null or invalid");
+        console.warn('Project ID is null or invalid');
         return;
       }
 
@@ -716,18 +621,14 @@ export default {
 
       // Check if sourceData exists and is an array
       if (!sourceData || !Array.isArray(sourceData)) {
-        console.warn("Source data is not available or not an array");
+        console.warn('Source data is not available or not an array');
         return;
       }
 
       sourceData.forEach((obj) => {
         if (obj && obj.project_name === projectId.text) {
           if (obj.project_activities && Array.isArray(obj.project_activities)) {
-            const sortedActivities = obj.project_activities
-              .slice()
-              .sort((a, b) => a.localeCompare(b));
-
-            this.timesheetitemsactivity.push(...sortedActivities);
+            this.timesheetitemsactivity.push(...obj.project_activities);
           }
         }
       });
@@ -827,56 +728,99 @@ export default {
       }
     },
     async add_mutation() {
-      if (!this.$refs.form || !this.daterangeSelected) return;
-
+      if (!this.$refs.form || !this.daterangeSelected) {
+        console.warn('Form ref is not available or form not rendered');
+        return;
+      }
       const { valid } = await this.$refs.form.validate();
-      if (!valid) return;
+      if (valid) {
+        let data = {};
+        if (this.dailyCheck == true) {
+          // Check if timesheetProject is valid
+          if (!this.timesheetProject || !this.timesheetProject.value || !this.timesheetProject.text) {
+            this.$emit("errorMsg", "Please select a valid project");
+            return;
+          }
+          
+          data = {
+            project_id: this.timesheetProject.value,
+            activity_name: this.timesheetactivity,
+            project_name: this.timesheetProject.text,
+            work_duartion:
+              this.timesheethour + "h" + " " + this.timesheetmin + "m",
+            timesheet_from_date: this.timeSheetdate,
+            timesheet_to_date: this.timeSheetdate,
+            comments:
+              this.commentstimesheet == "" || this.commentstimesheet == null
+                ? "N/A"
+                : this.commentstimesheet,
+          };
 
-      this.addLoading = true;
-
-      try {
-        // Upload files
-        let uploadedImages = [];
-
-        if (this.attachments && this.attachments.length > 0) {
-          for (let i = 0; i < this.attachments.length && i < 3; i++) {
-            const file = this.attachments[i];
-
-            const key = `timesheets/${crypto.randomUUID()}_${file.name}`;
-
-            const uploadedUrl = await uploadToS3(file, this.orgDetails, key);
-
-            uploadedImages.push(uploadedUrl);
+          if (this.presenceenabled == true) {
+            const isDurationValid = this.addDataAndCheckDuration(
+              this.timefilleditems,
+              data,
+              this.userdailyduartion
+            );
+            if (isDurationValid) {
+              // this.timefilleditems.push(data);
+              this.timeSheetdate = "";
+              this.userdailyduartion = "";
+              this.safeFormReset();
+            } else {
+              this.$emit(
+                "errorMsg",
+                "The entered data exceeds the total duration you worked a day"
+              );
+            }
+            //   if (this.canAddObject(data)) {
+            //     this.timefilleditems.push(data);
+            //     this.$refs.form.reset();
+            //   } else {
+            //     this.$emit(
+            //       "errorMsg",
+            //       "The entered data exceeds the total duration you worked"
+            //     );
+            //   }
+            // this.timefilleditems.push(data);
+            // this.$refs.form.reset();
+          } else {
+            this.timefilleditems.push(data);
+            this.safeFormReset();
+            this.timeSheetdate = "";
+          }
+        } else {
+          // Check if timesheetProject is valid
+          if (!this.timesheetProject || !this.timesheetProject.value || !this.timesheetProject.text) {
+            this.$emit("errorMsg", "Please select a valid project");
+            return;
+          }
+          
+          data = {
+            project_id: this.timesheetProject.value,
+            activity_name: this.timesheetactivity,
+            project_name: this.timesheetProject.text,
+            work_duartion:
+              this.timesheethour + "h" + " " + this.timesheetmin + "m",
+            timesheet_from_date: this.date[0],
+            timesheet_to_date: this.date[this.date.length - 1],
+            comments:
+              this.commentstimesheet == "" || this.commentstimesheet == null
+                ? "N/A"
+                : this.commentstimesheet,
+          };
+          if (this.presenceenabled == true) {
+            this.processTimesheetEntry(data, this.userWorkduration);
+            this.safeFormReset();
+            this.timeSheetdate = "";
+            this.userdailyduartion = "";
+          } else {
+            this.timefilleditems.push(data);
+            this.timeSheetdate = "";
+            this.userdailyduartion = "";
+            this.safeFormReset();
           }
         }
-
-        // ✅ store only actual images
-        const timesheet_images = uploadedImages;
-
-        let data = {
-          project_id: this.timesheetProject.value,
-          activity_name: this.timesheetactivity,
-          project_name: this.timesheetProject.text,
-          work_duartion: this.timesheethour + "h " + this.timesheetmin + "m",
-          timesheet_from_date: this.timeSheetdate || this.date[0],
-          timesheet_to_date:
-            this.timeSheetdate || this.date[this.date.length - 1],
-          comments:
-            this.commentstimesheet == "" || this.commentstimesheet == null
-              ? "N/A"
-              : this.commentstimesheet,
-          timesheet_images,
-        };
-
-        this.timefilleditems.push(data);
-
-        this.safeFormReset();
-        this.attachments = [];
-
-        this.addLoading = false;
-      } catch (error) {
-        this.addLoading = false;
-        this.$emit("errorMsg", "File upload failed");
       }
     },
     processTimesheetEntry(entry, organizationDuration) {
@@ -933,60 +877,22 @@ export default {
 
       return hours * 60 + minutes;
     },
-    async validate_data(actionType) {
-      if (actionType === "SUBMIT_DRAFT") {
-        this.draftLoading = true;
-      }
-
-      if (actionType === "UPDATE_DETAILS") {
-        this.submitLoading = true;
-      }
-
-      // determine draft flag
-      const isDraft = actionType === "SUBMIT_DRAFT";
-
-      // ✅ Check only when final save
-      if (actionType === "UPDATE_DETAILS" && this.dailyCheck === true) {
-        const recordsDates = new Set();
-
-        this.timefilleditems.forEach((record) => {
-          recordsDates.add(record.timesheet_from_date);
-        });
-
-        const missingDates = this.timeSheetdateitems.filter(
-          (date) => !recordsDates.has(date)
-        );
-
-        if (missingDates.length > 0) {
-          this.$emit(
-            "errorMsg",
-            `The timesheet has not been entered for this date ${missingDates.join(
-              ", "
-            )}`
-          );
-
-          this.draftLoading = false;
-          this.submitLoading = false;
-          return;
-        }
-      }
-
+    async validate_data() {
+      this.loading = true;
+      var data = this.$store.getters.GetUserObj;
       try {
         let result = await API.graphql(
           graphqlOperation(update_timesheet, {
             input: {
               timesheet_id: this.timesheetitems.timesheet_id,
-              action_type: actionType,
+              action_type: "UPDATE_DETAILS",
               timesheet_details: this.timefilleditems,
-              is_draft: isDraft, // ✅ added here
             },
           })
         );
-
         var response = JSON.parse(result.data.update_timesheet);
 
-        this.draftLoading = false;
-        this.submitLoading = false;
+        this.loading = false;
 
         if (response.Status == "SUCCESS") {
           this.$emit("successMsg", response.Message);
@@ -995,9 +901,8 @@ export default {
           this.$emit("errorMsg", response.Message);
         }
       } catch (error) {
-        this.draftLoading = false;
-        this.submitLoading = false;
         this.$emit("errorMsg", error.errors[0].message);
+        this.loading = false;
       }
     },
   },

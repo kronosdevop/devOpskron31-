@@ -263,7 +263,7 @@ export default {
       this.loading = true;
       try {
         const orgDetails = this.$store.getters.GetOrgDetails;
-        const userId = this.$store.getters.GetUserObj.user?.user_id;
+        const userId = this.$store.getters.GetUserObj.user.user_id;
         const file = Array.isArray(this.uploadedFiles)
           ? this.uploadedFiles[0]
           : this.uploadedFiles;

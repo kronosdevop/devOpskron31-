@@ -219,7 +219,7 @@
                   class="mr-3"
                   v-show="
                     dashboarditems.team_created_by ==
-                    $store.getters.GetUserObj.user?.user_email_id
+                    $store.getters.GetUserObj.user.user_email_id
                   "
                   >mdi-delete</v-icon
                 ><v-icon @click="close_edit">mdi-close</v-icon></v-toolbar
@@ -667,7 +667,7 @@ export default {
         let result = await API.graphql(
           graphqlOperation(get_particular_broadcast_details, {
             input: {
-              user_email_id: this.$store.getters.GetUserObj.user?.user_email_id,
+              user_email_id: this.$store.getters.GetUserObj.user.user_email_id,
               team_id: this.dashboarditems.team_id,
             },
           })
@@ -699,7 +699,7 @@ export default {
         let result = await API.graphql(
           graphqlOperation(list_broadcast_channels, {
             input: {
-              user_email_id: this.$store.getters.GetUserObj.user?.user_email_id,
+              user_email_id: this.$store.getters.GetUserObj.user.user_email_id,
             },
           })
         );

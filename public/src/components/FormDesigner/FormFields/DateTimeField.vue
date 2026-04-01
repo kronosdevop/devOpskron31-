@@ -122,10 +122,8 @@
     </v-card>
   </div>
 </template>
-
 <script>
 /*eslint-disable*/
-
 export default {
   props: {
     index: Object,
@@ -215,7 +213,7 @@ export default {
         this.get_value(
           this.dateTimevalue,
           this.index.display_label,
-          this.index.key,
+          this.index.key
         );
       }
     },

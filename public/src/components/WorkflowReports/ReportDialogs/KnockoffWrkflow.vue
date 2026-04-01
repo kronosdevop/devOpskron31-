@@ -172,13 +172,12 @@ import { get_all_org_users } from "@/mixins/GetUsersDropdown.js";
 import { API, graphqlOperation } from "aws-amplify";
 
 export default {
-  props: {
-    globalSearch: {
-      type: String,
-      default: "",
-    },
+  props:{
+     globalSearch:{
+         type : String,
+         default:'ALL'
+     }
   },
-
   mixins: [get_all_org_users],
 
   data() {
@@ -188,20 +187,21 @@ export default {
       allUSersNames: [],
       next_token: null,
       tableData: [],
+      search: "",
       tableLoading: false,
-
-      currentPage: 1,
-      itemsPerPage: 20,
-
       headers: [
-        { title: "Workflow Name/ID", key: "workflow_name", sortable: false },
+        {
+          title: "Workflow Name/ID",
+          key: "workflow_name",
+          sortable: false,
+        },
         {
           title: "Initiated By",
           key: "workflow_initiated_by",
           sortable: false,
         },
         {
-          title: "Initiated On",
+          title: "Intiated On",
           key: "workflow_initiated_on",
           sortable: false,
         },
@@ -215,135 +215,164 @@ export default {
           key: "knockedoff_timestamp",
           sortable: false,
         },
-        { title: "Knocked off Comments", key: "comments", sortable: false },
+        {
+          title: "Knocked off Comments",
+          key: "comments",
+          sortable: false,
+        },
       ],
+      pagination: {
+        rowsPerPage: 20,
+        itemsPerPage: 20,
+      },
+      currentPage: 1,
+      itemsPerPage: 20,
+      totalItems: 0,
     };
   },
+computed: {
+  filteredTableData() {
+    if (!this.globalSearch || this.globalSearch.trim() === "") {
+      return this.tableData;
+    }
 
-  computed: {
-    // 🔍 Search filter
-    filteredTableData() {
-      if (!this.globalSearch || this.globalSearch.trim() === "") {
-        return this.tableData;
-      }
+    const search = this.globalSearch.toLowerCase();
 
-      const search = this.globalSearch.toLowerCase();
-
-      return this.tableData.filter((row) =>
-        Object.values(row).some(
-          (val) => val && String(val).toLowerCase().includes(search)
-        )
-      );
-    },
-
-    // 📄 Pagination
-    paginatedItems() {
-      const sorted = this.filteredTableData.slice().sort((a, b) => {
-        const aVal = (a.workflow_name || "").toLowerCase();
-        const bVal = (b.workflow_name || "").toLowerCase();
-        return aVal.localeCompare(bVal);
-      });
-
-      const start = (this.currentPage - 1) * this.itemsPerPage;
-      const end = start + this.itemsPerPage;
-
-      return sorted.slice(start, end);
-    },
-
-    totalItems() {
-      return this.filteredTableData.length;
-    },
-
-    pageCount() {
-      return Math.ceil(this.totalItems / this.itemsPerPage);
-    },
-
-    visiblePages() {
-      const pages = [];
-      const start = Math.max(1, this.currentPage - 2);
-      const end = Math.min(this.pageCount, this.currentPage + 2);
-
-      for (let i = start; i <= end; i++) {
-        pages.push(i);
-      }
-
-      return pages;
-    },
+    return this.tableData.filter(row =>
+      Object.values(row).some(val =>
+        val &&
+        String(val).toLowerCase().includes(search)
+      )
+    );
   },
 
+  sortedAndPaginatedItems() {
+    const sortedItems = this.filteredTableData
+      .slice()
+      .sort((a, b) => {
+        const aValue = this.fetch_form_name(a.name).toLowerCase();
+        const bValue = this.fetch_form_name(b.name).toLowerCase();
+        return aValue.localeCompare(bValue);
+      });
+
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    const end = start + this.itemsPerPage;
+
+    return sortedItems.slice(start, end);
+  },
+
+  totalItems() {
+    return this.filteredTableData.length;
+  },
+
+  pageCount() {
+    return Math.ceil(this.totalItems / this.itemsPerPage);
+  },
+
+  visiblePages() {
+    const pages = [];
+    const start = Math.max(1, this.currentPage - 2);
+    const end = Math.min(this.pageCount, this.currentPage + 2);
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    return pages;
+  }
+}
+,
+
   watch: {
-    globalSearch() {
-      this.currentPage = 1;
+    globalSearch(){
+      this.currentPage = 1
+    },
+    currentPage(newVal, oldVal) {
+      if (newVal > oldVal && this.next_token) {
+        this.get_transaction();
+      } else {
+        const table = document.querySelector(".modern-data-table");
+        if (table) table.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     },
   },
 
   async mounted() {
     this.height = window.innerHeight - 250;
     await this.get_transaction();
-    await this.get_all_org_users();
-    this.allUSersNames = this.orgUsers;
+    await this.get_all_org_users(), (this.allUSersNames = this.orgUsers);
   },
 
   methods: {
     async get_transaction() {
       this.tableLoading = true;
-      const data = this.$store.getters.GetUserObj;
-
+      var data = this.$store.getters.GetUserObj;
       try {
         let result = await API.graphql(
           graphqlOperation(list_knockedoff_aging_workflow, {
             input: {
               organization_id: data.organization.organization_id,
               next_token: this.next_token,
-              limit: 100, // fetch more at once
+              limit: 21,
             },
           })
         );
+        this.tableLoading = false;
 
-        const response = JSON.parse(result.data.list_knockedoff_aging_workflow);
+        var response = JSON.parse(result.data.list_knockedoff_aging_workflow);
+        const newNextToken = response.nextToken;
 
-        if (response.Status === "SUCCESS") {
+        if (response.Status == "SUCCESS") {
           if (response.data && response.data.length > 0) {
-            this.tableData = [...this.tableData, ...response.data];
+            let array = this.tableData.concat(response.data);
+            this.tableData = array;
           }
-
-          // remove duplicates
-          this.tableData = this.tableData.filter(
+          const uniqueArrayOfObjects = this.tableData.filter(
             (obj, index, self) =>
               index === self.findIndex((o) => o.knockoff_id === obj.knockoff_id)
           );
-
-          this.next_token = response.nextToken;
+          this.tableData = uniqueArrayOfObjects;
+          this.next_token = newNextToken;
+          this.totalItems = this.tableData.length;
+        } else {
+          if (!this.next_token && this.tableData.length === 0) {
+            this.tableData = [];
+            this.totalItems = 0;
+          }
         }
       } catch (error) {
-        console.error("API Error:", error);
+        this.tableLoading = false;
+        this.SnackBarComponent = {
+          SnackbarVmodel: true,
+          SnackbarColor: "red",
+          SnackbarText: error.errors[0].message,
+          timeout: 5000,
+          Top: true,
+        };
       }
-
-      this.tableLoading = false;
     },
-
     get_date(date) {
       return formatedatetime(date);
     },
-
+    get_transaction_Pagination() {
+      if (this.next_token) {
+        this.get_transaction();
+      }
+    },
     fetch_user_name(value) {
-      let name = "";
-
+      var name = "";
       this.allUSersNames.forEach((element) => {
-        if (element.user_email_id === value) {
+        if (element.user_email_id == value) {
           name = element.full_user_name;
         }
       });
-
-      if (value === "SYSTEM") {
+      if (value == "SYSTEM") {
         name = "SYSTEM";
       }
-
       return name;
     },
   },
 };
 </script>
+
 <style scoped>
 .font-weight-medium {
   font-weight: 500;

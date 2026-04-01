@@ -8,103 +8,62 @@
       max-width="500"
       transition="dialog-top-transition"
     >
-      <v-card rounded="lg">
-
-        <!-- Header -->
-        <v-toolbar elevation="0" density="comfortable" class="navBar">
-          <v-toolbar-title class="ml-2">
-            <div class="custom-title">Update Project Status</div>
-          </v-toolbar-title>
-
+      <v-card>
+        <v-toolbar elevation="0" dark dense class="navBar">
+          <v-toolbar-title class="text--black ml-2"
+            ><div class="custom-title">
+              Update Project Status 
+            </div></v-toolbar-title
+          >
           <v-spacer />
-
-          <v-icon class="icon-class mr-4" @click="close_dialog()">mdi-close</v-icon>
+          <v-icon class="icon-class" @click="close_dialog()">mdi-close</v-icon>
         </v-toolbar>
 
-        <!-- Content -->
         <v-card-text class="mt-4">
-
           <v-row no-gutters>
-
-            <!-- Project name -->
-            <v-col cols="12" class="mb-2">
-              <div class="text-body-1 font-weight-medium">
-                Update Project Status for
-                <span class="font-weight-bold text-primary">
-                  {{ rowInfo.project_name }}
-                </span> ?
-              </div>
+            <v-col cols="12">
+              Update Project Status for {{ rowInfo.project_name }} ?
             </v-col>
-
-            <!-- Select -->
             <v-col cols="12">
               <v-select
                 density="compact"
                 variant="outlined"
                 class="mt-3"
                 v-model="projectStatus"
-                label="Select Status"
                 :items="[
-                  { title: 'Live', value: 'LIVE' },
-                  { title: 'Completed', value: 'COMPLETED' },
-                  { title: 'Suspended', value: 'SUSPENDED' },
+                  { title: 'LIVE', value: 'LIVE' },
+                  { title: 'COMPLETED', value: 'COMPLETED' },
+                  { title: 'SUSPENDED', value: 'SUSPENDED' },
                 ]"
-              />
+              ></v-select>
             </v-col>
-
-            <!-- Warning message if completed -->
-            <v-col cols="12" v-if="projectStatus === 'COMPLETED' && rowInfo.inprogress_task_count != 0 " class="mt-4">
-              <v-alert
-                type="warning"
-                variant="tonal"
-                border="start"
-                border-color="warning"
-                icon="mdi-alert"
-              >
-                Are you sure you want to
-                <b>complete</b> the project <b>"{{ rowInfo.project_name }}"</b> ?
-                <br /><br />
-                There are still <b >{{ rowInfo.inprogress_task_count }}</b>  task(s) pending in this project. Completing
-                the project will prevent further progress updates.
-              </v-alert>
-            </v-col>
-
           </v-row>
 
+          <!-- <div class="text-left">
+            Are you sure you want to delete
+            <b> {{ rowInfo.project_name }}</b> ?
+          </div> -->
         </v-card-text>
-
-        <!-- Actions -->
-        <v-card-actions class="justify-end pb-4 pr-4">
-
+        <v-card-actions class="justify-end">
           <v-btn
-            variant="text"
-            color="grey"
-            @click="close_dialog()"
-          >
-            Cancel
-          </v-btn>
-
-          <v-btn
+            depressed
             :loading="loading"
-            :disabled="!projectStatus"
-            color="primary"
-            variant="flat"
             @click="delete_mutation()"
+            dark
+            class="cardCss"
           >
-            {{ projectStatus === 'COMPLETED' ? 'Complete Project' : 'Update' }}
+            Yes
           </v-btn>
-
         </v-card-actions>
-
       </v-card>
     </v-dialog>
   </div>
 </template>
-
-<script>
+  <script>
 /* eslint-disable */
 import { update_project_status } from "@/graphql/mutations.js";
 import { API, graphqlOperation } from "aws-amplify";
+// import { update_audit_logs } from "@/mixins/AuditLogActions.js";
 
 export default {
   props: {
@@ -118,7 +77,6 @@ export default {
       projectStatus: "",
     };
   },
-
   watch: {
     projectStatusUpdateDialog: {
       async handler() {
@@ -129,7 +87,6 @@ export default {
       immediate: true,
     },
   },
-
   methods: {
     close_dialog() {
       this.$emit("clicked", 0);
@@ -148,17 +105,13 @@ export default {
             },
           })
         );
-
         this.loading = false;
-
         var response = JSON.parse(result.data.update_project_status);
-
         if (response.Status == "SUCCESS") {
           this.$emit("successMsg", response.Message);
         } else {
           this.$emit("errorMsg", response.Message);
         }
-
       } catch (error) {
         this.loading = false;
         this.$emit("errorMsg", error.errors[0].message);

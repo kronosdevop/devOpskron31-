@@ -317,13 +317,13 @@ export default {
             if (
               element.directory_visibility_type == "USERS" &&
               element.directory_created_by !=
-                this.$store.getters.GetUserObj.user?.user_email_id
+                this.$store.getters.GetUserObj.user.user_email_id
             ) {
               arraynew.push(element);
               this.tableData = arraynew.filter(
                 (item) =>
                   !item.directory_visibility_users.includes(
-                    this.$store.getters.GetUserObj.user?.user_id
+                    this.$store.getters.GetUserObj.user.user_id
                   )
               );
             }

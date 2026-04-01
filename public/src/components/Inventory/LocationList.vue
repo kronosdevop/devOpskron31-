@@ -267,7 +267,7 @@ export default {
       let data = this.$store.getters.GetUserObj;
       try {
         let result = await API.graphql(
-          graphqlOperation(list_all_locations, { 
+          graphqlOperation(list_all_locations, {
             organization_id: data.organization.organization_id,
             location_status: "ACTIVE",
             limit: 500,

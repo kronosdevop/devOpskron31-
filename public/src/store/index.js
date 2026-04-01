@@ -92,12 +92,11 @@ const store = createStore({
     openRestrictedChannels: [],
     chatMessageList: [],
     termsandconditions: {},
-    // mqqtColor: "",
+    mqqtColor: "",
     stockStatus: "",
     dragCheck: false,
     customerDetails: {},
     customerData: {},
-    reportiesData: {},
     distributorDetails: {},
     vendorbulkback: false,
     Checklist: {},
@@ -107,20 +106,12 @@ const store = createStore({
       selectedTheme: "",
       generatedData: null,
       themeObject: null,
-      OPEN_CREATE_FORM :false,
-        activeTab: "settings",
-        worktype_form_id: null
     },
   },
   getters: {
     GetAuth: (state) => {
       return state.pAuth || false;
     },
-      GetWorktypeFormId: (state) => state.worktype_form_id ,
-      GetActiveTab: (state) => {
-        return state.activeTab;},
-
-
 
     GetUserEmail: (state) => {
       return state.pUserEmail;
@@ -279,9 +270,9 @@ const store = createStore({
     GetTermsandConditions: (state) => {
       return state.termsandconditions;
     },
-    // GetmqqtColor: (state) => {
-    //   return state.mqqtColor;
-    // },
+    GetmqqtColor: (state) => {
+      return state.mqqtColor;
+    },
     GetdragCheck: (state) => {
       return state.dragCheck;
     },
@@ -306,9 +297,6 @@ const store = createStore({
     GetattendenceBack: (state) => {
       return state.attendenceBack;
     },
-    GetReporties: (state) => {
-      return state.reportiesData;
-    },
     getNotifications: (state) => state.notificationsData,
     getNotificationCount: (state) => state.notificationsData.length,
     getTaskData: (state) => state.tasks,
@@ -328,20 +316,10 @@ const store = createStore({
     SetAuth(state, status) {
       state.pAuth = status;
     },
-    OPEN_CREATE_FORM(state, val){
-      state.openCreateForm = val
-    },
-  SET_ACTIVE_TAB(state, tab) {
-    state.activeTab = tab;
-  }
-,
     // To set current user email
     SetUserEmail(state, useremail) {
       state.pUserEmail = useremail;
     },
-    SetWorktypeFormId(state, id) {
-    state.worktype_form_id = id;
-  },
     SetOrgLogo(state, pOrgLogo) {
       state.pOrgLogo = pOrgLogo;
     },
@@ -494,9 +472,9 @@ const store = createStore({
       state.termsandconditions = termsandconditions;
     },
 
-    // SetmqqtColor(state, mqqtColor) {
-    //   state.mqqtColor = mqqtColor;
-    // },
+    SetmqqtColor(state, mqqtColor) {
+      state.mqqtColor = mqqtColor;
+    },
     SetdragCheck(state, dragCheck) {
       state.dragCheck = dragCheck;
     },
@@ -536,9 +514,6 @@ const store = createStore({
     SetattendenceBack(state, attendenceBack) {
       state.attendenceBack = attendenceBack;
     },
-    SetReportieData(state, reportiesData) {
-      state.reportiesData = reportiesData;
-    },
     ClearWebsiteBuilder(state) {
       state.websiteBuilder = {
         prompt: "",
@@ -551,13 +526,13 @@ const store = createStore({
     ADD_NOTIFICATION(state, notification) {
       if (
         !state.notificationsData.some(
-          (item) => item.msgID === notification.msgID,
+          (item) => item.msgID === notification.msgID
         )
       ) {
         state.notificationsData.push(notification);
         localStorage.setItem(
           "notoficationItems",
-          JSON.stringify(state.notificationsData),
+          JSON.stringify(state.notificationsData)
         ); // Update localStorage
       }
     },
@@ -597,7 +572,7 @@ const store = createStore({
     ADD_CHANNELS(state, openRestricted) {
       if (
         !state.openRestrictedChannels.some(
-          (item) => item.msgId === openRestricted.msgId,
+          (item) => item.msgId === openRestricted.msgId
         )
       ) {
         state.openRestrictedChannels.push(openRestricted);

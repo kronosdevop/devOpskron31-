@@ -313,10 +313,13 @@
                           :items="masterGlobalCategories"
                           item-title="category_name"
                           item-value="category_id"
+                          return
+                          object
                           density="compact"
                           hide-details
                           placeholder="Select Category"
                           variant="plain"
+                          class="item-input"
                         />
                       </td>
                       <td
@@ -724,8 +727,6 @@ export default {
       transactionConfig: {
         billing_name_parties: false, // Default value
       },
-      orgState: "",
-
       bucketUrls: {
         image: null,
       },
@@ -1357,7 +1358,7 @@ export default {
           item.unit = "";
           item.price_per_unit = "1";
           item.discount_percent = "";
-          item.tax_percent = "GST@0%";
+          item.tax_percent = "";
         }
 
         this.calculateItemAmount(index);
@@ -1412,11 +1413,20 @@ export default {
     },
 
     filterItems(index) {
-      const search = this.orderForm.items[index].item_name || "";
+      const item = this.orderForm.items[index];
+      const query = item.item_name.toLowerCase();
 
-      return this.masterItems.filter((item) =>
-        (item.product_name || "").toLowerCase().includes(search.toLowerCase())
-      );
+      if (!query) {
+        return this.masterItems;
+      } else {
+        return this.masterItems.filter(
+          (masterItem) =>
+            masterItem.item_name.toLowerCase().includes(query) ||
+            masterItem.item_code.toLowerCase().includes(query) ||
+            (masterItem.category_name &&
+              masterItem.category_name.toLowerCase().includes(query))
+        );
+      }
     },
 
     selectPredefinedItem(index, predefinedItem) {
@@ -1427,7 +1437,7 @@ export default {
       item.item_code = predefinedItem.item_code || "";
       if (this.itemConfiguration.item_category) {
         item.category = this.masterGlobalCategories.find(
-          (c) => c.product_id === predefinedItem.category_id
+          (c) => c.category_id === predefinedItem.category_id
         );
       }
       if (this.itemConfiguration.description) {
@@ -1437,10 +1447,10 @@ export default {
       item.price_per_unit = predefinedItem.sale_price?.sale_price || "1";
       item.discount_percent =
         predefinedItem.discount_price?.discount_price || "";
-      item.tax_percent =
-        predefinedItem.item_tax ||
-        this.taxOptions.find((t) => t.includes("GST@0%")) ||
-        "GST@0%";
+item.tax_percent =
+  predefinedItem.item_tax ||
+  this.taxOptions.find(t => t.includes("GST@0%")) ||
+  "GST@0%";
       item.unit_id = "";
       item.showDropdown = false;
 

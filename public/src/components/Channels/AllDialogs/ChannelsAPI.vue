@@ -210,7 +210,7 @@ export default {
         let result = await API.graphql(
           graphqlOperation(get_particular_broadcast_details, {
             input: {
-              user_email_id: this.$store.getters.GetUserObj.user?.user_email_id,
+              user_email_id: this.$store.getters.GetUserObj.user.user_email_id,
               team_id: fetchName.team_id,
             },
           })

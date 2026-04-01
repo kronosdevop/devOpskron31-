@@ -651,7 +651,6 @@ export const list_all_organizations_swipes = /* GraphQL */ `
         swipe_id
         location_id
         datacorrected_by
-        datacorrected_by_name
         swiped_time
         member_id
         user_name
@@ -794,7 +793,6 @@ export const list_presence_reports = /* GraphQL */ `
         progressing_status
         report_created_on
         report_generated_by
-        report_generated_by_name
         report_type
         generationreport_url
         report_genrated_month
@@ -1087,7 +1085,6 @@ export const list_timesheet_reports = /* GraphQL */ `
         progressing_status
         report_created_on
         report_generated_by
-        report_generated_by_name
         report_type
         generationreport_url
         report_genrated_month
@@ -1748,8 +1745,18 @@ export const list_my_leaves = /* GraphQL */ `
   }
 `;
 export const get_supplier_transactions = /* GraphQL */ `
-  query Get_supplier_transactions($input: getSupplierTransactionInputs) {
-    get_supplier_transactions(input: $input)
+  query Get_supplier_transactions(
+    $supplier_id: String!
+    $organization_id: String!
+    $nextToken: String
+    $limit: Int
+  ) {
+    get_supplier_transactions(
+      supplier_id: $supplier_id
+      organization_id: $organization_id
+      nextToken: $nextToken
+      limit: $limit
+    )
   }
 `;
 export const list_all_reward_projects = /* GraphQL */ `
@@ -1840,39 +1847,5 @@ export const get_leaderboard = /* GraphQL */ `
 export const get_apps_enabled_status = /* GraphQL */ `
   query Get_apps_enabled_status {
     get_apps_enabled_status
-  }
-`;
-export const get_inventory_stock = /* GraphQL */ `
-  query Get_inventory_stock($input: GetInventoryStockInput) {
-    get_inventory_stock(input: $input)
-  }
-`;
-export const get_inventory_consumption_logs = /* GraphQL */ `
-  query Get_inventory_consumption_logs(
-    $input: GetInventoryConsumptionLogsInput
-  ) {
-    get_inventory_consumption_logs(input: $input)
-  }
-`;
-export const list_all_org_projects = /* GraphQL */ `
-  query List_all_org_projects($input: ListAllOrgProjectsInput) {
-    list_all_org_projects(input: $input)
-  }
-`;
-export const get_project_notification_settings = /* GraphQL */ `
-  query Get_project_notification_settings(
-    $input: getProjectNotificationSettingsInput
-  ) {
-    get_project_notification_settings(input: $input)
-  }
-`;
-export const get_worktypes = /* GraphQL */ `
-  query Get_worktypes($input: GetWorktypesInput) {
-    get_worktypes(input: $input)
-  }
-`;
-export const list_worktype_forms = /* GraphQL */ `
-  query List_worktype_forms($input: listWorktypeFormsInput) {
-    list_worktype_forms(input: $input)
   }
 `;

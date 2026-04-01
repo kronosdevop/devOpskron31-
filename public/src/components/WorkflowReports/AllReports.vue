@@ -46,11 +46,18 @@
           </template>
 
           <!-- Workflow Name -->
-            <template v-slot:[`item.report_name`]="{ item }">
-          <div class="workflow-cell">
-            {{ item.report_name }}
-          </div>
-        </template>
+          <template v-slot:[`item.report_name`]="{ item }">
+            <div class="d-flex align-center">
+              <!-- <v-icon size="20" color="primary" class="mr-3"
+                >mdi-file-document</v-icon
+              > -->
+              <div>
+                <div class="font-weight-medium text-body-2">
+                  {{ item.report_name }}
+                </div>
+              </div>
+            </div>
+          </template>
 
           <!-- From Date -->
           <template v-slot:[`item.report_from_date`]="{ item }">
@@ -314,7 +321,6 @@ filteredItems() {
     fetch_value(val) {
       return format_Date(val);
     },
-   
 
     async fetch_records() {
       this.tableLoading = true;
@@ -347,36 +353,31 @@ filteredItems() {
       }
     },
 
-        async download_item(item) {
-  try {
-    if (!item.report_url) {
-      throw new Error("Report URL not found");
-    }
+    async download_item(item) {
+      const fileName = `${item.report_name}.xlsx`;
 
-    const response = await axios.get(item.report_url, {
-      responseType: "blob",
-    });
+      try {
+        const response = await axios({
+          url: item.report_url,
+          method: "GET",
+          responseType: "blob",
+        });
 
-    const blob = new Blob([response.data], {
-      type:
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    });
+        const blob = new Blob([response.data], {
+          type: response.headers["content-type"],
+        });
 
-    const fileName = `${item.report_name || "Report"}.xlsx`;
-
-    FileSaver.saveAs(blob, fileName);
-
-  } catch (err) {
-    console.error(err);
-    this.$store.commit("SetSnackbar", {
-      SnackbarVmodel: true,
-      SnackbarColor: "red",
-      SnackbarText: "Download failed.",
-      timeout: 4000,
-      Top: true,
-    });
-  }
-},
+        FileSaver.saveAs(blob, fileName);
+      } catch (err) {
+        this.$store.commit("SetSnackbar", {
+          SnackbarVmodel: true,
+          SnackbarColor: "red",
+          SnackbarText: "Download failed.",
+          timeout: 4000,
+          Top: true,
+        });
+      }
+    },
 
     handleSortChange(value) {
       // Implement the logic to handle sort change
@@ -481,16 +482,5 @@ filteredItems() {
 
 .modern-data-table :deep(.v-data-table__tbody tr) {
   transition: background-color 0.2s ease;
-}
-.workflow-cell {
-  max-width: 200px;
-  white-space: normal;  
-  word-break: break-word;  
-  line-height: 1.3;
-}
-
-.modern-data-table :deep(td:not(:first-child)),
-.modern-data-table :deep(th:not(:first-child)) {
-  white-space: nowrap;
 }
 </style>

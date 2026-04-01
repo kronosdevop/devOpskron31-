@@ -34,7 +34,7 @@
         <v-btn
           v-if="salesToggle === 'quotation'"
           @click="createQuotation()"
-          class="action-btn mr-4"
+          class="action-btn"
           size="small"
         >
           <v-icon>mdi-plus</v-icon>
@@ -45,7 +45,7 @@
         <v-btn
           v-if="salesToggle === 'proforma'"
           @click="createProforma()"
-          class="action-btn mr-4"
+          class="action-btn"
           size="small"
         >
           <v-icon>mdi-plus</v-icon>
@@ -56,7 +56,7 @@
         <v-btn
           v-if="salesToggle === 'sales-order'"
           @click="createSalesOrder()"
-          class="action-btn mr-4"
+          class="action-btn"
           size="small"
         >
           <v-icon>mdi-plus</v-icon>
@@ -67,7 +67,7 @@
         <v-btn
           v-if="salesToggle === 'invoice'"
           @click="createInvoice()"
-          class="action-btn mr-4"
+          class="action-btn"
           size="small"
         >
           <v-icon>mdi-plus</v-icon>
@@ -78,7 +78,7 @@
         <v-btn
           v-if="salesToggle === 'paymentin'"
           @click="addPaymentIn()"
-          class="action-btn mr-4"
+          class="action-btn"
           size="small"
         >
           <v-icon>mdi-plus</v-icon>

@@ -21,8 +21,8 @@
         <v-divider></v-divider>
 
         <!--Text field-->
-        <div class="text-center pa-4 font-weight-bold">
-          🚨 Are you sure you want to delete question -
+        <div class="d-flex justify-center pa-4 font-weight-bold">
+          Are you sure you want to delete question
           {{ StoreObj.splay_question_text }}?
         </div>
 

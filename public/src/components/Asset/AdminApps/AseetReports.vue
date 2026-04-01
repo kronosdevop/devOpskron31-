@@ -1,6 +1,10 @@
 <template>
   <div>
-  <OverlayComp :overlay="overlay"/>
+    <v-overlay v-model="loading" class="align-center justify-center">
+      <v-progress-circular color="primary" size="44" indeterminate>
+      </v-progress-circular>
+      <span class="ml-4">Loading...</span>
+    </v-overlay>
     <v-card flat >
       <v-card-text>
         <v-row no-gutters>
@@ -106,18 +110,13 @@ import SnackBar from "@/components/SnackBar.vue";
 import { asset_dashboard_reports } from "@/graphql/queries.js";
 import { API, graphqlOperation } from "aws-amplify";
 import { GChart } from "vue-google-charts";
-import OverlayComp from "@/components/OverlayComp.vue";
-
 export default {
   components: {
     GChart,
     SnackBar,
-    OverlayComp,
-
   },
   data() {
     return {
-            overlay: false,
       chartData1: [["labels", "Data"]],
       chartData2: [["labels", "Data"]],
       chartData3: [["labels", "Data"]],
@@ -189,7 +188,6 @@ export default {
           sortable: false,
         },
       ],
-      
     };
   },
   async mounted() {
@@ -202,7 +200,7 @@ export default {
       return data;
     },
     async get_asset_graph() {
-      this.overlay = true;
+      this.loading = true;
       try {
         let result = await API.graphql(
           graphqlOperation(asset_dashboard_reports, {
@@ -214,7 +212,7 @@ export default {
 
         var response = JSON.parse(result.data.asset_dashboard_reports).data;
         // console.log(response);
-      this.overlay = false;
+        this.loading = false;
         this.graphdata = response.asset_details;
         this.adminassetRecords = response.recently_added_assets;
 
@@ -238,7 +236,7 @@ export default {
 
         // console.log(this.chartData1);
       } catch (error) {
-      this.overlay = false;
+        this.loading = false;
         console.log(error);
         this.SnackBarComponent = {
           SnackbarVmodel: true,

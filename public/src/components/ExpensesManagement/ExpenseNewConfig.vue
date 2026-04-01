@@ -3,10 +3,12 @@
     <SnackBar :SnackBarComponent="SnackBarComponent" />
 
     <v-card flat>
-      <!-- Toolbar -->
-      <v-toolbar flat class="bg-white mt-2">
+      <v-toolbar flat class="bg-white">
+        <v-toolbar-title class="text-h6 font-weight-medium">
+          <v-icon size="24" color="primary" class="mr-3">mdi-cog</v-icon>
+          Petty Cash Request Limits Configuration
+        </v-toolbar-title>
         <v-spacer />
-
         <v-btn
           dark
           @click="saveConfiguration"
@@ -19,120 +21,111 @@
         </v-btn>
       </v-toolbar>
 
-      <v-card-text class="pa-6 mt-n6">
-        <v-row>
-          <!-- Petty Cash Limits -->
-          <v-col cols="12" md="6">
-            <v-card elevation="2" class="pa-6 setting-card">
-              <v-card-title class="text-h6 font-weight-bold mb-4">
-                <v-icon color="primary" class="mr-2 ml-n5">mdi-cash-multiple</v-icon>
-                Petty Cash Limits
+      <v-card-text class="pa-6">
+        <v-row justify="start">
+          <v-col cols="12" md="8" lg="6">
+            <v-card class="pa-6" elevation="2">
+              <v-card-title class="text-h6 font-weight-medium mb-4">
+                <v-icon size="24" color="primary" class="mr-3"
+                  >mdi-currency-usd</v-icon
+                >
+                Request Amount Limits
               </v-card-title>
 
               <v-form ref="form" v-model="isFormValid">
+                <!-- Minimum Request Amount -->
                 <v-text-field
                   v-model="minAmount"
                   label="Minimum Request Amount"
-                  placeholder="Enter minimum amount"
+                  placeholder="Enter minimum amount (e.g., 10.00)"
                   type="number"
+                  :rules="minAmountRules"
                   prefix="₹"
                   variant="outlined"
                   density="comfortable"
                   class="mb-4"
-                  :rules="minAmountRules"
                   :error-messages="minAmountError"
                   @input="validateForm"
+                  @blur="validateMinAmount"
                 >
                   <template v-slot:prepend-inner>
                     <v-icon color="primary">mdi-currency-inr</v-icon>
                   </template>
                 </v-text-field>
 
+                <!-- Maximum Request Amount -->
                 <v-text-field
                   v-model="maxAmount"
                   label="Maximum Request Amount"
-                  placeholder="Enter maximum amount"
+                  placeholder="Enter maximum amount (e.g., 1000.00)"
                   type="number"
+                  :rules="maxAmountRules"
                   prefix="₹"
                   variant="outlined"
                   density="comfortable"
-                  :rules="maxAmountRules"
+                  class="mb-4"
                   :error-messages="maxAmountError"
                   @input="validateForm"
+                  @blur="validateMaxAmount"
                 >
                   <template v-slot:prepend-inner>
                     <v-icon color="primary">mdi-currency-inr</v-icon>
                   </template>
                 </v-text-field>
 
-                <v-switch
+                <!-- Negative Balance Checkbox -->
+                <v-checkbox
                   v-model="allowNegativeBalance"
+                  label="Is negative balance allowed"
                   color="primary"
-                  class="mt-4"
-                  label="Allow Negative Balance"
-                />
+                  hide-details
+                  class="mb-4"
+                >
+                  <template v-slot:label>
+                    <div class="d-flex align-center">
+                      <v-icon size="18" color="primary" class="mr-2"
+                        >mdi-minus-circle</v-icon
+                      >
+                      <span class="font-weight-medium"
+                        >Is negative balance allowed</span
+                      >
+                    </div>
+                  </template>
+                </v-checkbox>
               </v-form>
             </v-card>
           </v-col>
 
-          <!-- Expense Settings -->
-          <v-col cols="12" md="6">
-            <v-card elevation="2" class="pa-6 setting-card">
-              <v-card-title class="text-h6 font-weight-bold mb-4">
-                <v-icon color="primary" class="mr-2 ml-n5">mdi-cog-outline</v-icon>
-                Expense Settings
+          <v-col cols="12" md="8" lg="6">
+            <v-card class="pa-6" elevation="2">
+              <v-card-title class="text-h6 font-weight-medium mb-4">
+                <v-icon size="24" color="primary" class="mr-3"
+                  >mdi-paperclip</v-icon
+                >
+                Attachment Requirements
               </v-card-title>
 
-              <!-- Attachment -->
-              <div class="setting-row">
-                <div class="setting-info">
-                  <v-icon color="primary">mdi-paperclip</v-icon>
-
-                  <div>
-                    <div class="setting-title">Expense Attachment</div>
-                    <div class="setting-subtitle">
-                      Require attachment when submitting expense
-                    </div>
-                  </div>
-                </div>
-
-                <v-switch
+              <v-form>
+                <!-- Attachment Required Checkbox -->
+                <v-checkbox
                   v-model="isExpenseAttachmentRequired"
+                  label="Is expense attachment required"
                   color="primary"
-                />
-              </div>
-
-              <!-- Vendor -->
-              <div class="setting-row">
-                <div class="setting-info">
-                  <v-icon color="primary">mdi-account-tie</v-icon>
-
-                  <div>
-                    <div class="setting-title">Vendor Configuration</div>
-                    <div class="setting-subtitle">
-                      Enable vendor selection for expense
+                  hide-details
+                  class="mb-4"
+                >
+                  <template v-slot:label>
+                    <div class="d-flex align-center">
+                      <v-icon size="18" color="primary" class="mr-2"
+                        >mdi-attachment</v-icon
+                      >
+                      <span class="font-weight-medium"
+                        >Expense Attachment Mandatory</span
+                      >
                     </div>
-                  </div>
-                </div>
-
-                <v-switch v-model="vendorEnabled" color="primary" />
-              </div>
-
-              <!-- Subcategory -->
-              <div class="setting-row">
-                <div class="setting-info">
-                  <v-icon color="primary">mdi-shape-outline</v-icon>
-
-                  <div>
-                    <div class="setting-title">Subcategory Configuration</div>
-                    <div class="setting-subtitle">
-                      Enable subcategory field for expense
-                    </div>
-                  </div>
-                </div>
-
-                <v-switch v-model="subcategoryEnabled" color="primary" />
-              </div>
+                  </template>
+                </v-checkbox>
+              </v-form>
             </v-card>
           </v-col>
         </v-row>
@@ -149,50 +142,38 @@ import { get_Org_details } from "@/mixins/GetOrgDetails.js";
 
 export default {
   mixins: [get_Org_details],
-
   name: "ExpenseNewConfig",
-
   components: {
     SnackBar,
   },
-
   data() {
     return {
       minAmount: "",
       maxAmount: "",
       allowNegativeBalance: false,
-
       isExpenseAttachmentRequired: false,
-      vendorEnabled: false,
-      subcategoryEnabled: false,
-
       isFormValid: false,
       saving: false,
-
       minAmountError: "",
       maxAmountError: "",
       rangeError: false,
-
       SnackBarComponent: {},
 
+      // Validation rules
       minAmountRules: [
         (v) => !!v || "Minimum amount is required",
         (v) => !isNaN(v) || "Must be a valid number",
         (v) => parseFloat(v) > 0 || "Must be greater than 0",
+        (v) => parseFloat(v) <= 999999 || "Amount too large",
       ],
 
       maxAmountRules: [
         (v) => !!v || "Maximum amount is required",
         (v) => !isNaN(v) || "Must be a valid number",
         (v) => parseFloat(v) > 0 || "Must be greater than 0",
+        (v) => parseFloat(v) <= 999999 || "Amount too large",
       ],
     };
-  },
-
-  async created() {
-    await this.get_Org_details();
-        this.loadConfiguration();
-
   },
 
   methods: {
@@ -200,30 +181,49 @@ export default {
       this.$nextTick(() => {
         const formValid = this.$refs.form?.validate() || false;
         const rangeValid = !this.rangeError;
-
         this.isFormValid = formValid && rangeValid;
       });
+    },
+
+    validateMinAmount() {
+      const value = parseFloat(this.minAmount);
+      if (this.minAmount && (isNaN(value) || value <= 0)) {
+        this.minAmountError = "Please enter a valid positive number";
+      } else {
+        this.minAmountError = "";
+      }
+      this.validateRange();
+    },
+
+    validateMaxAmount() {
+      const value = parseFloat(this.maxAmount);
+      if (this.maxAmount && (isNaN(value) || value <= 0)) {
+        this.maxAmountError = "Please enter a valid positive number";
+      } else {
+        this.maxAmountError = "";
+      }
+      this.validateRange();
     },
 
     validateRange() {
       const min = parseFloat(this.minAmount);
       const max = parseFloat(this.maxAmount);
 
-      if (min && max) {
+      if (this.minAmount && this.maxAmount && !isNaN(min) && !isNaN(max)) {
         if (max <= min) {
           this.rangeError = true;
         } else {
           this.rangeError = false;
         }
+      } else {
+        this.rangeError = false;
       }
+      this.validateForm();
     },
 
-    fetch_min_max_amount() {
-      return JSON.stringify({
-        min_amount: this.minAmount,
-        max_amount: this.maxAmount,
-        allow_negative_balance: this.allowNegativeBalance,
-      });
+    formatCurrency(value) {
+      if (!value) return "0.00";
+      return parseFloat(value).toFixed(2);
     },
 
     async saveConfiguration() {
@@ -235,34 +235,23 @@ export default {
           timeout: 5000,
           Top: true,
         };
-
         return;
       }
 
       this.saving = true;
-
       var data = this.$store.getters.GetUserObj;
-
       try {
         let result = await API.graphql(
           graphqlOperation(edit_organization, {
             input: {
               organization_id: data.organization.organization_id,
               user_email_id: data.user.user_email_id,
-
               petty_cash_settings: this.fetch_min_max_amount(),
-
               is_expense_attachment_required: this.isExpenseAttachmentRequired,
-
-              is_expense_vendor_enabled: this.vendorEnabled,
-
-              is_expense_subcategory_enabled: this.subcategoryEnabled,
             },
           })
         );
-
         var response = JSON.parse(result.data.edit_organization);
-
         if (response.Status == "SUCCESS") {
           this.SnackBarComponent = {
             SnackbarVmodel: true,
@@ -272,8 +261,8 @@ export default {
             Top: true,
           };
 
+          this.saving = false;
           await this.get_Org_details();
-
           this.loadConfiguration();
         } else {
           this.SnackBarComponent = {
@@ -283,12 +272,11 @@ export default {
             timeout: 5000,
             Top: true,
           };
+       
+          this.saving = false;
         }
-
-        this.saving = false;
       } catch (error) {
-        this.saving = false;
-
+        this.loading = false;
         this.SnackBarComponent = {
           SnackbarVmodel: true,
           SnackbarColor: "red",
@@ -299,63 +287,79 @@ export default {
       }
     },
 
+    fetch_min_max_amount() {
+      var data = {
+        min_amount: this.minAmount,
+        max_amount: this.maxAmount,
+        allow_negative_balance: this.allowNegativeBalance,
+      };
+      return JSON.stringify(data);
+    },
+
+ 
+
     async loadConfiguration() {
       try {
         var data = this.$store.getters.GetOrgDetails;
-
+        // console.log(data);  
         this.isExpenseAttachmentRequired =
           data.organization.is_expense_attachment_required || false;
 
-        this.vendorEnabled = data.organization.is_expense_vendor_enabled || false;
+        if (
+          data &&
+          data.organization &&
+          data.organization.petty_cash_settings
+        ) {
+          // Parse the petty cash settings from the organization data
+          const pettyCashSettings = data.organization.petty_cash_settings;
 
-        this.subcategoryEnabled =
-          data.organization.is_expense_subcategory_enabled || false;
+          // Set the form values from the parsed settings
+          this.minAmount = pettyCashSettings.min_amount || "";
+          this.maxAmount = pettyCashSettings.max_amount || "";
+          this.allowNegativeBalance =
+            pettyCashSettings.allow_negative_balance || false;
 
-        if (data.organization.petty_cash_settings) {
-          const petty = data.organization.petty_cash_settings;
-
-          this.minAmount = petty.min_amount || "";
-          this.maxAmount = petty.max_amount || "";
-          this.allowNegativeBalance = petty.allow_negative_balance || false;
+          // this.validateForm();
+        } else {
+          // If no settings exist, set default values
+          this.minAmount = "";
+          this.maxAmount = "";
+          this.allowNegativeBalance = false;
+          this.isExpenseAttachmentRequired = false;
         }
       } catch (error) {
-        console.error(error);
+        this.showError("Failed to load existing configuration");
+
+        // Set default values on error
+        this.minAmount = "";
+        this.maxAmount = "";
+        this.allowNegativeBalance = false;
+        this.isExpenseAttachmentRequired = false;
       }
+    },
+  },
+
+  mounted() {
+    this.loadConfiguration();
+  },
+
+  watch: {
+    minAmount() {
+      this.validateMinAmount();
+    },
+    maxAmount() {
+      this.validateMaxAmount();
     },
   },
 };
 </script>
 
 <style scoped>
-.setting-card {
-  border-radius: 14px;
+.v-text-field :deep(.v-field__outline) {
+  border-radius: 8px;
 }
 
-.setting-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 0;
-  border-bottom: 1px solid #f1f1f1;
-}
-
-.setting-row:last-child {
-  border-bottom: none;
-}
-
-.setting-info {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.setting-title {
-  font-weight: 600;
-  font-size: 15px;
-}
-
-.setting-subtitle {
-  font-size: 13px;
-  color: #6b7280;
+.v-card {
+  border-radius: 12px;
 }
 </style>

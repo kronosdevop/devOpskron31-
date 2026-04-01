@@ -22,7 +22,7 @@
 
         <!--Text field-->
         <div class="text-center pa-4 font-weight-bold">
-          🚨 Are you sure you want to delete category -
+          Are you sure you want to delete category -
           {{ StoreObj.splay_category_name }}?
         </div>
 

@@ -1,11 +1,7 @@
 <template>
   <div>
-    <CreateTicketDialog
-      :DialogCreateTicket="DialogCreateTicket"
-      :screenshot-file="ScreenshotFile"
-      :org-details="orgDetails"
-      @clicked="DialogCreateTicketEmit"
-    />
+    <CreateTicketDialog :DialogCreateTicket="DialogCreateTicket" :screenshot-file="ScreenshotFile"
+      :org-details="orgDetails" @clicked="DialogCreateTicketEmit" />
     <v-app-bar class="modern-header-section">
       <div class="header-left">
         <div class="header-icon-container">
@@ -14,19 +10,14 @@
           </div>
         </div>
         <div class="header-text">
-          <span class="header-title"
-            >Submitted Workflows
-            <v-icon @click="refresh_list" size="x-small" color="primary"
-              >mdi-refresh</v-icon
-            >
-          </span>
-          <span class="header-subtitle"
-            >Review and manage submitted workflows</span
-          >
+          <span class="header-title">Submitted Workflows <v-icon  @click="refresh_list" size="x-small" color="primary">mdi-refresh</v-icon>
+</span>
+          <span class="header-subtitle">Review and manage submitted workflows</span>
         </div>
       </div>
       <v-spacer />
-      <div class="refresh-action"></div>
+      <div class="refresh-action">
+      </div>
       <div class="header-actions">
         <!--Screenshot Button-->
         <v-tooltip text="Take a screenshot and raise a ticket">
@@ -38,60 +29,33 @@
         </v-tooltip>
 
         <!-- Filter Button -->
-        <v-btn
-          :class="
-            activeFiltersCount > 0
-              ? 'action-btn filter-btn active'
-              : 'action-btn filter-btn'
-          "
-          @click="openFilterDrawer()"
-          style="margin-right: 2px"
-        >
+        <v-btn :class="activeFiltersCount > 0
+            ? 'action-btn filter-btn active'
+            : 'action-btn filter-btn'
+          " @click="openFilterDrawer()" style="margin-right: 16px">
           <v-icon>mdi-filter-variant</v-icon>
           <span>Filter</span>
-          <v-badge
-            v-if="activeFiltersCount > 0"
-            :content="activeFiltersCount"
-            color="white"
-            class="ml-2"
-          />
+          <v-badge v-if="activeFiltersCount > 0" :content="activeFiltersCount" color="white" class="ml-2" />
         </v-btn>
 
-        <v-btn
-          color="primary"
-          class="text-capitalize mr-4"
-          @click="back_call()"
-          prepend-icon="mdi-step-backward"
-          style="background: #db4c77 !important; color: white !important"
-        >
+        <v-btn color="primary" size="small" class="text-capitalize" @click="back_call()"
+          prepend-icon="mdi-step-backward" style="background: #db4c77 !important; color: white !important">
           Back
         </v-btn>
       </div>
     </v-app-bar>
 
     <!-- Filter Navigation Drawer -->
-    <v-navigation-drawer
-      :model-value="showFilterDrawer"
-      @update:model-value="showFilterDrawer = $event"
-      location="right"
-      temporary
-      width="400"
-      class="pa-0 filter-drawer"
-      :style="{ top: '64px', height: 'calc(100vh - 64px)' }"
-    >
+    <v-navigation-drawer :model-value="showFilterDrawer" @update:model-value="showFilterDrawer = $event"
+      location="right" temporary width="400" class="pa-0 filter-drawer"
+      :style="{ top: '64px', height: 'calc(100vh - 64px)' }">
       <v-card flat>
         <v-toolbar elevation="1" density="compact" class="navBar">
           <v-toolbar-title class="text--white ml-2">
             <div class="custom-title">Filter Options</div>
           </v-toolbar-title>
           <v-spacer />
-          <v-btn
-            variant="text"
-            color="white"
-            size="small"
-            @click="clear_data()"
-            class="mr-2"
-          >
+          <v-btn variant="text" color="white" size="small" @click="clear_data()" class="mr-2">
             <v-icon size="16">mdi-close-circle</v-icon>
             <span class="ml-1">Clear</span>
           </v-btn>
@@ -103,155 +67,50 @@
               <!-- Status Filter -->
               <div class="filter-group">
                 <label class="filter-label">Status</label>
-                <v-select
-                  v-model="filterBy"
-                  :items="[
-                    { title: 'ALL', value: 'ALL' },
-                    { title: 'INPROGRESS', value: 'INPROGRESS' },
-                    { title: 'COMPLETED', value: 'COMPLETED' },
-                    { title: 'REJECTED', value: 'REJECTED' },
-                    { title: 'WITHDRAWN', value: 'WITHDRAWN' },
-                  ]"
-                  item-title="title"
-                  item-value="value"
-                  variant="outlined"
-                  density="compact"
-                  hide-details
-                  class="filter-select"
-                />
+                <v-select v-model="filterBy" :items="[
+                  { title: 'ALL', value: 'ALL' },
+                  { title: 'INPROGRESS', value: 'INPROGRESS' },
+                  { title: 'COMPLETED', value: 'COMPLETED' },
+                  { title: 'REJECTED', value: 'REJECTED' },
+                  { title: 'WITHDRAWN', value: 'WITHDRAWN' },
+                ]" item-title="title" item-value="value" variant="outlined" density="compact" hide-details
+                  class="filter-select" />
               </div>
 
               <!-- Workflow Filter -->
               <div class="filter-group">
                 <label class="filter-label">Workflow</label>
-                <v-autocomplete
-                  v-model="filterByAction"
-                  :items="workflowItems"
-                  variant="outlined"
-                  density="compact"
-                  hide-details
-                  class="filter-select"
-                  :menu-props="{ offsetY: true, maxHeight: 200 }"
-                  @update:model-value="input_check"
-                />
+                <v-autocomplete v-model="filterByAction" :items="workflowItems" variant="outlined" density="compact"
+                  hide-details class="filter-select" :menu-props="{ offsetY: true, maxHeight: 200 }"
+                  @update:model-value="input_check" />
               </div>
 
               <!-- Summary Fields Filter -->
               <div class="filter-group" v-if="selectItems.length">
                 <label class="filter-label">Summary Field</label>
-                <v-select
-                  v-model="summarylabel"
-                  :items="selectItems"
-                  item-text="text"
-                  item-value="value"
-                  variant="outlined"
-                  density="compact"
-                  hide-details
-                  class="filter-select"
-                  :menu-props="{ offsetY: true, maxHeight: 200 }"
-                />
+                <v-select v-model="summarylabel" :items="selectItems" item-text="text" item-value="value"
+                  variant="outlined" density="compact" hide-details class="filter-select"
+                  :menu-props="{ offsetY: true, maxHeight: 200 }" />
               </div>
 
               <!-- Search Summary -->
               <div class="filter-group" v-if="summarylabel != ''">
                 <label class="filter-label">Search Summary</label>
-                <v-text-field
-                  v-model="searchsummary"
-                  placeholder="Min 3 Character"
-                  variant="outlined"
-                  density="compact"
-                  hide-details
-                  class="filter-select"
-                  append-inner-icon="mdi-magnify"
-                  :rules="[
+                <v-text-field v-model="searchsummary" placeholder="Min 3 Character" variant="outlined" density="compact"
+                  hide-details class="filter-select" append-inner-icon="mdi-magnify" :rules="[
                     (v) =>
                       v.length >= 3 || v.length === 0 || 'Min 3 characters',
-                  ]"
-                />
-              </div>
-              <!-- From Date -->
-              <div class="filter-group">
-                <label class="filter-label">From Date</label>
-
-                <v-text-field
-                  v-model="fromDateFilter"
-                  variant="outlined"
-                  density="compact"
-                  readonly
-                  class="filter-select"
-                  append-inner-icon="mdi-calendar"
-                  @click="fromDateMenu = true"
-                />
-
-                <v-dialog v-model="fromDateMenu" max-width="320">
-                  <v-card>
-                    <v-date-picker
-                      v-model="tempFromDate"
-                      :max="todayDate"
-                      color="#DB4C77"
-                    />
-                    <v-card-actions>
-                      <v-spacer></v-spacer>
-                      <v-btn text @click="fromDateMenu = false">Cancel</v-btn>
-                      <v-btn text color="primary" @click="saveFromDateFilter"
-                        >OK</v-btn
-                      >
-                    </v-card-actions>
-                  </v-card>
-                </v-dialog>
-              </div>
-
-              <!-- To Date -->
-              <div class="filter-group">
-                <label class="filter-label">To Date</label>
-
-                <v-text-field
-                  v-model="toDateFilter"
-                  variant="outlined"
-                  density="compact"
-                  readonly
-                  class="filter-select"
-                  append-inner-icon="mdi-calendar"
-                  @click="toDateMenu = true"
-                />
-
-                <v-dialog v-model="toDateMenu" max-width="320">
-                  <v-card>
-                    <v-date-picker
-                      v-model="tempToDate"
-                      :min="fromDateRaw"
-                      :max="todayDate"
-                      color="#DB4C77"
-                    />
-                    <v-card-actions>
-                      <v-spacer></v-spacer>
-                      <v-btn text @click="toDateMenu = false">Cancel</v-btn>
-                      <v-btn text color="primary" @click="saveToDateFilter"
-                        >OK</v-btn
-                      >
-                    </v-card-actions>
-                  </v-card>
-                </v-dialog>
+                  ]" />
               </div>
 
               <!-- Action Buttons -->
               <div class="filter-actions">
-                <v-btn
-                  :loading="goLoading"
-                  class="apply-filter-btn"
-                  @click="applyFilterFromDrawer()"
-                  block
-                  style="margin-bottom: 8px"
-                >
+                <v-btn :loading="goLoading" class="apply-filter-btn" @click="applyFilterFromDrawer()" block
+                  style="margin-bottom: 8px">
                   <v-icon class="mr-2">mdi-filter</v-icon>
                   Apply Filters
                 </v-btn>
-                <v-btn
-                  class="clear-filter-btn"
-                  @click="clear_data()"
-                  block
-                  variant="outlined"
-                >
+                <v-btn class="clear-filter-btn" @click="clear_data()" block variant="outlined">
                   <v-icon class="mr-2">mdi-close</v-icon>
                   Clear All
                 </v-btn>
@@ -270,27 +129,13 @@
         <div class="card-container" style="position: relative">
           <v-card class="" flat>
             <v-card-text class="pa-4">
-              <v-data-table
-                :headers="headers"
-                :items="paginatedItems"
-                :loading="tableLoading"
-                :sort-by="['workflow_initiated_on']"
-                :items-per-page="itemsPerPage"
-                :page="currentPage"
-                :server-items-length="totalItems"
-                hide-default-footer
-                class="modern-data-table"
-                density="comfortable"
-                hover
-                :fixed-header="true"
-                :height="windowHeight"
-                @click:row="handleClick"
-              >
+              <v-data-table :headers="headers" :items="paginatedItems" :loading="tableLoading"
+                :sort-by="['workflow_initiated_on']" :items-per-page="itemsPerPage" :page="currentPage"
+                :server-items-length="totalItems" hide-default-footer class="modern-data-table" density="comfortable"
+                hover :fixed-header="true" :height="windowHeight" @click:row="handleClick">
                 <template v-slot:no-data>
                   <div class="text-center py-8">
-                    <v-icon size="64" color="grey-lighten-1" class="mb-4"
-                      >mdi-file-document-multiple</v-icon
-                    >
+                    <v-icon size="64" color="grey-lighten-1" class="mb-4">mdi-file-document-multiple</v-icon>
                     <div class="text-h6 text-grey mb-2">
                       No Submitted Workflows
                     </div>
@@ -302,12 +147,7 @@
 
                 <template v-slot:loading>
                   <div class="text-center py-8">
-                    <v-progress-circular
-                      indeterminate
-                      color="primary"
-                      size="32"
-                      class="mb-4"
-                    ></v-progress-circular>
+                    <v-progress-circular indeterminate color="primary" size="32" class="mb-4"></v-progress-circular>
                     <div class="text-body-2 text-grey">
                       Loading workflows...
                     </div>
@@ -317,11 +157,7 @@
                 <!-- Approval Status -->
                 <template v-slot:[`item.approval_status`]="{ item }">
                   <div class="d-flex align-center">
-                    <v-icon
-                      size="16"
-                      :color="getStatusColor(item.approval_status)"
-                      class="mr-2"
-                    >
+                    <v-icon size="16" :color="getStatusColor(item.approval_status)" class="mr-2">
                       {{ getStatusIcon(item.approval_status) }}
                     </v-icon>
                     <span class="caption font-weight-medium">{{
@@ -336,11 +172,7 @@
                     <span class="caption font-weight-medium">{{
                       item.transaction_id
                     }}</span>
-                    <span
-                      class="caption text-truncate"
-                      style="max-width: 200px"
-                      >{{ item.workflow_name }}</span
-                    >
+                    <span class="caption text-truncate" style="max-width: 200px">{{ item.workflow_name }}</span>
                   </div>
                 </template>
 
@@ -359,11 +191,7 @@
                   <div class="d-flex flex-column">
                     <v-tooltip location="top" v-if="item.summary_field_1">
                       <template v-slot:activator="{ props }">
-                        <span
-                          v-bind="props"
-                          class="caption text-truncate"
-                          style="max-width: 200px"
-                        >
+                        <span v-bind="props" class="caption text-truncate" style="max-width: 200px">
                           {{ getFileName(item.summary_field_1) }}
                         </span>
                       </template>
@@ -373,11 +201,7 @@
 
                     <v-tooltip location="top" v-if="item.summary_field_2">
                       <template v-slot:activator="{ props }">
-                        <span
-                          v-bind="props"
-                          class="caption text-truncate text-grey"
-                          style="max-width: 200px"
-                        >
+                        <span v-bind="props" class="caption text-truncate text-grey" style="max-width: 200px">
                           {{ getFileName(item.summary_field_2) }}
                         </span>
                       </template>
@@ -394,7 +218,7 @@
                     <span class="caption font-weight-medium">
                       {{
                         item.approval_status == "COMPLETED" ||
-                        item.approval_status == "REJECTED"
+                          item.approval_status == "REJECTED"
                           ? fetch_user_name(item.workflow_approval_name)
                           : "-"
                       }}
@@ -420,17 +244,13 @@
                 <template v-slot:[`item.workflow_initiated_on`]="{ item }">
                   <div class="d-flex flex-column">
                     <div class="d-flex align-center">
-                      <v-icon size="16" color="primary" class="mr-2"
-                        >mdi-calendar-start</v-icon
-                      >
+                      <v-icon size="16" color="primary" class="mr-2">mdi-calendar-start</v-icon>
                       <span class="caption">{{
                         fetch_value(item.workflow_initiated_on)
                       }}</span>
                     </div>
                     <div class="d-flex align-center">
-                      <v-icon size="16" color="success" class="mr-2"
-                        >mdi-calendar-check</v-icon
-                      >
+                      <v-icon size="16" color="success" class="mr-2">mdi-calendar-check</v-icon>
                       <span class="caption">{{
                         fetch_value(item.workflow_aprroved_on)
                       }}</span>
@@ -449,43 +269,22 @@
                   }}
                 </div>
                 <div class="pagination-controls">
-                  <v-btn
-                    :disabled="currentPage === 1"
-                    variant="text"
-                    size="small"
-                    class="pagination-btn"
-                    @click="currentPage = currentPage - 1"
-                    style="color: #666 !important"
-                  >
+                  <v-btn :disabled="currentPage === 1" variant="text" size="small" class="pagination-btn"
+                    @click="currentPage = currentPage - 1" style="color: #666 !important">
                     Previous
                   </v-btn>
                   <div class="page-numbers">
-                    <v-btn
-                      v-for="page in visiblePages"
-                      :key="page"
-                      :variant="page === currentPage ? 'elevated' : 'text'"
-                      size="small"
-                      :class="
-                        page === currentPage ? 'active-page' : 'inactive-page'
-                      "
-                      @click="currentPage = page"
-                      :style="
-                        page === currentPage
+                    <v-btn v-for="page in visiblePages" :key="page"
+                      :variant="page === currentPage ? 'elevated' : 'text'" size="small" :class="page === currentPage ? 'active-page' : 'inactive-page'
+                        " @click="currentPage = page" :style="page === currentPage
                           ? 'background: #DB4C77 !important; color: white !important;'
                           : 'color: #666 !important;'
-                      "
-                    >
+                        ">
                       {{ page }}
                     </v-btn>
                   </div>
-                  <v-btn
-                    :disabled="currentPage === pageCount"
-                    variant="text"
-                    size="small"
-                    class="pagination-btn"
-                    @click="currentPage = currentPage + 1"
-                    style="color: #666 !important"
-                  >
+                  <v-btn :disabled="currentPage === pageCount" variant="text" size="small" class="pagination-btn"
+                    @click="currentPage = currentPage + 1" style="color: #666 !important">
                     Next
                   </v-btn>
                 </div>
@@ -498,15 +297,8 @@
 
     <!-- Form Dialog -->
     <div v-if="componentCheck == 1">
-      <FormInfo
-        :submittedInfo="submittedInfo"
-        :formDetails="formDetails"
-        :formAction="formAction"
-        v-on:errorMsg="error_info"
-        v-on:successMsg="success_info"
-        :rowInfo="rowInfo"
-        @clicked="submittedInfo = false"
-      />
+      <FormInfo :submittedInfo="submittedInfo" :formDetails="formDetails" :formAction="formAction"
+        v-on:errorMsg="error_info" v-on:successMsg="success_info" :rowInfo="rowInfo" @clicked="submittedInfo = false" />
     </div>
   </div>
 </template>
@@ -615,44 +407,14 @@ export default {
         bucket_name: "stichh-medias",
         region: "us-east-1",
       },
-      fromDateFilter: "",
-      toDateFilter: "",
-      fromDateMenu: false,
-      toDateMenu: false,
-      tempFromDate: null,
-      tempToDate: null,
-      todayDate: new Date().toISOString().split("T")[0],
-      fromDateRaw: "",
-      toDateRaw: "",
-      appliedFromDate: "",
-      appliedToDate: "",
     };
   },
 
   computed: {
     paginatedItems() {
-      let filtered = this.tableData;
-
-      if (this.appliedFromDate) {
-        filtered = filtered.filter(
-          (item) =>
-            new Date(item.workflow_initiated_on * 1000) >=
-            new Date(this.appliedFromDate)
-        );
-      }
-
-      if (this.appliedToDate) {
-        filtered = filtered.filter(
-          (item) =>
-            new Date(item.workflow_initiated_on * 1000) <=
-            new Date(this.appliedToDate)
-        );
-      }
-
       const start = (this.currentPage - 1) * this.itemsPerPage;
       const end = start + this.itemsPerPage;
-
-      return filtered.slice(start, end);
+      return this.tableData.slice(start, end);
     },
     pageCount() {
       return Math.ceil(this.totalItems / this.itemsPerPage);
@@ -682,9 +444,7 @@ export default {
     },
     activeFiltersCount() {
       let count = 0;
-      if (this.appliedFromDate || this.appliedToDate) {
-        count++;
-      }
+
       // Count status filter (if not default)
       if (this.filterBy && this.filterBy !== "ALL") {
         count++;
@@ -759,74 +519,9 @@ export default {
   },
 
   methods: {
-    formatDisplayDate(date) {
-      if (!date) return "";
-
-      // if date is a Date object
-      if (date instanceof Date) {
-        const day = String(date.getDate()).padStart(2, "0");
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const year = date.getFullYear();
-        return `${day}-${month}-${year}`;
-      }
-
-      // if date is string (YYYY-MM-DD)
-      if (typeof date === "string") {
-        const [year, month, day] = date.split("-");
-        return `${day}-${month}-${year}`;
-      }
-
-      return "";
-    },
-    saveFromDateFilter() {
-      if (!this.tempFromDate) return;
-
-      const date = new Date(this.tempFromDate);
-
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, "0");
-      const day = String(date.getDate()).padStart(2, "0");
-
-      const isoDate = `${year}-${month}-${day}`;
-
-      this.fromDateRaw = isoDate;
-      this.fromDateFilter = `${day}-${month}-${year}`;
-
-      this.toDateFilter = "";
-      this.toDateRaw = "";
-
-      this.fromDateMenu = false;
-    },
-    saveToDateFilter() {
-      if (!this.tempToDate) return;
-
-      const date = new Date(this.tempToDate);
-
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, "0");
-      const day = String(date.getDate()).padStart(2, "0");
-
-      const isoDate = `${year}-${month}-${day}`;
-
-      if (new Date(isoDate) < new Date(this.fromDateRaw)) {
-        this.SnackBarComponent = {
-          SnackbarVmodel: true,
-          SnackbarColor: "red",
-          SnackbarText: "To Date cannot be before From Date",
-          timeout: 4000,
-          Top: true,
-        };
-        return;
-      }
-
-      this.toDateRaw = isoDate;
-      this.toDateFilter = `${day}-${month}-${year}`;
-
-      this.toDateMenu = false;
-    },
     refresh_list() {
-      this.next_token = null;
-      this.get_submitted_workflow();
+      this.next_token = null
+      this.get_submitted_workflow()
     },
     async TakeScreenshot() {
       const target = document.body;
@@ -856,12 +551,8 @@ export default {
     },
 
     applyFilterFromDrawer() {
-      // Apply selected dates only when user clicks Apply Filters
-      this.appliedFromDate = this.fromDateRaw;
-      this.appliedToDate = this.toDateRaw;
-
+      // Apply the filter and close the drawer
       this.filter_data();
-
       this.closeFilterDrawer();
     },
 
@@ -956,20 +647,6 @@ export default {
       this.selectItems = [];
       this.currentPage = 1;
       this.totalItems = 0;
-
-      this.fromDateMenu = false;
-      this.toDateMenu = false;
-      this.tempFromDate = null;
-      this.tempToDate = null;
-      this.todayDate = new Date().toISOString().split("T")[0];
-
-      this.fromDateFilter = "";
-      this.toDateFilter = "";
-      this.fromDateRaw = "";
-      this.toDateRaw = "";
-
-      this.appliedFromDate = "";
-      this.appliedToDate = "";
       this.get_submitted_workflow();
     },
 

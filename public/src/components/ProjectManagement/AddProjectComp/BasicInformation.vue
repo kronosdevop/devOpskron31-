@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-card variant="flat"> 
+    <v-card>
       <v-card-actions class="mt-2 justify-end">
         <v-btn
           variant="flat"

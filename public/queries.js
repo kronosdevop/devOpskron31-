@@ -1824,6 +1824,7 @@ export const list_lead_deadlines = /* GraphQL */ `
     list_lead_deadlines
   }
 `;
+<<<<<<< HEAD
 export const list_games = /* GraphQL */ `
   query List_games {
     list_games
@@ -1844,8 +1845,5 @@ export const get_leaderboard = /* GraphQL */ `
     get_leaderboard(input: $input)
   }
 `;
-export const get_apps_enabled_status = /* GraphQL */ `
-  query Get_apps_enabled_status {
-    get_apps_enabled_status
-  }
-`;
+=======
+>>>>>>> 068f01f25711f23ff3254ef78a96d14f7485c4c4

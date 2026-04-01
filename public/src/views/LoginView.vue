@@ -99,7 +99,6 @@
                   </transition>
 
                   <v-spacer class="mt-2" />
-                  <!-- Primary Button -->
                   <v-btn
                     block
                     :color="loading1 ? 'grey' : 'primary'"
@@ -112,54 +111,6 @@
                   >
                     {{ otpVisible === 0 ? "SEND OTP" : "SIGN IN" }}
                   </v-btn>
-
-                  <!-- OR Divider (Show only before OTP is sent) -->
-                  <div v-if="otpVisible === 0" class="d-flex align-center my-4 mb-4">
-                    <v-divider></v-divider>
-                    <span
-                      class="mx-3 text-medium-emphasis"
-                      style="font-size: 13px"
-                    >
-                      OR
-                    </span>
-                    <v-divider></v-divider>
-                  </div>
-
-                  <!-- Google Button -->
-                  <v-btn
-                    v-if="otpVisible === 0"
-                    block
-                    class="social-btn"
-                    size="large"
-                    elevation="0"
-                    @click="newLoginMethod"
-                  >
-                    <img
-                      src="https://www.svgrepo.com/show/475656/google-color.svg"
-                      alt="Google"
-                      class="social-icon"
-                    />
-                    <span class="social-text ml-5">Continue with Google</span>
-                  </v-btn>
-
-                  <!-- Microsoft Button -->
-                  <v-btn
-                    v-if="otpVisible === 0"
-                    block
-                    class="social-btn mt-3"
-                    size="large"
-                    elevation="0"
-                    @click="loginWithMicrosoft"
-                  >
-                    <img
-                      src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg"
-                      alt="Microsoft"
-                      class="social-icon ml-3"
-                    />
-                    <span class="social-text ml-5"
-                      >Continue with Microsoft</span
-                    >
-                  </v-btn> 
                 </v-form>
               </v-card>
             </div>
@@ -230,10 +181,10 @@ export default {
       stichhLogo,
     };
   },
-  // async created() {
-  //   // Enhanced authentication cleanup
-  //   await this.clearAuthenticationData();
-  // },
+  async created() {
+    // Enhanced authentication cleanup
+    await this.clearAuthenticationData();
+  },
   mounted() {
     // this.clearAllStores();
     this.canvas = document.getElementById("dots-canvas");
@@ -261,7 +212,7 @@ export default {
     async clearAuthenticationData() {
       try {
         // Force sign out to clear any cached tokens
-        await Auth.signOut();
+        await Auth.signOut({ global: true });
         console.log("User signed out successfully");
       } catch (error) {
         // Ignore errors as user might not be signed in
@@ -316,7 +267,7 @@ export default {
       this.$store.commit("Setvisitdetails", {});
       this.$store.commit("SetVisitorFormEdit", false);
       this.$store.commit("SetTermsandConditions", {});
-      // this.$store.commit("SetmqqtColor", "");
+      this.$store.commit("SetmqqtColor", "");
       this.$store.commit("SetdragCheck", false);
       this.$store.commit("SetstockStatus", "");
       this.$store.commit("SetcustomerDetails", {});
@@ -640,90 +591,11 @@ export default {
         this.loading1 = false;
       }
     },
-    async newLoginMethod() {
-      if (this.loading1) return;
-
-      this.loading1 = true;
-
-      try {
-        await Auth.federatedSignIn({
-          provider: "Google",
-        });
-
-        // await Auth.currentAuthenticatedUser()
-        //     .then(async (user) => {
-        //       this.$store.commit("SetAuth", true);
-        //       this.$store.commit("SetUserEmail", this.userEmail);
-        //       this.$store.commit("Setloginaudit", true);
-        //     });
-      } catch (error) {
-        console.log("Error during sign-in:", error);
-
-        if (error.message === "There is already a signed in user.") {
-          await Auth.signOut();
-          return this.newLoginMethod();
-        }
-
-        if (
-          error.message?.includes("redirect is coming from a different origin")
-        ) {
-          this.SnackbarComponent = {
-            SnackbarVmodel: true,
-            SnackbarColor: "redColorVariant2",
-            Top: true,
-            SnackbarText: error.message,
-          };
-        }
-      } finally {
-        this.loading1 = false; // ✅ FIXED
-      }
-    },
-    // async loginWithMicrosoft() {
-    //   if (!this.loading1) {
-    //     this.loading1 = true;
-    //     try {
-    //       await Auth.federatedSignIn({
-    //         customProvider: "Microsoft",
-    //       });
-    //     } catch (error) {
-    //       console.log("Error during Microsoft sign-in:", error);
-    //       if (error.message === "There is already a signed in user.") {
-    //         await Auth.signOut();
-    //         return this.loginWithMicrosoft();
-    //       }
-    //     } finally {
-    //       this.loading1 = false;
-    //     }
-    //   }
-    // },
-    loginWithMicrosoft(){
-      this.$router.push('/MicrosoftLogin')
-    }
   },
 };
 </script>
 
 <style scoped>
-.google-btn {
-  background-color: #ffffff !important;
-  color: #444 !important;
-  border: 1px solid #dadce0;
-  text-transform: none;
-  font-weight: 500;
-  letter-spacing: 0.3px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.google-btn:hover {
-  background-color: #f7f8f8 !important;
-}
-
-.google-icon {
-  width: 20px;
-  height: 20px;
-}
 .login-background {
   position: relative;
   width: 100%;
@@ -812,59 +684,66 @@ export default {
   background-color: #f5f6f8;
   height: 100%;
 }
-.or-divider {
-  display: flex;
-  align-items: center;
-  text-align: center;
-  margin: 16px 0;
-  font-size: 13px;
-  color: rgba(0, 0, 0, 0.6);
-}
-
-.or-divider::before,
-.or-divider::after {
-  content: "";
-  flex: 1;
-  border-bottom: 1px solid #ddd;
-}
-
-.or-divider:not(:empty)::before {
-  margin-right: 10px;
-}
-
-.or-divider:not(:empty)::after {
-  margin-left: 10px;
-}
-
-.social-btn {
-  background-color: #ffffff !important;
-  border: 1px solid #e0e0e0 !important;
-  color: #3c4043 !important;
-  text-transform: none;
-  font-weight: 500;
-  font-size: 14px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
-  transition: all 0.2s ease;
-}
-
-.social-btn:hover {
-  background-color: #f8f9fa !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
-}
-
-.social-icon {
-  width: 20px;
-  height: 20px;
-}
-
-.social-text {
-  font-size: 14px;
-  letter-spacing: 0.2px;
-}
 </style>
 
+//
+<style lang="scss" scoped>
+// .login-card {
+//   border-radius: 8px;
+//   background: white;
+//   box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.1);
+// }
+
+// .v-application {
+//   background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+//     url("@/assets/loginbackgroundimg.png") center/cover no-repeat fixed;
+// }
+
+// .gap-2 {
+//   gap: 0.5rem;
+// }
+
+// :deep(.v-otp-input) {
+//   gap: 8px;
+//   justify-content: center;
+// }
+
+// :deep(.v-otp-input input) {
+//   width: 40px !important;
+//   height: 40px !important;
+//   font-size: 1.2rem;
+//   border: 1px solid rgba(0, 0, 0, 0.12);
+//   border-radius: 4px;
+// }
+
+// .fade-enter-active,
+// .fade-leave-active {
+//   transition: opacity 0.3s ease;
+// }
+
+// .fade-enter-from,
+// .fade-leave-to {
+//   opacity: 0;
+// }
+
+// .v-btn {
+//   text-transform: none !important;
+//   letter-spacing: 0.5px;
+//   font-weight: 600;
+// }
+
+// .text-subtitle-1 {
+//   color: #666;
+// }
+
+// // Add styles for Stichh logo
+// .v-img.cursor-pointer {
+//   cursor: pointer;
+//   transition: transform 0.2s ease;
+
+//   &:hover {
+//     transform: scale(1.05);
+//   }
+// }
+//
+</style>

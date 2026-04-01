@@ -20,36 +20,35 @@
           <v-spacer />
 
           <!-- Search User Field -->
-          <v-col cols="2" class="d-flex align-center">
+          <v-col cols="auto" class="d-flex align-center">
             <v-autocomplete density="compact" variant="outlined" v-model="userselect" label="Search User"
-              item-title="title" item-value="user_id" :items="userArray" hide-no-data style="max-width: 180px"
-              class="mr-n2" placeholder="Min 3 Character" hide-selected @input="searchF = ''" />
+              item-title="title" item-value="user_id" :items="userArray" hide-no-data style="max-width: 200px"
+              class="mr-4" placeholder="Min 3 Character" hide-selected @input="searchF = ''" />
           </v-col>
 
           <!-- Category Filter -->
-          <v-col cols="2" class="d-flex align-center">
-            <v-select density="compact" variant="outlined" v-model="categoriesName" style="max-width: 180px"
-              :items="categoriesitems" label="Category Name" class="mr-n2" item-title="text" item-value="value"
+          <v-col cols="auto" class="d-flex align-center">
+            <v-select density="compact" variant="outlined" v-model="categoriesName" style="max-width: 200px"
+              :items="categoriesitems" label="Category Name" class="mr-4" item-title="text" item-value="value"
               @update:model-value="fetch_sub_data()" />
           </v-col>
 
           <!-- Sub Category Filter -->
-          <v-col cols="2" class="d-flex align-center">
-            <v-select density="compact" variant="outlined" class="mr-n2" style="max-width: 180px" v-model="subcategory"
+          <v-col cols="auto" class="d-flex align-center">
+            <v-select density="compact" variant="outlined" class="mr-4" style="max-width: 200px" v-model="subcategory"
               :items="assetSubCategoriesList" item-title="text" item-value="value" label="Sub Category" />
           </v-col>
 
           <!-- Action Buttons -->
-          <v-col cols="4" class="align-center mr-n12 mt-n6">
-            <v-btn dark class="text-capitalize cardCss mr-2" :loading="goLoading" @click="get_data()">
+          <v-col cols="auto" class="d-flex align-center">
+            <v-btn dark size="small" class="text-capitalize cardCss mr-2" :loading="goLoading" @click="get_data()">
               <v-icon>mdi-filter</v-icon>
               Apply Filter
             </v-btn>
-            <v-btn dark class="text-capitalize cardCss mr-2" :loading="clearData" @click="clear_data()">
+            <v-btn dark size="small" class="text-capitalize cardCss mr-2" :loading="clearData" @click="clear_data()">
               <v-icon>mdi-filter-remove</v-icon>
             </v-btn>
-            <v-btn dark class="text-capitalize cardCss" :loading="exportload" @click="get_export()">
-              <v-icon>mdi-download</v-icon>
+            <v-btn dark size="small" class="text-capitalize cardCss" :loading="exportload" @click="get_export()">
               Export
             </v-btn>
           </v-col>

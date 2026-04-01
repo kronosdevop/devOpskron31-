@@ -7,7 +7,7 @@
       @clicked="DialogCreateExternalTicketEmit"
     />
     <!-- App Bar -->
-    <v-app-bar class="modern-header-section" elevation="0">
+    <v-app-bar class="modern-header-section">
       <div class="header-left">
         <div class="header-icon-container">
           <div class="header-icon-bg">
@@ -96,11 +96,9 @@
           <v-icon>mdi-plus</v-icon>
           <span>Add Customer</span>
         </v-btn>
-        <v-menu offset-y v-if="toggle_exclusive == 'customers'" v-model="actionsMenu"
-        :close-on-content-click="false"
-        >
+        <v-menu offset-y v-if="toggle_exclusive == 'customers'">
           <template #activator="{ props }">
-            <v-btn v-bind="props" class="action-btn mr-4" size="small">
+            <v-btn v-bind="props" class="action-btn" size="small">
               <v-icon>mdi-dots-vertical</v-icon>
               <span>Actions</span>
             </v-btn>
@@ -142,7 +140,7 @@
                 <v-icon color="primary">mdi-import</v-icon>
               </template>
 
-              <BulkBusiness class="bulk-align"
+              <BulkBusiness
                 :on-success="handleSuccessbusiness"
                 :before-upload="beforeUpload"
               />
@@ -153,36 +151,21 @@
                 <v-icon color="primary">mdi-import</v-icon>
               </template>
 
-              <BulkIndividual class="bulk-align"
+              <BulkIndividual
                 :on-success="handleSuccess"
                 :before-upload="beforeUpload"
               />
             </v-list-item>
-            
-            <v-list-item 
-            :disabled="exportLoad"
-  @click.stop="export_item"
+
+            <v-list-item
+              @click="export_item"
+              v-if="toggle_exclusive == 'customers'"
             >
-            <template #prepend>
-              <v-progress-circular 
-              v-if="exportLoad"
-              indeterminate
-              size = "18"
-              width="2"
-              color="primary"
-                    class="export-loader"
-
-              />
-              <v-icon v-else color="primary">
-                mdi-download
-              </v-icon>
-
-            </template>
-                          <v-list-item-title>{{ exportLoad ? 'Exporting...' : 'Export' }}</v-list-item-title>
-
-
+              <template #prepend>
+                <v-icon color="primary">mdi-download</v-icon>
+              </template>
+              <v-list-item-title>Export</v-list-item-title>
             </v-list-item>
-           
           </v-list>
         </v-menu>
       </div>
@@ -206,8 +189,8 @@
             value="members"
             class="tab-btn"
             v-if="
-              $store.getters.GetUserObj.user?.user_type == 'ADMIN' ||
-              this.$store.getters.GetUserObj.user?.user_type == 'OWNER'
+              $store.getters.GetUserObj.user.user_type == 'ADMIN' ||
+              this.$store.getters.GetUserObj.user.user_type == 'OWNER'
             "
             >Members</v-tab
           >
@@ -273,14 +256,11 @@ export default {
     BulkIndividual,
     CreateExternalTicketDialog,
   },
-
   data: () => ({
     toggle_exclusive: "customers",
     searchlist: "",
     b2btemplateurl: "",
     individualtemplateurl: "",
-            exportLoad:false,
-
 
     // Screenshot Values
     DialogCreateExternalTicket: false,
@@ -290,12 +270,11 @@ export default {
       region: "us-east-1",
     },
     leadList: [],
-      actionsMenu: false   
   }),
 
   async created() {
     await this.get_lead_list();
-    console.log("User Object:", this.$store.getters.GetUserObj.user?.user_type);
+    console.log("User Object:", this.$store.getters.GetUserObj.user.user_type);
     // Fetch template URLs
     try {
       let result = await API.graphql(
@@ -402,9 +381,6 @@ export default {
     },
     async export_item() {
       let data = this.$store.getters.GetUserObj;
-      if(this.exportLoad) return;
-
-      this.exportLoad = true
       try {
         let result = await API.graphql(
           graphqlOperation(export_customer_data, {
@@ -423,15 +399,11 @@ export default {
             details.s3_details
           );
           if (signedUrl) {
-          await  this.download_items(signedUrl);
+            this.download_items(signedUrl);
           }
         }
       } catch (error) {
         console.error("Error exporting data:", error);
-      }
-      finally{
-        this.exportLoad = false 
-        this.actionsMenu = false
       }
     },
     handleSuccess({ results, header }) {
@@ -579,12 +551,5 @@ export default {
     padding: 6px 10px !important;
     font-size: 11px !important;
   }
-}
-.bulk-align{
-  margin-left: -4%;
-}
-.export-loader,
-.export-icon {
-  margin-right: 50px; 
 }
 </style>

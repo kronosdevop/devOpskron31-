@@ -18,28 +18,10 @@
         </v-toolbar>
 
         <v-card-text class="pa-4">
-          <div class="text-h6 font-weight-bold mb-2">
+          <div class="text-h6 font-weight-bold mb-4">
             Choose the dates you worked on and fill out the timesheet for those
             days
           </div>
-
-          <v-alert
-            type="warning"
-            variant="tonal"
-            border="start"
-            color="orange"
-            density="compact"
-            class="mb-4"
-          >
-            <strong>Note:</strong>
-            If you are saving the timesheet as a draft, please select the
-            correct
-            <b>From Date</b> and <b>To Date</b> for the number of days you plan
-            to fill.
-            <br />
-            Once the draft is created,
-            <b>the date range cannot be modified during editing.</b>
-          </v-alert>
 
           <!-- Date Selection -->
           <v-row class="mb-4">
@@ -148,7 +130,7 @@
                   />
                 </v-col>
                 <v-col cols="12" :md="dailyCheck == false ? 4 : 3">
-                  <v-autocomplete
+                  <v-select
                     v-model="timesheetProject"
                     density="compact"
                     variant="outlined"
@@ -180,8 +162,7 @@
                     auto-grow
                     v-model="commentstimesheet"
                     rows="1"
-                    counter="5000"
-                    maxlength="5000"
+                    maxlength="500"
                     label="Comments"
                   ></v-textarea>
                 </v-col>
@@ -230,68 +211,12 @@
                     "
                   />
                 </v-col>
-                <!-- Attachments -->
-                <v-col cols="12" md="4">
-                  <v-file-input
-                    v-model="attachments"
-                    label="Upload Files (Max 3)"
-                    variant="outlined"
-                    density="compact"
-                    multiple
-                    accept="image/*,.pdf,.doc,.docx"
-                    :rules="[limitFileCount]"
-                  >
-                    <template v-slot:selection="{ fileNames }">
-                      <div class="d-flex flex-wrap">
-                        <v-chip
-                          v-for="(file, index) in attachments"
-                          :key="file.name"
-                          class="ma-1"
-                          closable
-                          size="small"
-                          @click:close="removeAttachment(file)"
-                        >
-                          <v-icon start size="16">
-                            {{ getFileIcon(file.name) }}
-                          </v-icon>
-
-                          {{ file.name }}
-                        </v-chip>
-                      </div>
-                    </template>
-                  </v-file-input>
-                </v-col>
-                <!-- <v-col cols="12" md="3" v-if="attachments.length">
-                  <div class="file-chip-container mt-2">
-                    <v-chip
-                      v-for="(file, index) in attachments"
-                      :key="index"
-                      class="file-chip"
-                      closable
-                      size="small"
-                      @click:close="removeAttachment(index)"
-                    >
-                      <v-icon start size="16">
-                        {{ getFileIcon(file.name) }}
-                      </v-icon>
-
-                      <span class="file-name">
-                        {{ file.name }}
-                      </span>
-
-                      <span class="file-size">
-                        ({{ formatFileSize(file.size) }})
-                      </span>
-                    </v-chip>
-                  </div>
-                </v-col> -->
-
-                <v-col cols="12" md="2" class="">
+                <v-col cols="12" md="2" class="d-flex align-end">
                   <v-btn
                     color="primary"
                     @click="add_mutation()"
-                    class="text-capitalize mt-auto"
-                    :loading="addLoading"
+                    class="text-capitalize"
+                    :loading="loading"
                   >
                     Add Entry
                   </v-btn>
@@ -310,6 +235,10 @@
                 :headers="dailyCheck ? timeSheetHeaders : dailyTimeSheetHeaders"
                 :fixed-header="fixed"
                 :items="timeRecords"
+                :footer-props="{
+                  itemsPerPageOptions: [10, 20, 30, 40, 50],
+                }"
+                :items-per-page="0"
                 density="compact"
                 class="elevation-1"
               >
@@ -343,36 +272,6 @@
                     >mdi-delete</v-icon
                   >
                 </template>
-                <template v-slot:[`item.timesheet_images`]="{ item }">
-                  <div class="d-flex flex-wrap">
-                    <template v-if="item && item.timesheet_images">
-                      <v-chip
-                        v-for="(img, index) in item.timesheet_images.filter(
-                          (i) => i
-                        )"
-                        :key="index"
-                        size="x-small"
-                        class="ma-1"
-                        color="primary"
-                        variant="tonal"
-                        @click="openAttachment(img)"
-                      >
-                        <v-icon start size="14">mdi-paperclip</v-icon>
-                        File {{ index + 1 }}
-                      </v-chip>
-                    </template>
-
-                    <span
-                      v-if="
-                        !item.timesheet_images ||
-                        item.timesheet_images.filter((i) => i).length === 0
-                      "
-                      class="text-grey"
-                    >
-                      -
-                    </span>
-                  </div>
-                </template>
               </v-data-table>
             </div>
           </div>
@@ -398,30 +297,20 @@
         <!-- Footer Actions -->
         <v-card-actions class="justify-end pa-4">
           <v-btn
-            color="secondary"
-            @click="checkDatesInRecords(true)"
-            v-if="timeRecords.length != 0"
-            :loading="draftLoading"
-            class="text-capitalize"
-          >
-            Save As Draft
-          </v-btn>
-
-          <v-btn
             color="primary"
-            @click="checkDatesInRecords(false)"
+            @click="checkDatesInRecords()"
             v-if="timeRecords.length != 0"
-            :loading="submitLoading"
+            :loading="loading"
             class="text-capitalize"
           >
-            Submit Timesheet
+            Save Timesheet
           </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
   </div>
 </template>
-<script>
+    <script>
 /* eslint-disable */
 import moment from "moment";
 import { get_total_work_duartion } from "@/graphql/queries.js";
@@ -429,7 +318,7 @@ import { create_timesheet } from "@/graphql/mutations.js";
 import { API, graphqlOperation } from "aws-amplify";
 import { get_projects } from "@/graphql/queries.js";
 import { formatdisplayDate } from "@/JsonFiles/DateFormate.js";
-import { uploadToS3 } from "@/mixins/TicketsS3Upload.js";
+
 export default {
   props: {
     timesheetUpdate: Boolean,
@@ -441,6 +330,7 @@ export default {
         .substr(0, 10),
       date: "",
       menu: false,
+      loading: false,
       daterangeSelected: false,
       timeSheetdate: "",
       OrganisationDuartion: "",
@@ -467,7 +357,6 @@ export default {
       timeRange: [],
       projectdata: [],
       filledtimesheetdates: [],
-      attachments: [],
       isResettingForm: false,
       timeSheetHeaders: [
         {
@@ -483,7 +372,6 @@ export default {
         { title: "Activity", key: "activity_name", sortable: false },
         { title: "Time Spent", key: "work_duartion", sortable: false },
         { title: "Comments", key: "comments", sortable: false },
-        { title: "Attachments", key: "timesheet_images" },
         { title: "Actions", key: "actions", sortable: false },
       ],
       dailyTimeSheetHeaders: [
@@ -495,7 +383,6 @@ export default {
         { title: "Activity", key: "activity_name", sortable: false },
         { title: "Time Spent", key: "work_duartion", sortable: false },
         { title: "Comments", key: "comments", sortable: false },
-        { title: "Attachments", key: "timesheet_images" },
         { title: "Actions", key: "actions", sortable: false },
       ],
       totalDuration: "",
@@ -510,13 +397,6 @@ export default {
       toDatePicker: false,
       fromDateFormatted: "",
       toDateFormatted: "",
-      orgDetails: {
-        bucket_name: "stichh-medias",
-        region: "us-east-1",
-      },
-      addLoading: false,
-      draftLoading: false,
-      submitLoading: false,
     };
   },
   computed: {
@@ -527,9 +407,14 @@ export default {
       return this.displayFormatDate(this.toDateFormatted);
     },
     filteredTimeSheetHeaders() {
+      // console.log(
+      //   "filteredTimeSheetHeaders computed called, dailyCheck:",
+      //   this.dailyCheck
+      // );
       const headers = this.dailyCheck
         ? this.dailyTimeSheetHeaders
         : this.timeSheetHeaders;
+      // console.log("Selected headers:", headers);
       return headers;
     },
     tableKey() {
@@ -561,53 +446,13 @@ export default {
             ? true
             : this.$store.getters.GetOrgDetails.organization
                 .is_daily_timesheet_required;
+        // console.log(this.dailyCheck, "dailyCheck");
       },
       immediate: true,
     },
   },
 
   methods: {
-    removeAttachment(file) {
-      this.attachments = this.attachments.filter((f) => f !== file);
-    },
-    hasAttachments(item) {
-      return item.timesheet_images && item.timesheet_images.length > 0;
-    },
-
-    limitFileCount(files) {
-      if (!files) return true;
-
-      if (files.length > 3) {
-        this.$emit("errorMsg", "Maximum 3 files allowed");
-        this.attachments = files.slice(0, 3);
-      }
-
-      return true;
-    },
-    getFileIcon(name) {
-      const ext = name.split(".").pop().toLowerCase();
-
-      if (["png", "jpg", "jpeg", "gif", "webp"].includes(ext))
-        return "mdi-image";
-      if (ext === "pdf") return "mdi-file-pdf-box";
-      if (["doc", "docx"].includes(ext)) return "mdi-file-word";
-      return "mdi-file";
-    },
-
-    formatFileSize(size) {
-      if (!size) return "";
-      const kb = size / 1024;
-
-      if (kb < 1024) {
-        return kb.toFixed(1) + " KB";
-      }
-
-      return (kb / 1024).toFixed(1) + " MB";
-    },
-    openAttachment(url) {
-      if (!url) return;
-      window.open(url, "_blank");
-    },
     is_number(evt) {
       evt = evt ? evt : window.event;
       var charCode = evt.which ? evt.which : evt.keyCode;
@@ -681,34 +526,31 @@ export default {
       return `${hours}h ${remainingMinutes}m`;
     },
     addDataAndCheckDuration(existingData, newData, maxDuration) {
-      if (!maxDuration) return true;
+      const {
+        work_duration: newWorkDuration,
+        timesheet_from_date: newFromDate,
+      } = newData;
 
-      const newFromDate = newData.timesheet_from_date;
-
-      // 1️⃣ Calculate total already entered duration for same date
-      const totalDurationForDate = existingData.reduce((total, record) => {
-        if (record.timesheet_from_date === newFromDate) {
-          total += this.parseDuration(record.work_duartion);
+      const totalDurationForDate = existingData.reduce((total, data) => {
+        if (data.timesheet_from_date === newFromDate) {
+          var newduration = data.work_duartion;
+          total += this.parseDuration(newduration);
         }
+
         return total;
       }, 0);
 
-      // 2️⃣ Convert new entry duration to minutes
-      const newEntryDuration = this.parseDuration(newData.work_duartion);
+      const newTotalDuration =
+        totalDurationForDate + this.parseDuration(newData.work_duartion);
 
-      // 3️⃣ Convert allowed max duration to minutes
       const maxDurationInMinutes = this.parseDuration(maxDuration);
 
-      // 4️⃣ Final validation check
-      const finalTotal = totalDurationForDate + newEntryDuration;
-
-      return finalTotal <= maxDurationInMinutes;
-    },
-    limitFiles(files) {
-      if (files && files.length > 3) {
-        this.attachments = files.slice(0, 3);
-        this.$emit("errorMsg", "You can upload maximum 3 files only");
+      if (newTotalDuration > maxDurationInMinutes) {
+        return false;
       }
+
+      existingData.push(newData);
+      return true;
     },
     async get_duration(daterange) {
       var data = this.$store.getters.GetUserObj;
@@ -752,7 +594,7 @@ export default {
       if (this.isResettingForm) {
         return;
       }
-
+      
       var data = this.$store.getters.GetUserObj;
       try {
         let result = await API.graphql(
@@ -782,26 +624,9 @@ export default {
         this.$emit("errorMsg", error.errors[0].message);
       }
     },
-    checkDatesInRecords(isDraft) {
-      // 🟢 SAVE AS DRAFT
-      if (isDraft) {
-        if (this.timeRecords.length === 0) {
-          this.$emit(
-            "errorMsg",
-            "Please add at least one timesheet entry before saving as draft."
-          );
-
-          return;
-        }
-
-        this.validate_data(true);
-        return;
-      }
-
-      // 🔵 SAVE TIMESHEET (Final submission)
-      if (this.dailyCheck === true) {
+    checkDatesInRecords() {
+      if (this.dailyCheck == true) {
         const recordsDates = new Set();
-
         this.timeRecords.forEach((record) => {
           recordsDates.add(record.timesheet_from_date);
         });
@@ -811,17 +636,18 @@ export default {
         );
 
         if (missingDates.length === 0) {
-          this.validate_data(false);
+          this.validate_data();
         } else {
           this.$emit(
             "errorMsg",
-            `The timesheet has not been entered for this date ${missingDates.join(
+
+            ` The timesheet has not been entered for this date ${missingDates.join(
               ", "
             )}`
           );
         }
       } else {
-        this.validate_data(false);
+        this.validate_data();
       }
     },
     removeSeconds(duration) {
@@ -861,14 +687,7 @@ export default {
             this.projectdata = response.data;
 
             if (Array.isArray(this.projectdata)) {
-              // Clear first (important to avoid duplicate push)
-              this.timesheetitemsProject = [];
-
-              const sortedProjects = this.projectdata
-                .slice()
-                .sort((a, b) => a.project_name.localeCompare(b.project_name));
-
-              sortedProjects.forEach((element) => {
+              this.projectdata.forEach((element) => {
                 this.timesheetitemsProject.push({
                   text: element.project_name,
                   value: element.project_id,
@@ -900,17 +719,12 @@ export default {
         return;
       }
       this.timesheetitemsactivity = [];
-      this.timesheetitemsactivity = [];
-
       this.projectdata.forEach((obj) => {
         if (obj.project_name === projectId.text) {
-          const sortedActivities = obj.project_activities
-            .slice()
-            .sort((a, b) => a.localeCompare(b));
-
-          this.timesheetitemsactivity.push(...sortedActivities);
+          this.timesheetitemsactivity.push(...obj.project_activities);
         }
       });
+      // console.log(this.timesheetitemsactivity, "timesheetitemsactivity");
     },
     generateDatesInRange(dateArray) {
       let startDate = new Date(dateArray[0]);
@@ -925,7 +739,6 @@ export default {
       ) {
         generatedDates.push(currentDate.toISOString().slice(0, 10));
       }
-
       return generatedDates;
     },
 
@@ -936,33 +749,75 @@ export default {
       this.timeRecords = [];
       this.$emit("clicked", 0);
     },
-    async datebind(dates) {
-      let filteredDates = [...dates];
+    async datebind(newArray) {
+      if (newArray.length === 1) {
+        this.timeSheetdateitems = newArray;
+        if (this.attedencedata.length != 0) {
+          this.attedencedata.forEach((item) => {
+            if (this.timeSheetdateitems.includes(item.swipe_date)) {
+              let index = this.timeSheetdateitems.indexOf(item.swipe_date);
 
-      // Remove only weekoff
-      if (this.weekoffdata.length) {
-        const weekoffDates = this.weekoffdata.map((i) => i.swipe_date);
-        filteredDates = filteredDates.filter((d) => !weekoffDates.includes(d));
+              this.timeSheetdateitems.splice(index, 1);
+            }
+          });
+        }
+        if (this.weekoffdata.length != 0) {
+          this.weekoffdata.forEach((item) => {
+            if (this.timeSheetdateitems.includes(item.swipe_date)) {
+              let index = this.timeSheetdateitems.indexOf(item.swipe_date);
+
+              this.timeSheetdateitems.splice(index, 1);
+            }
+          });
+        }
+        if (this.filledtimesheetdates.length != 0) {
+          this.filledtimesheetdates.forEach((item) => {
+            if (this.timeSheetdateitems.includes(item)) {
+              let index = this.timeSheetdateitems.indexOf(item);
+
+              this.timeSheetdateitems.splice(index, 1);
+            }
+          });
+        }
+      } else {
+        this.timeSheetdateitems = this.generateDatesInRange(newArray);
+        if (this.attedencedata.length != 0) {
+          this.attedencedata.forEach((item) => {
+            if (this.timeSheetdateitems.includes(item.swipe_date)) {
+              let index = this.timeSheetdateitems.indexOf(item.swipe_date);
+
+              this.timeSheetdateitems.splice(index, 1);
+            }
+          });
+        }
+        if (this.weekoffdata.length != 0) {
+          this.weekoffdata.forEach((item) => {
+            if (this.timeSheetdateitems.includes(item.swipe_date)) {
+              let index = this.timeSheetdateitems.indexOf(item.swipe_date);
+
+              this.timeSheetdateitems.splice(index, 1);
+            }
+          });
+        }
+        if (this.filledtimesheetdates.length != 0) {
+          this.filledtimesheetdates.forEach((item) => {
+            if (this.timeSheetdateitems.includes(item)) {
+              let index = this.timeSheetdateitems.indexOf(item);
+
+              this.timeSheetdateitems.splice(index, 1);
+            }
+          });
+        }
       }
-
-      // Remove already filled
-      if (this.filledtimesheetdates.length) {
-        filteredDates = filteredDates.filter(
-          (d) => !this.filledtimesheetdates.includes(d)
-        );
-      }
-
-      this.timeSheetdateitems = filteredDates;
 
       this.timeRecords = [];
       this.userdailyduartion = "";
 
-      if (this.$refs.form) {
+      if (this.timeSheetdate != "") {
         this.isResettingForm = true;
         this.$refs.form.reset();
         this.isResettingForm = false;
       }
-
       this.timeSheetdate = "";
     },
     async updatedaterange() {
@@ -1004,35 +859,11 @@ export default {
       }
     },
     async add_mutation() {
+      let data = {};
       const { valid } = await this.$refs.form.validate();
-      if (!valid) return;
-
-      try {
-        this.addLoading = true;
-        // 🔥 1. Upload Images to S3 (Max 3)
-        let uploadedImages = [];
-
-        if (this.attachments && this.attachments.length > 0) {
-          for (let i = 0; i < this.attachments.length && i < 3; i++) {
-            const file = this.attachments[i];
-
-            const key = `timesheets/${crypto.randomUUID()}_${file.name}`;
-
-            const uploadedUrl = await uploadToS3(file, this.orgDetails, key);
-
-            uploadedImages.push(uploadedUrl);
-          }
-        }
-
-        // Ensure exactly 3 keys
-        const timesheet_images = uploadedImages;
-
-        let data = {};
-
-        // =====================================================
-        // 🟣 DAILY TIMESHEET
-        // =====================================================
-        if (this.dailyCheck === true) {
+      if (valid) {
+        // console.log(this.dailyCheck);
+        if (this.dailyCheck == true) {
           data = {
             project_id: this.timesheetProject.value,
             activity_name: this.timesheetactivity,
@@ -1045,37 +876,37 @@ export default {
               this.commentstimesheet == "" || this.commentstimesheet == null
                 ? "N/A"
                 : this.commentstimesheet,
-
-            timesheet_images,
           };
-
-          if (this.presenceenabled === true) {
+          if (this.presenceenabled == true) {
             const isDurationValid = this.addDataAndCheckDuration(
               this.timeRecords,
               data,
               this.userdailyduartion
             );
-
-            if (!isDurationValid) {
+            if (isDurationValid) {
+              this.timeSheetdate = "";
+              this.userdailyduartion = "";
+              this.isResettingForm = true;
+              this.$refs.form.reset();
+              this.isResettingForm = false;
+            } else {
               this.$emit(
                 "errorMsg",
                 "The entered data exceeds the total duration you worked a day"
               );
-              this.addLoading = false;
-              return;
             }
+            this.isResettingForm = true;
+            this.$refs.form.reset();
+            this.isResettingForm = false;
+          } else {
+            this.timeRecords.push(data);
+            this.isResettingForm = true;
+            this.$refs.form.reset();
+            this.isResettingForm = false;
+            this.timeSheetdate = "";
+            this.userdailyduartion = "";
           }
-
-          this.timeRecords.push(data);
-
-          this.timeSheetdate = "";
-          this.userdailyduartion = "";
-        }
-
-        // =====================================================
-        // 🟢 RANGE / WEEKLY TIMESHEET
-        // =====================================================
-        else {
+        } else {
           data = {
             project_id: this.timesheetProject.value,
             activity_name: this.timesheetactivity,
@@ -1091,48 +922,26 @@ export default {
               this.commentstimesheet == "" || this.commentstimesheet == null
                 ? "N/A"
                 : this.commentstimesheet,
-
-            timesheet_images,
           };
-
-          if (this.presenceenabled === true) {
-            const newEntryMinutes = this.durationToMinutes(data.work_duartion);
-            const totalExistingMinutes = this.timeRecords.reduce(
-              (sum, entry) => sum + this.durationToMinutes(entry.work_duartion),
-              0
-            );
-            const orgMinutes = this.durationToMinutes(this.userWorkduration);
-
-            if (totalExistingMinutes + newEntryMinutes > orgMinutes) {
-              this.$emit(
-                "errorMsg",
-                "Adding this entry exceeds the worked duration."
-              );
-              this.addLoading = false;
-              return;
-            }
+          // console.log(this.presenceenabled,data);
+          if (this.presenceenabled == true) {
+            this.processTimesheetEntry(data, this.userWorkduration);
+            this.isResettingForm = true;
+            this.$refs.form.reset();
+            this.isResettingForm = false;
+            this.timeSheetdate = "";
+            this.userdailyduartion = "";
+          } else {
+            this.timeRecords.push(data);
+            this.timeSheetdate = "";
+            this.userdailyduartion = "";
+            this.isResettingForm = true;
+            this.$refs.form.reset();
+            this.isResettingForm = false;
           }
-
-          this.timeRecords.push(data);
-
-          this.timeSheetdate = "";
-          this.userdailyduartion = "";
         }
-
-        // =====================================================
-        // 🔄 RESET FORM + FILES
-        // =====================================================
-        this.isResettingForm = true;
-        this.$refs.form.reset();
-        this.isResettingForm = false;
-
-        this.attachments = [];
-
-        this.addLoading = false;
-      } catch (error) {
-        this.addLoading = false;
-        this.$emit("errorMsg", "Image upload failed. Please try again.");
       }
+    
     },
     processTimesheetEntry(entry, organizationDuration) {
       // Convert durations to minutes for easier calculation
@@ -1195,12 +1004,8 @@ export default {
 
       return hours * 60 + minutes;
     },
-    async validate_data(isDraft) {
-      if (isDraft) {
-        this.draftLoading = true;
-      } else {
-        this.submitLoading = true;
-      }
+    async validate_data() {
+      this.loading = true;
       var data = this.$store.getters.GetUserObj;
       try {
         let result = await API.graphql(
@@ -1213,14 +1018,12 @@ export default {
               timesheet_to_date:
                 this.timeSheetdateitems[this.timeSheetdateitems.length - 1],
               organization_working_duration: this.OrganisationDuartion,
-              is_draft: isDraft,
             },
           })
         );
         var response = JSON.parse(result.data.create_timesheet);
 
-        this.draftLoading = false;
-        this.submitLoading = false;
+        this.loading = false;
 
         if (response.Status == "SUCCESS") {
           this.$emit("successMsg", response.Message);
@@ -1230,8 +1033,7 @@ export default {
         }
       } catch (error) {
         this.$emit("errorMsg", error.errors[0].message);
-        this.draftLoading = false;
-        this.submitLoading = false;
+        this.loading = false;
       }
     },
     saveFromDate() {
@@ -1311,34 +1113,5 @@ export default {
 
 .v-data-table :deep(.v-data-table__tbody tr:hover) {
   background-color: #f5f5f5;
-}
-.btn-addentity {
-  margin-top: -80px !important;
-}
-.file-chip-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.file-chip {
-  background: #f4f6f8;
-  border-radius: 20px;
-  font-size: 12px;
-  padding: 2px 6px;
-  max-width: 220px;
-}
-
-.file-name {
-  max-width: 120px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.file-size {
-  margin-left: 4px;
-  color: #777;
-  font-size: 11px;
 }
 </style>

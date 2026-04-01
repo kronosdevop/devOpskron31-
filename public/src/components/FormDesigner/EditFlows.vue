@@ -20,23 +20,23 @@
       <v-card-text>
         <v-stepper v-model="editFlowSteps">
           <v-stepper-header>
-            <v-stepper-item :complete="editFlowSteps > 0" :value="1">
+            <v-stepper-item :complete="editFlowSteps > 0" value="1">
               Selected Form
             </v-stepper-item>
             <v-divider></v-divider>
-            <v-stepper-item :complete="editFlowSteps > 1" :value="2">
+            <v-stepper-item :complete="editFlowSteps > 1" value="2">
               Create Flow
             </v-stepper-item>
             <v-divider></v-divider>
-            <v-stepper-item :complete="editFlowSteps > 2" :value="3">
+            <v-stepper-item :complete="editFlowSteps > 2" value="3">
               Configure Form
             </v-stepper-item>
             <v-divider></v-divider>
-            <v-stepper-item :complete="editFlowSteps > 3" :value="4">
+            <v-stepper-item :complete="editFlowSteps > 3" value="4">
               Form Details
             </v-stepper-item>
             <v-divider></v-divider>
-            <v-stepper-item :complete="editFlowSteps > 4" :value="5">
+            <v-stepper-item :complete="editFlowSteps > 4" value="5">
               Preview and Publish
             </v-stepper-item>
             <v-divider></v-divider>

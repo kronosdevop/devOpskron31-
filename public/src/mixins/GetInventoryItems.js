@@ -1,5 +1,5 @@
 import { API, graphqlOperation } from "aws-amplify";
-import { inventory_products_CRUD } from "@/graphql/mutations.js"
+import { list_items } from "@/graphql/queries";
 
 export const get_inventory_items = {
     data() {
@@ -13,23 +13,16 @@ export const get_inventory_items = {
         async get_inventory_items() {
             this.itemsLoading = true;
             try {
-                    const response = await API.graphql(
-          graphqlOperation(inventory_products_CRUD, {
-            input: {
-              action_type: "LIST",
-            },
-          }),
+                const response = await API.graphql(
+                    graphqlOperation(list_items)
                 );
 
-                const resultData = JSON.parse(response.data.inventory_products_CRUD);
+                const resultData = JSON.parse(response.data.list_items);
                 // console.log(resultData);
                 if (resultData.Status == "SUCCESS") {
-  this.masterItems = resultData.data.map(item => ({
-    ...item,
-    item_name: item.product_name,   // ✅ fix mapping
-    item_id: item.product_id
-  }))
-} else {
+                    this.masterItems = resultData.data;
+
+                } else {
                     this.masterItems = [];
                 }
             } catch (error) {

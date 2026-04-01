@@ -328,8 +328,8 @@
                                     signimagesarrayurls.lastIndexOf('/') + 1,
                                     signimagesarrayurls.indexOf('?') !== -1
                                       ? signimagesarrayurls.indexOf('?')
-                                      : undefined,
-                                  ),
+                                      : undefined
+                                  )
                                 ) == true
                                   ? '5'
                                   : '10'
@@ -341,7 +341,7 @@
                                     signimagesarrayurls.lastIndexOf("/") + 1,
                                     signimagesarrayurls.indexOf("?") !== -1
                                       ? signimagesarrayurls.indexOf("?")
-                                      : undefined,
+                                      : undefined
                                   )
                                 }}
                               </div>
@@ -354,8 +354,8 @@
                                     signimagesarrayurls.lastIndexOf('/') + 1,
                                     signimagesarrayurls.indexOf('?') !== -1
                                       ? signimagesarrayurls.indexOf('?')
-                                      : undefined,
-                                  ),
+                                      : undefined
+                                  )
                                 ) == true
                               "
                             >
@@ -400,14 +400,13 @@
     </v-dialog>
   </div>
 </template>
-
+  
 <script>
 /* eslint-disable */
 import { get_all_org_users } from "@/mixins/GetUsersDropdown.js";
 import { create_booking_resource } from "@/graphql/mutations.js";
 import { API, graphqlOperation } from "aws-amplify";
-import { VTimePicker } from 'vuetify/components'
-
+import { VTimePicker } from "vuetify/labs/VTimePicker";
 // TODO: Replace with Vue 3 compatible image cropper (e.g., vue-cropper, cropperjs)
 var AWS = require("aws-sdk");
 import { Buffer } from "buffer";
@@ -518,7 +517,7 @@ export default {
             // Round to nearest allowed minute
             const allowedMinutes = [0, 15, 30, 45];
             const nearestMinute = allowedMinutes.reduce((prev, curr) =>
-              Math.abs(curr - minutes) < Math.abs(prev - minutes) ? curr : prev,
+              Math.abs(curr - minutes) < Math.abs(prev - minutes) ? curr : prev
             );
             this.formTime = `${hours
               .toString()
@@ -696,14 +695,14 @@ export default {
         const fileUrl = await uploadToS3(
           this.documentFiles,
           orgDetails.s3_details,
-          Key,
+          Key
         );
         if (fileUrl) {
           this.actualURLs.push(fileUrl);
 
           const signedUrl = await getS3SignedUrl(
             fileUrl,
-            orgDetails.s3_details,
+            orgDetails.s3_details
           );
           if (signedUrl) {
             // console.log(signedUrl);
@@ -877,7 +876,7 @@ export default {
               resource_amount_type:
                 this.slotPayed == true ? this.currency : undefined,
             },
-          }),
+          })
         );
         this.loading = false;
         var response = JSON.parse(result.data.create_booking_resource);
@@ -987,7 +986,7 @@ export default {
             // Round to nearest allowed minute
             const allowedMinutes = [0, 15, 30, 45];
             const nearestMinute = allowedMinutes.reduce((prev, curr) =>
-              Math.abs(curr - minutes) < Math.abs(prev - minutes) ? curr : prev,
+              Math.abs(curr - minutes) < Math.abs(prev - minutes) ? curr : prev
             );
             this.toTime = `${hours.toString().padStart(2, "0")}:${nearestMinute
               .toString()
@@ -1016,7 +1015,7 @@ export default {
   },
 };
 </script>
-<style scoped>
+  <style scoped>
 .v-file input[type="file"]::-webkit-file-upload-button {
   visibility: hidden;
 }
@@ -1025,3 +1024,4 @@ export default {
   color: #db4c77 !important;
 }
 </style>
+  

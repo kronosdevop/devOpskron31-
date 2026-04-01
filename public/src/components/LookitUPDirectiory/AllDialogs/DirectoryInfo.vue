@@ -725,16 +725,20 @@ export default {
       } catch (error) {}
     },
 
-   fetch_names(ids) {
-  const uniqueIds = [...new Set(ids)];
+    fetch_names(ids) {
+      var names = [];
+      for (var i = 0; i < ids.length; i++) {
+        var id = ids[i];
+        for (var j = 0; j < this.allUsers.length; j++) {
+          if (this.allUsers[j].user_id === id) {
+            names.push(this.allUsers[j].full_user_name);
+            break; // Break the inner loop once match is found
+          }
+        }
+      }
 
-  const names = uniqueIds.map(id => {
-    const user = this.allUsers.find(u => u.user_id === id);
-    return user ? user.full_user_name : null;
-  });
-
-  return names.filter(Boolean);
-},
+      return names;
+    },
     fetch_name(email) {
       var userName = "";
       for (var i = 0; i < this.allUsers.length; i++) {

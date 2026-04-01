@@ -1,72 +1,71 @@
 <template>
   <v-card-text>
     <!--Dialog Imports-->
+    <CreateCategoryDialog
+      :DialogCreateCategory="DialogCreateCategory"
+      @clicked="DialogCreateCategoryEmit"
+    />
     <DeleteCategory
       :DialogDeleteCategory="DialogDeleteCategory"
       :StoreObj="StoreObj"
       @clicked="DialogDeleteCategoryEmit"
     />
-    <EditSplayCategoryDialog
-      :DialogEditSplayCategory="DialogEditSplayCategory"
+    <ScheduleCustomGameDialog
+      :DialogScheduleCustomGame="DialogScheduleCustomGame"
       :StoreObj="StoreObj"
-      @clicked="DialogEditSplayCategoryEmit"
+      @clicked="DialogScheduleCustomGameEmit"
     />
     <CustomQuestions
       v-if="current_view === 'Custom_Questions'"
-      ref="questionsComponent"
       :StoreObj="StoreObj"
       @clicked="QuestionPageEmit"
     />
 
-    <div v-else class="mt-n2">
+    <div v-else class="mt-n15">
+      <!--Create Category-->
+      <v-card-actions class="d-flex justify-end">
+        <v-tooltip text="Create Category">
+          <template #activator="{ props }">
+            <v-btn
+              v-bind="props"
+              variant="flat"
+              rounded="lg"
+              size="small"
+              color="primary"
+              class="text-start"
+              @click="DialogCreateCategory = true"
+            >
+              Create
+            </v-btn>
+          </template>
+        </v-tooltip>
+      </v-card-actions>
+
       <!--Data Table-->
       <v-data-table
         :height="windowHeight"
         :headers="TableHeaders"
-        :items="paginatedItems"
+        :items="ListAllCustomCategories"
         :loading="loading"
-        :items-per-page="itemsPerPage"
         @click:row="OpenQuestionsPage"
         class="modern-data-table"
         hide-default-footer
       >
-        <!--No data-->
-        <template #no-data>
-          <div class="text-center py-8">
-            <v-icon size="64" color="grey-lighten-1" class="mb-4"
-              >mdi-controller</v-icon
-            >
-            <div class="text-h6 text-grey mb-2">
-              No custom categories at the moment!
-            </div>
-            <div class="text-body-2 text-grey">Create one to start</div>
-          </div>
-        </template>
-
-        <!--Category-->
-        <template #[`item.splay_category_name`]="{ item }">
-          <div class="d-flex align-center">
-            <v-avatar>
-              <v-img :src="item.splay_category_image" cover />
-            </v-avatar>
-            <div class="ml-2">{{ item.splay_category_name }}</div>
-          </div>
-        </template>
-
         <!--Action Buttons-->
         <template #[`item.action`]="{ item }">
-          <!--Edit-->
-          <v-tooltip text="Edit">
+          <!--Schedule Game-->
+          <v-tooltip text="Schedule Game">
             <template #activator="{ props }">
               <v-btn
                 v-bind="props"
-                size="small"
+                rounded="lg"
+                size="20"
                 color="transparent"
                 elevation="0"
                 icon
-                @click.stop="OpenDialogEditSplayCategory(item)"
+                @click.stop="OpenDialogScheduleCustomGame(item)"
               >
-                <v-icon color="green">mdi-pencil</v-icon>
+                <v-icon color="orange">mdi-clock-outline</v-icon>
               </v-btn>
             </template>
           </v-tooltip>
@@ -75,8 +74,10 @@
             <template #activator="{ props }">
               <v-btn
                 v-bind="props"
+                rounded="lg"
                 size="small"
                 color="transparent"
+                class="mr-2"
                 elevation="0"
                 icon
                 @click.stop="OpenDialogDeleteCategory(item)"
@@ -142,36 +143,35 @@
 </template>
 
 <script>
-import { GetAllCategories } from "@/mixins/GetAllCategories";
+import { GetAllCustomCategories } from "@/mixins/GetAllCustomCategories";
 
 import CustomQuestions from "./CustomQuestions.vue";
-import EditSplayCategoryDialog from "./EditSplayCategoryDialog.vue";
+import CreateCategoryDialog from "./CreateCategoryDialog.vue";
 import DeleteCategory from "./DeleteCategory.vue";
+import ScheduleCustomGameDialog from "./ScheduleCustomGameDialog.vue";
 
 export default {
-  emits: ["question-view", "category-view"],
-
-  mixins: [GetAllCategories],
+  mixins: [GetAllCustomCategories],
 
   components: {
     CustomQuestions,
-    EditSplayCategoryDialog,
+    CreateCategoryDialog,
     DeleteCategory,
+    ScheduleCustomGameDialog,
   },
 
   data: () => ({
     current_view: "Custom_Categories",
 
     windowHeight: 0,
-    currentPage: 1,
-    itemsPerPage: 15,
 
+    DialogCreateCategory: false,
     DialogDeleteCategory: false,
-    DialogEditSplayCategory: false,
+    DialogScheduleCustomGame: false,
 
     StoreObj: {},
-    signedImages: {},
 
+    ListAllCustomCategories: [],
     TableHeaders: [
       { title: "Category Name", value: "splay_category_name", width: "45%" },
       { title: "Questions", value: "question_count", width: "45%" },
@@ -181,20 +181,20 @@ export default {
 
   async mounted() {
     this.windowHeight = window.innerHeight - 230;
-    await this.GetAllCategoriesMethod();
+    await this.GetAllCustomCategoriesMethod();
   },
 
   computed: {
     totalItems() {
-      return this.ListCustomCategories.length;
+      return this.ListAllCustomCategories.length;
     },
     paginatedItems() {
       const start = (this.currentPage - 1) * this.itemsPerPage;
       const end = start + this.itemsPerPage;
-      return this.ListCustomCategories.slice(start, end);
+      return this.ListAllCustomCategories.slice(start, end);
     },
     pageCount() {
-      return Math.ceil(this.ListCustomCategories.length / this.itemsPerPage);
+      return Math.ceil(this.ListAllCustomCategories.length / this.itemsPerPage);
     },
     visiblePages() {
       const totalPages = this.pageCount;
@@ -223,11 +223,15 @@ export default {
     OpenQuestionsPage(event, rowItem) {
       this.StoreObj = rowItem.item;
       this.current_view = "Custom_Questions";
-      this.$emit("question-view", rowItem.item);
     },
     QuestionPageEmit() {
       this.current_view = "Custom_Categories";
-      this.$emit("category-view");
+    },
+    DialogCreateCategoryEmit(Toggle) {
+      this.DialogCreateCategory = false;
+      if (Toggle === 2) {
+        this.GetAllCustomCategoriesMethod();
+      }
     },
     OpenDialogDeleteCategory(item) {
       this.StoreObj = item;
@@ -236,32 +240,15 @@ export default {
     DialogDeleteCategoryEmit(Toggle) {
       this.DialogDeleteCategory = false;
       if (Toggle === 2) {
-        this.GetAllCategoriesMethod();
+        this.GetAllCustomCategoriesMethod();
       }
     },
-    OpenDialogEditSplayCategory(item) {
+    OpenDialogScheduleCustomGame(item) {
       this.StoreObj = item;
-      this.DialogEditSplayCategory = true;
+      this.DialogScheduleCustomGame = true;
     },
-    DialogEditSplayCategoryEmit(Toggle) {
-      this.DialogEditSplayCategory = false;
-      if (Toggle === 2) {
-        this.GetAllCategoriesMethod();
-      }
-    },
-    openCreateQuestion() {
-      if (this.current_view === "Custom_Questions") {
-        this.$refs.questionsComponent?.openCreateQuestion();
-      }
-    },
-    goBackToCategories() {
-      this.current_view = "Custom_Categories";
-      this.$emit("category-view");
-    },
-    refreshQuestions() {
-      if (this.current_view === "Custom_Questions") {
-        this.$refs.questionsComponent?.ListQuestionsMethod();
-      }
+    DialogScheduleCustomGameEmit() {
+      this.DialogScheduleCustomGame = false;
     },
   },
 };

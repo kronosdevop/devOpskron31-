@@ -1,191 +1,173 @@
 <template>
-  <v-card class="pa-4" elevation="2">
-    <!-- Header -->
-    <v-card-title class="d-flex justify-space-between align-center">
-      <span class="text-h6 font-weight-bold">Team Members</span>
-
-      <div>
+  <div>
+    <v-card>
+      <v-card-actions class="mt-2 justify-end">
         <v-btn
-          variant="outlined"
-          class="mr-2"
-          color="grey"
-          @click="backOptions"
+          variant="flat"
+          @click="backOptions()"
+          dark
+          class="cardCss text-capitalize button-corner ml-2"
         >
           Back
         </v-btn>
-
-        <v-btn color="primary" @click="validateNextRequest"> Next </v-btn>
-      </div>
-    </v-card-title>
-
-    <v-divider class="mb-4"></v-divider>
-
-    <v-card-text>
-      <!-- Project Manager -->
-      <v-row>
-        <v-col cols="4">
-          <v-text-field
-            density="compact"
-            variant="outlined"
-            label="Project Manager"
-            v-model="projectManagerDisplay"
-            prepend-inner-icon="mdi-account-tie"
-            readonly
-          />
-        </v-col>
-      </v-row>
-
-      <!-- Add Member Card -->
-      <v-card class="pa-4 mt-4" variant="outlined">
-        <div class="text-subtitle-1 font-weight-medium mb-2">
-          Add Team Member
-        </div>
-
-        <v-row align="center">
-          <v-col cols="2">
-            <v-select
-              density="compact"
-              label="Member Type"
-              variant="outlined"
-              v-model="memberType"
-              :items="[
-                { title: 'Internal', value: 'INTERNAL' },
-                { title: 'External', value: 'EXTERNAL' },
-              ]"
-            />
-          </v-col>
-
-          <!-- INTERNAL -->
-          <template v-if="memberType == 'INTERNAL'">
+        <v-btn
+          variant="flat"
+          @click="validateNextRequest()"
+          dark
+          class="cardCss text-capitalize button-corner ml-2"
+        >
+          Next
+        </v-btn>
+      </v-card-actions>
+      <v-card-text>
+        <v-form ref="form">
+          <v-row no-gutters class="mt-3">
             <v-col cols="4">
-              <v-autocomplete
-                density="compact"
-                label="Team Member"
-                variant="outlined"
-                v-model="internalTeamMember.full_user_name"
-                item-title="full_user_name"
-                item-value="user_email_id"
-                :items="userArray"
-                :rules="[rules.required]"
-                return-object
-                prepend-inner-icon="mdi-account"
-              />
-            </v-col>
-
-            <v-col cols="3">
-              <v-select
-                density="compact"
-                label="Role"
-                variant="outlined"
-                v-model="internalTeamMember.userRole"
-                :items="roleItems"
-                :rules="[rules.required]"
-              />
-            </v-col>
-          </template>
-
-          <!-- EXTERNAL -->
-          <template v-if="memberType == 'EXTERNAL'">
-            <v-col cols="3">
               <v-text-field
                 density="compact"
-                label="Name"
                 variant="outlined"
-                v-model="externalTeamMember.userName"
-                prepend-inner-icon="mdi-account"
-                :rules="[rules.required]"
-              />
+                v-model="projectManagerDisplay"
+                readonly
+                label="Project Manager"
+              ></v-text-field>
             </v-col>
-
-            <v-col cols="3">
-              <v-text-field
-                density="compact"
-                label="Email"
-                variant="outlined"
-                v-model="externalTeamMember.userEmail"
-                prepend-inner-icon="mdi-email"
-                :rules="[rules.required, rules.email]"
-              />
-            </v-col>
-
-            <v-col cols="2">
-              <v-select
-                density="compact"
-                label="CC"
-                variant="outlined"
-                v-model="externalTeamMember.countryCode"
-                :items="countryitems"
-                item-title="name"
-                item-value="code"
-                :rules="[rules.required]"
-              />
-            </v-col>
-
-            <v-col cols="2">
-              <v-text-field
-                density="compact"
-                label="Phone"
-                variant="outlined"
-                v-model="externalTeamMember.contactNumber"
-                :rules="[rules.required]"
-              />
-            </v-col>
-          </template>
-
-          <!-- ADD BUTTON -->
-          <v-col cols="1" class="text-center mt-n4">
-            <v-btn icon color="primary" size="small" @click="addTeamMember">
-              <v-icon>mdi-plus</v-icon>
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-card>
-
-      <!-- Team Member List -->
-      <v-card v-if="teamMembers.length" class="mt-6" variant="outlined">
-        <v-card-title class="text-subtitle-1"> Added Members </v-card-title>
-
-        <v-divider></v-divider>
-
-        <v-list>
-          <v-list-item v-for="(item, index) in teamMembers" :key="index">
-            <template v-slot:prepend>
-              <v-avatar color="primary">
-                {{ item.userName.charAt(0) }}
-              </v-avatar>
-            </template>
-
-            <v-list-item-title>
-              {{ item.userName }}
-            </v-list-item-title>
-
-            <v-list-item-subtitle>
-              {{ item.userEmail }}
-            </v-list-item-subtitle>
-
-            <template v-slot:append>
-              <v-chip
-                size="small"
-                class="mr-2"
-                color="blue"
-                v-if="item.userRole"
-              >
-                {{ item.userRole }}
-              </v-chip>
-
-              <v-chip size="small" color="green" class="mr-4">
-                {{ item.memberType }}
-              </v-chip>
-
-              <v-btn icon color="red" size="small" @click="deleteMember(index)">
-                <v-icon>mdi-delete</v-icon>
-              </v-btn>
-            </template>
-          </v-list-item>
-        </v-list>
-      </v-card>
-    </v-card-text>
-  </v-card>
+            <v-col cols="12"><b> Add Team Members</b></v-col>
+            <v-row class="mt-3 pa-2 bg-white" align="center" justify="start" no-gutters>
+              <v-col cols="2" class="pr-2">
+                <v-select
+                  density="compact"
+                  variant="outlined"
+                  label="Member Type"
+                  v-model="memberType"
+                  :items="[
+                    { title: 'Internal', value: 'INTERNAL' },
+                    { title: 'External', value: 'EXTERNAL' },
+                  ]"
+                ></v-select>
+              </v-col>
+              <v-col cols="4" v-if="memberType == 'INTERNAL'" class="pr-2">
+                <v-autocomplete
+                  density="compact"
+                  v-model="internalTeamMember.full_user_name"
+                  label="Team Members"
+                  variant="outlined"
+                  item-title="full_user_name"
+                  item-value="user_email_id"
+                  :items="userArray"
+                  :rules="[rules.required]"
+                  hide-no-data
+                  return-object
+                  placeholder="Min 3 Character"
+                ></v-autocomplete>
+              </v-col>
+              <v-col cols="3" v-if="memberType == 'INTERNAL'" class="pr-2">
+                <v-select
+                  density="compact"
+                  variant="outlined"
+                  :rules="[rules.required]"
+                  label="Role"
+                  v-model="internalTeamMember.userRole"
+                  :items="roleItems"
+                />
+              </v-col>
+              <v-col cols="3" v-if="memberType == 'EXTERNAL'" class="pr-2">
+                <v-text-field
+                  density="compact"
+                  variant="outlined"
+                  label="Name"
+                  v-model="externalTeamMember.userName"
+                  :rules="[rules.required]"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="3" v-if="memberType == 'EXTERNAL'" class="pr-2">
+                <v-text-field
+                  density="compact"
+                  variant="outlined"
+                  label="Email"
+                  v-model="externalTeamMember.userEmail"
+                  :rules="[rules.required, rules.email]"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="2" v-if="memberType == 'EXTERNAL'" class="pr-2">
+                <v-select
+                  density="compact"
+                  v-model="externalTeamMember.countryCode"
+                  label="CC"
+                  :items="countryitems"
+                  item-title="name"
+                  item-value="code"
+                  variant="outlined"
+                  :rules="[rules.required]"
+                ></v-select>
+              </v-col>
+              <v-col cols="2" v-if="memberType == 'EXTERNAL'" class="pr-2">
+                <v-text-field
+                  density="compact"
+                  v-model="externalTeamMember.contactNumber"
+                  label="Contact Number"
+                  maxlength="14"
+                  variant="outlined"
+                  :rules="[
+                    (v) => (v ? v.length >= 8 : false) || 'Phone is required',
+                  ]"
+                  @keypress="is_number($event, externalTeamMember.contactNumber)"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="1" class="d-flex align-center justify-center mt-2">
+                <v-icon
+                  @click="addTeamMember()"
+                  density="compact"
+                  color="black"
+                  style="cursor:pointer;"
+                >mdi-plus</v-icon>
+              </v-col>
+            </v-row>
+          
+          </v-row>
+          <v-row v-if="teamMembers.length != 0" class="mt-4">
+              <v-col cols="12">
+                <v-list density="compact" two-line variant="outlined">
+                  <v-list-item v-for="(item, index) in teamMembers" :key="index">
+                    <v-list-item-content>
+                      <v-list-item-title>
+                        {{ item.userName }}
+                      </v-list-item-title>
+                      <v-list-item-subtitle>
+                        {{ item.userEmail }}
+                      </v-list-item-subtitle>
+                      <v-list-item-subtitle v-if="item.userRole">
+                        {{ item.userRole }}
+                      </v-list-item-subtitle>
+                      <v-list-item-subtitle v-if="item.contactNumber">
+                        {{ item.countryCode + " " + item.contactNumber }}
+                      </v-list-item-subtitle>
+                    </v-list-item-content>
+                    <v-list-item-action>
+                      <v-chip size="x-small" color="primary" text-color="white">
+                        {{
+                          item.memberType === "INTERNAL"
+                            ? "Internal User"
+                            : "External User"
+                        }}
+                      </v-chip>
+                      <v-btn
+                        class="mr-8"
+                        color="red"
+                        size="x-small"
+                        icon
+                        @click="deleteMember(index)"
+                      >
+                        <v-icon>mdi-delete</v-icon>
+                      </v-btn>
+                    </v-list-item-action>
+                  </v-list-item>
+                </v-list>
+              </v-col>
+            </v-row>
+        </v-form>
+      </v-card-text>
+    </v-card>
+  </div>
 </template>
 
 <script>
@@ -196,7 +178,7 @@ export default {
   mixins: [get_all_org_users],
   data() {
     return {
-      roleItems: ["Member", "Observer", "Admin"],
+            roleItems: [ "Member", "Observer"],
       projectManagerDisplay: "",
       memberType: "INTERNAL",
       internalTeamMember: {
@@ -223,7 +205,7 @@ export default {
 
   async mounted() {
     this.projectManagerDisplay =
-      this.$store.getters.GetUserObj.user?.full_user_name;
+      this.$store.getters.GetUserObj.user.full_user_name;
     await this.get_all_org_users();
     this.fetchDetails();
   },
@@ -248,7 +230,7 @@ export default {
         if (element.user_status == "ACTIVE") {
           if (
             element.user_email_id !=
-            this.$store.getters.GetUserObj.user?.user_email_id
+            this.$store.getters.GetUserObj.user.user_email_id
           ) {
             this.userArray.push({
               full_user_name: element.full_user_name,

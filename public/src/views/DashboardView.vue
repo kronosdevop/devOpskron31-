@@ -1,24 +1,18 @@
 <template>
   <div>
-    <OverlayComp :overlay="overlay" />
-    <SnackBar :SnackBarComponent="SnackBarComponent" />
-    <AppSnackBar :AppSnackBarComponent="AppSnackBarComponent" />
-    <CreateExternalTicketDialog
-      :DialogCreateExternalTicket="DialogCreateExternalTicket"
-      :screenshot-file="ScreenshotFile"
-      :org-details="orgDetails"
-      @clicked="DialogCreateExternalTicketEmit"
-    />
+    <!-- ===== Toolbar (UNCHANGED) ===== -->
+    <CreateExternalTicketDialog :DialogCreateExternalTicket="DialogCreateExternalTicket"
+      :screenshot-file="ScreenshotFile" :org-details="orgDetails" @clicked="DialogCreateExternalTicketEmit" />
 
     <v-app-bar class="modern-header-section">
       <div class="header-left">
         <div class="header-icon-container">
-          <div class="header-icon-bg mb-4">
-            <v-icon color="white mt" size="24">mdi-view-dashboard</v-icon>
+          <div class="header-icon-bg">
+            <v-icon color="white" size="24">mdi-view-dashboard</v-icon>
           </div>
         </div>
-        <div class="header-text mb-3">
-          <span class="header-title">Home</span> 
+        <div class="header-text">
+          <span class="header-title">Home</span>
           <span class="header-subtitle">
             Overview of your workflows and activities
           </span>
@@ -37,16 +31,16 @@
     </v-app-bar>
 
     <!-- ===== Dashboard Body ===== -->
-    <v-card v-if="!overlay" flat class="dashboard-root">
+    <v-card flat class="dashboard-root">
       <v-card-text class="">
         <!-- ===== Welcome Banner ===== -->
-        <v-card class="welcome-banner" elevation="0">
+        <v-card class="welcome-banner " elevation="0">
           <div class="welcome-inner">
             <!-- Left -->
             <div class="banner-left">
               <v-img :src="StichhLogo" class="banner-logo mt-4 ml-3" contain />
               <div>
-                <h2 class="welcome-title mt-6 ml-3"> Stichh</h2>
+                <h2 class="welcome-title mt-6 ml-3">Welcome to Stichh</h2>
                 <p class="welcome-subtitle mt-1 ml-3">
                   Manage your enterprise workflows with precision and ease.
                 </p>
@@ -54,55 +48,34 @@
             </div>
 
             <!-- Right -->
-            <div class="banner-right"> 
-              <v-img
-                :src="AppDownload"
-                class="banner-logo mt-5"
-                width="180"
-                contain
-              />
+            <div class="banner-right">
+              <v-img :src="AppDownload" class="banner-logo mt-5" width="180" contain />
+              
             </div>
           </div>
         </v-card>
 
+        <!-- ===== Stats Cards ===== -->
         <v-row class="workflow" dense>
           <!-- Pending -->
           <v-col cols="12" sm="6" md="3">
             <v-card class="modern-card" @click="pending_form">
-  <div class="card-top">
-    <div class="icon-wrap pink">
-      <v-icon size="20">mdi-file-clock-outline</v-icon>
-    </div>
+              <div class="card-top">
+                <div class="icon-wrap pink">
+                  <v-icon size="20">mdi-file-clock-outline</v-icon>
+                </div>
 
-    <!-- RIGHT SIDE -->
-    <div class="count-refresh">
-     <v-tooltip location="bottom">
-  <template #activator="{ props }">
-    <v-icon
-      v-bind="props"
-      @click.stop="refresh_list"
-      size="small"
-      color="primary"
-      class="mr-1"
-    >
-      mdi-refresh
-    </v-icon>
-  </template>
+                <!-- 🔥 COUNT TOP RIGHT -->
+                <div class="count-badge">
+                  {{ pedningData.pendingcount ? pedningData.pendingcount : 0 }}
+                </div>
+              </div>
 
-  Refresh pending count
-</v-tooltip>
-
-      <div class="count-badge">
-        {{ pendingCount || 0 }}
-      </div>
-    </div>
-  </div>
-
-  <div class="card-content">
-    <h3>Pending Workflows</h3>
-    <p>Workflows awaiting your action</p>
-  </div>
-</v-card>
+              <div class="card-content">
+                <h3>Pending Workflows</h3>
+                <p>Workflows awaiting your action</p>
+              </div>
+            </v-card>
           </v-col>
 
           <!-- Submitted -->
@@ -145,6 +118,7 @@
                   <v-icon size="20">mdi-plus-box-outline</v-icon>
                 </div>
               </div>
+
               <div class="card-content">
                 <h3>Initiate Workflow</h3>
                 <p>Start a new workflow process</p>
@@ -152,74 +126,79 @@
             </v-card>
           </v-col>
         </v-row>
+    
+<v-card class="quick-actions-card mt-5" elevation="0">
+   <h3 class="section-title  ml-2">
+          <v-icon size="18" color="secondary" class=" mr-1">mdi-flash</v-icon>
+          Deployed Apps
+        </h3>
 
-        <v-card class="apps-unified-card mt-5" elevation="0">
-          <h3 class="section-title ml-2 deployed-title">
-            <v-icon size="18" color="secondary" class="mr-1">mdi-apps</v-icon>
-            Apps
-            <v-tooltip location="bottom" content-class="custom-tooltip"
-              ><template #activator="{ props }"
-                ><span class="app-count" v-bind="props">{{
-                  deployedAppsCount
-                }}</span></template
-              >
-              {{ deployedAppsCount }} Apps have been deployed for you
-            </v-tooltip>
-          </h3>
+  <div class="qa-container">
+    <div class="qa-track">
+      <div
+        v-for="(action, i) in [...quickActionsList, ...quickActionsList]"
+        :key="i"
+        class="qa-item mt-2"
+      >
+        <!-- Icon -->
+        <div :class="['qa-icon', action.color]">
+          <v-icon color="white">{{ action.icon }}</v-icon>
+        </div>
 
-          <div class="apps-grid">
-            <div
-              v-for="app in allAppsUnified"
-              :key="app.id"
-              class="app-card"
-              :class="{ disabled: !app.isEnabled }"
-            >
-              <div class="app-icon-wrap" @click="app_detail_dialog(app)">
-                <div
-                  :class="[
-                    'app-icon-bg',
-                    app.color, // 🔥 RESTORES background
-                    app.isEnabled ? 'icon-deployed' : 'icon-not-deployed',
-                    app.id === deployingAppId ? 'icon-deploying' : '',
-                  ]"
-                >
-                  <v-icon color="white" size="26">{{ app.icon }}</v-icon>
-                </div>
-                <div v-if="app.isEnabled" class="status-badge enabled">
-                  <v-icon icon="mdi-check" size="12" color="white" />
-                </div>
-                <div v-else class="status-badge disabled">
-                  <v-icon icon="mdi-lock" size="12" color="white" />
-                </div>
-              </div>
-              <div class="app-name">{{ app.text }}</div>
-            </div>
-          </div>
-        </v-card>
+        <!-- Text -->
+        <div class="qa-text-wrap">
+          <p class="qa-title">{{ action.text }}</p>
+          <p class="qa-desc">{{ action.description }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</v-card>
+<br/>
+    <!-- ===== Other Apps Actions ===== -->
+ 
+<v-card class="quick-actions-card mt-5" elevation="0">
+  <div class="qa-container">
+      <h3 class="section-title ml-2">
+          <v-icon size="18" color="secondary" class=" mr-1">mdi-menu</v-icon>
+          Other Apps
+        </h3>
+
+    <div class="qa-track1">
+      <div
+        v-for="(action, i) in [...quickActionsList, ...quickActionsList]"
+        :key="i"
+        class="qa-item mt-2"
+      >
+        <!-- Icon -->
+        <div :class="['qa-icon', action.color]">
+          <v-icon color="white">{{ action.icon }}</v-icon>
+        </div>
+
+        <!-- Text -->
+        <div class="qa-text-wrap">
+          <p class="qa-title">{{ action.text }}</p>
+          <p class="qa-desc">{{ action.description }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</v-card>
+
+
+
+
       </v-card-text>
     </v-card>
-    <div>
-      <DashboardDialog
-        :dashboard_dialog="dashboard_dialog"
-        :dashboard_data="dashboard_data"
-        :owneremail="owneremail"
-        :ownerName="ownerName"
-        @close="dashboard_dialog = false"
-        v-on:successMsg="success_info"
-        v-on:errorMsg="error_info"
-      />
-    </div>
   </div>
 </template>
 <script>
 /*eslint-disable*/
 // Imports
 import { get_org_dashboard_data } from "@/graphql/queries";
-import { list_pending_workflows_v1 } from "@/graphql/queries.js";
 import { API, graphqlOperation } from "aws-amplify";
 import OverlayComp from "@/components/OverlayComp.vue";
 import { mapGetters } from "vuex";
-import SnackBar from "@/components/SnackBar.vue";
 //import { format } from "date-fns";
 import { formatedatetime } from "@/JsonFiles/DateFormate.js";
 import UpgradeDialog from "@/components/AdminApps/UpgradeDialog.vue";
@@ -227,9 +206,7 @@ import CreateExternalTicketDialog from "@/components/Tickets/CreateExternalTicke
 import html2canvas from "html2canvas";
 import StichhLogo from "@/assets/stichh white logo.png";
 import AppDownload from "@/assets/AppDownload.png";
-import { get_apps_enabled_status } from "@/graphql/queries";
-import DashboardDialog from "./DashboardDialog.vue";
-import AppSnackBar from "./AppSnackBar.vue";
+import {get_apps_enabled_status} from "@/graphql/queries"
 
 // Mixins
 import { get_all_users } from "@/mixins/GetAllUsers.js";
@@ -240,9 +217,6 @@ export default {
     OverlayComp,
     UpgradeDialog,
     CreateExternalTicketDialog,
-    DashboardDialog,
-    SnackBar,
-    AppSnackBar,
   },
 
   // Mixins
@@ -267,29 +241,16 @@ export default {
   // Data
   data() {
     return {
-      AppSnackBarComponent: {
-        AppSnackBarVmodel: false,
-        AppSnackbarText: "",
-        AppSnackbarColor: "green",
-        timeout: 4000,
-        icon: "",
-        title: "",
-      },
-      allApp: [],
-      owneremail: "",
-      ownerName: "",
+       allApp:[],
       // String properties
       pendingCount: "",
       myteamCount: "",
       billingType: "",
-      pendingCount: "",
 
       // Object properties
       lastNotification: null,
       selectedChannel: null,
       tasksTab: null,
-      dashboard_dialog: false,
-      dashboard_data: {},
 
       // Array properties
       listItems: [],
@@ -315,7 +276,6 @@ export default {
       ],
 
       // Boolean properties
-      loading: false,
       overlay: false,
       tableLoading: false,
       notificationTab: false,
@@ -326,7 +286,6 @@ export default {
 
       // Null values
       ScreenshotFile: null,
-      nextToken: null,
 
       // Number properties
       submittedWorkflowsCount: 0,
@@ -344,25 +303,28 @@ export default {
       orgDetails: {
         bucket_name: "stichh-medias",
         region: "us-east-1",
+
+       
       },
+    
+
+      
     };
   },
 
   // Lifecycle hooks
   async created() {
     this.windowHeight = window.innerHeight - 80;
-    await this.get_pending_workflows();
-
     await this.get_all_users();
 
     // var data = JSON.parse(localStorage.getItem("notoficationItems"));
     // this.listItems = data;
 
-    await this.get_App_Details();
-    this.app_details();
+     await this.get_App_Details();
   },
 
   mounted() {
+
     this.$store.commit("SetappName", "Home");
     this.$store.commit("Setappicon", "mdi-home");
 
@@ -371,18 +333,11 @@ export default {
 
     // Set billing type with proper null checks
     this.setBillingType();
+    
   },
 
   // Watchers
   watch: {
-    "$store.getters.GetUserObj": {
-      immediate: false,
-      deep: true,
-      async handler() {
-        // User permissions changed → refresh apps
-        await this.get_App_Details();
-      },
-    },
 
     // Watch for channel data changes to set default selected channel
     recentChannels: {
@@ -407,116 +362,12 @@ export default {
 
   // Computed properties
   computed: {
-    deployedAppsCount() {
-      const grouped = new Set();
-
-      this.allApp.forEach((app) => {
-        if (
-          app.is_enabled === true &&
-          this.userAccessibleTypes.has(app.dashboard_unique_type)
-        ) {
-          const baseType = this.normalizeAppType(app.dashboard_unique_type);
-          grouped.add(baseType);
-        }
-      });
-
-      return grouped.size;
-    },
-    userAccessibleTypes() {
-      const userObj = this.$store.getters.GetUserObj;
-      if (!userObj) return new Set();
-
-      const types = [];
-
-      if (Array.isArray(userObj.user_apps)) {
-        userObj.user_apps.forEach((app) => {
-          if (app.is_visible) {
-            types.push(app.dashboard_unique_type);
-          }
-        });
-      }
-
-      if (Array.isArray(userObj.admin_apps)) {
-        userObj.admin_apps.forEach((app) => {
-          if (app.is_visible) {
-            types.push(app.dashboard_unique_type);
-          }
-        });
-      }
-
-      return new Set(types);
-    },
-    deployedAppsCount() {
-      const grouped = new Set();
-
-      this.allApp.forEach((app) => {
-        if (app.is_enabled === true) {
-          const baseType = this.normalizeAppType(app.dashboard_unique_type);
-          grouped.add(baseType);
-        }
-      });
-
-      return grouped.size;
-    },
-    otherApps() {
-      return this.allApp
-        .filter(
-          (app) =>
-            !(
-              app.is_enabled === true &&
-              this.userAccessibleTypes.has(app.dashboard_unique_type)
-            )
-        )
-        .map((app) => {
-          const ui = this.getAppUIConfig(app.dashboard_unique_type);
-          return {
-            id: app.dashboard_id,
-            text: app.dashboard_name,
-            description: ui.desc,
-            icon: ui.icon,
-            color: ui.color,
-          };
-        });
-    },
-    allAppsUnified() {
-      const grouped = {};
-
-      this.allApp.forEach((app) => {
-        const baseType = this.normalizeAppType(app.dashboard_unique_type);
-        const ui = this.getAppUIConfig(app.dashboard_unique_type);
-
-        const isAccessible = app.is_enabled === true;
-
-        if (!grouped[baseType]) {
-          grouped[baseType] = {
-            id: app.dashboard_id,
-            text: app.dashboard_name,
-            description: app.dashboard_description,
-            icon: ui.icon,
-            color: ui.color,
-            access: app.app_access,
-            isEnabled: isAccessible,
-            priority: app.dashboard_unique_type.includes("_USERS") ? 2 : 1,
-          };
-        } else if (isAccessible && grouped[baseType].priority < 2) {
-          grouped[baseType].isEnabled = true;
-        }
-      });
-
-      return Object.values(grouped).sort((a, b) => {
-        if (a.isEnabled !== b.isEnabled) {
-          return a.isEnabled ? -1 : 1;
-        }
-        return a.text.localeCompare(b.text, undefined, {
-          sensitivity: "base",
-        });
-      });
-    },
-    doubledActions() {
-      return [...this.quickActionsList, ...this.quickActionsList];
-    },
+    
+     doubledActions() {
+    return [...this.quickActionsList, ...this.quickActionsList];
+  },
     currentDate() {
-      return format(new Date(), "dd-MM-yyyy");
+      return format(new Date(), "dd-MM-yyyy"); // Returns current date in dd-MM-yyyy format
     },
     ...mapGetters([
       "getNotifications",
@@ -528,10 +379,10 @@ export default {
     notifications() {
       return {
         noticount:
-          this.getNotifications.length != 0 ? this.getNotifications.length : 0,
+          this.getNotifications.length != 0 ? this.getNotifications.length : 0, // Get the count of messages
         notificationmsg:
           this.getNotifications.length != 0
-            ? this.getNotifications[this.getNotifications.length - 1]
+            ? this.getNotifications[this.getNotifications.length - 1] // Get the last message
             : {},
       };
     },
@@ -637,536 +488,154 @@ export default {
       return [];
     },
     // Dynamic Quick Actions based on available apps
+    quickActionsList() {
+      const userObj = this.$store.getters.GetUserObj;
+      if (!userObj) return [];
+
+      const availableApps = [];
+
+      // Add Chats as first action (always available)
+      // availableApps.push({
+      //   actionType: "chats",
+      //   text: "Chats",
+      //   icon: "mdi-chat-outline",
+      //   color: "bg-blue",
+      //   route: "/home/Chats",
+      // });
+
+      // Get user apps from store or build dynamically
+      let userApps = [];
+
+      // Check if userApps exist in user object
+      if (userObj.user_apps && Array.isArray(userObj.user_apps)) {
+        userApps = userObj.user_apps.filter(
+          (item) =>
+            item.is_visible &&
+            (item.app_usage_level === "WEB_PHONE_ONLY" ||
+              item.app_usage_level === "WEB_ONLY")
+        );
+      }
+
+      // Add admin apps that should be available to users
+      if (userObj.admin_apps && Array.isArray(userObj.admin_apps)) {
+        const adminApps = userObj.admin_apps.filter(
+          (item) =>
+            item.is_visible &&
+            item.is_dashboard_admin &&
+            (item.app_usage_level === "WEB_PHONE_ONLY" ||
+              item.app_usage_level === "WEB_ONLY")
+        );
+
+        // Add specific admin apps that should be in quick actions
+        const quickActionTypes = [
+          "EVENTS_ADMINS",
+          "EXPENSE_ADMINS",
+          "ASSETS_ADMIN",
+          "TIMESHEET_ADMINS",
+          "DIRECTORY_USER",
+          "FORMS_ADMINS",
+          "TICKET_MANAGEMENT_ADMINS",
+          "BOOKING_SLOT_ADMINS",
+          "PREZENCE_ADMINS",
+          "PROJECT_USER",
+          "COLLATERALS",
+          "DASHBOARD_MANAGEMENT",
+        ];
+
+        quickActionTypes.forEach((type) => {
+          const adminApp = adminApps.find(
+            (app) => app.dashboard_unique_type === type
+          );
+          if (adminApp) {
+            const actionConfig = this.getQuickActionConfig(
+              adminApp.dashboard_unique_type
+            );
+            if (actionConfig) {
+              availableApps.push(actionConfig);
+            }
+          }
+        });
+      }
+
+      // Add user apps that should be in quick actions
+      const userQuickActionTypes = [
+        "EVENTS",
+        "EXPENSE",
+        "ASSETS_USER",
+        "TIMESHEET_USER",
+        "DIRECTORY_USER",
+        "FORMS_ADMINS",
+        "TICKET_MANAGEMENT",
+        "BOOKING_SLOT",
+        "PREZENCE",
+        "PROJECT_USER",
+        "COLLATERALS",
+        "DASHBOARD_MANAGEMENT",
+        "PAYROLL",
+        "AP_AR_USER",
+        "GUESTHOUSE_USER",
+        "QABM_USERS",
+        "SAIM_USERS",
+        "VNDR_USERS",
+        "ORDMG_USERS",
+      ];
+
+      userQuickActionTypes.forEach((type) => {
+        const userApp = userApps.find(
+          (app) => app.dashboard_unique_type === type
+        );
+        if (userApp) {
+          const actionConfig = this.getQuickActionConfig(    
+          );
+          if (actionConfig) {
+            availableApps.push(actionConfig);
+          }
+        }
+      });
+
+      // Remove duplicates and ensure minimum 5 items
+      const uniqueApps = availableApps.filter(
+        (app, index, self) =>
+          index === self.findIndex((t) => t.actionType === app.actionType)
+      );
+
+      // Return exactly 5 items maximum (only apps user has access to)
+      return uniqueApps.slice(0, 5);
+    },
   },
   // Methods
   methods: {
-    refresh_list() {
-      this.next_token = null;
-      this.get_pending_workflows();
-      this.get_App_Details();
-    },
-    async get_pending_workflows() {
-      const userObj = this.$store.getters.GetUserObj;
-
-      if (!userObj || !userObj.organization || !userObj.user) {
-        console.log("User not ready yet");
-        return;
-      }
-
+  
+ async get_App_Details() {
       this.overlay = true;
-
-      try {
-        let result = await API.graphql(
-          graphqlOperation(list_pending_workflows_v1, {
-            input: {
-              organization_id: userObj.organization.organization_id,
-              user_email_id: userObj.user.user_email_id,
-              limit: 21,
-              nextToken: null,
-            },
-          })
-        );
-
-        const response = JSON.parse(result.data.list_pending_workflows_v1);
-
-        if (response.Status === "SUCCESS") {
-          this.pendingCount = response.count;
-          console.log("Pending workflows fetched:", response);
-        }
-      } catch (error) {
-        console.error("Pending API Error:", error);
-      }
-
-      this.overlay = false;
-    },
-    normalizeAppType(type) {
-      if (type.startsWith("REWARDS")) {
-        return "REWARDS";
-      }
-
-      return type.replace(/_ADMINS?$/, "").replace(/_USERS?$/, "");
-    },
-
-    app_detail_dialog(apps) {
-      console.log("apps:", apps);
-
-      if (!apps.isEnabled) {
-        this.dashboard_data = apps;
-        this.dashboard_dialog = true;
-      } else {
-        this.AppSnackBarComponent = {
-          AppSnackBarVmodel: true,
-          AppSnackbarColor: "green",
-          AppSnackbarText: `${apps.text} module is already deployed`,
-          timeout: 5000,
-          icon: "mdi-information-outline",
-        };
-      }
-    },
-
-    async get_App_Details() {
-      this.overlay = true;
-      try {
+      try{
         let result = await API.graphql(
           graphqlOperation(get_apps_enabled_status, {
-            inputs: {
+            inputs:{
               // organization_id :this.$store.getters.GetUserObj.organization.organization_id
-            },
+            }
           })
+          
         );
-
+      
+        //  console.log("Full result:", result);
         var response = JSON.parse(result.data.get_apps_enabled_status);
 
+        this.overlay = false;
         if (response.Status == "SUCCESS") {
-          this.owneremail = response.data.owner_email_id;
-          this.ownerName = response.data.owner_name;
-          this.overlay = false;
           this.allApp = response.data.apps;
-          console.log(response.data);
-          console.log();
+          console.log(response.data)
+         console.log()
+         
+        } else {
+          this.overlay = false;
         }
       } catch (error) {
-        this.overlay = false;
         console.error("Error fetching App details:", error);
-      } finally {
         this.overlay = false;
       }
-    },
-    async success_info(val) {
-      this.dashboard_dialog = false;
-      this.overlay = true;
-
-      const appName =
-        typeof val === "string" ? val : val?.appName || val?.message || "App";
-
-      this.AppSnackBarComponent = {
-        AppSnackBarVmodel: true,
-        AppSnackbarColor: "green",
-        AppSnackbarText:
-          val?.message || `${appName} has been deployed successfully`,
-        timeout: 4000,
-        icon: "mdi-check-circle-outline",
-        title: "Deployment Successful",
-      };
-
-      try {
-        await this.get_all_users();
-        await this.get_App_Details();
-      } finally {
-        this.overlay = false;
-      }
-    },
-    async success_info(val) {
-      this.dashboard_dialog = false;
-      this.overlay = true;
-
-      const appName =
-        typeof val === "string" ? val : val?.appName || val?.message || "App";
-
-      this.AppSnackBarComponent = {
-        AppSnackBarVmodel: true,
-        AppSnackbarColor: "green",
-        AppSnackbarText:
-          val?.message || `${appName} has been deployed successfully`,
-        timeout: 4000,
-        icon: "mdi-check-circle-outline",
-        title: "Deployment Successful",
-      };
-
-      try {
-        await this.get_all_users();
-        await this.get_App_Details();
-      } finally {
-        this.overlay = false;
-      }
-    },
-    error_info(val) {
-      this.AppSnackBarComponent = {
-        AppSnackBarVmodel: true,
-        AppSnackbarColor: "red",
-        AppSnackbarText:
-          typeof val === "string" ? val : val?.message || "An error occurred",
-        timeout: 5000,
-        icon: "mdi-alert-circle-outline",
-        title: "Error",
-      };
-    },
-    async refreshUserAndApps() {
-      await this.get_all_users();
-
-      await this.get_App_Details();
-    },
-
-    app_details() {
-      var dashboardType = this.allApp.map((item) => item.dashboard_unique_type);
-    },
-    getColorFromType(type) {
-      const DEFAULT_ICON_POOL = [
-        "mdi-apps",
-        "mdi-view-grid",
-        "mdi-grid-large",
-        "mdi-layers-outline",
-        "mdi-puzzle-outline",
-        "mdi-cube-outline",
-        "mdi-shape-outline",
-        "mdi-view-dashboard-outline",
-        "mdi-dots-grid",
-        "mdi-widgets-outline",
-      ];
-
-      const colors = [
-        "bg-blue",
-        "bg-green",
-        "bg-orange",
-        "bg-purple",
-        "bg-indigo",
-        "bg-teal",
-        "bg-pink",
-        "bg-brown",
-        "bg-yellow",
-      ];
-
-      let hash = 0;
-      for (let i = 0; i < type.length; i++) {
-        hash = type.charCodeAt(i) + ((hash << 5) - hash);
-      }
-
-      return colors[Math.abs(hash) % colors.length];
-    },
-
-    getAppUIConfig(type) {
-      const APP_UI_MAP = {
-        // TASKS
-        TASKS: {
-          icon: "mdi-clipboard-check-outline",
-          color: "bg-indigo",
-          desc: "Task management",
-        },
-
-        // MATERIAL
-        MATERIAL_USER: {
-          icon: "mdi-package-variant",
-          color: "bg-blue",
-          desc: "Material tracking",
-        },
-        MATERIAL_ADMIN: {
-          icon: "mdi-package-variant-closed",
-          color: "bg-deep-blue",
-          desc: "Material administration",
-        },
-
-        //  CRM
-        CUSTOMERS_ADMINS: {
-          icon: "mdi-account-multiple",
-          color: "bg-teal",
-          desc: "Customer management",
-        },
-
-        //FORMS
-        FORMS: {
-          icon: "mdi-form-select",
-          color: "bg-purple",
-          desc: "Submit forms",
-        },
-        FORMS_ADMINS: {
-          icon: "mdi-form-textbox",
-          color: "bg-deep-purple",
-          desc: "Form designer & workflows",
-        },
-
-        //  VISITS
-        VISIT_USERS: {
-          icon: "mdi-map-marker-outline",
-          color: "bg-green",
-          desc: "Track visits",
-        },
-        VISIT_ADMIN: {
-          icon: "mdi-map-marker-account-outline",
-          color: "bg-teal",
-          desc: "Manage visits",
-        },
-
-        //  ATTENDANCE
-        PREZENCE: {
-          icon: "mdi-face-recognition",
-          color: "bg-light-green",
-          desc: "Attendance tracking",
-        },
-        PREZENCE_ADMINS: {
-          icon: "mdi-face-recognition",
-          color: "bg-green",
-          desc: "Attendance administration",
-        },
-
-        //PURCHASE
-        PURCHASE_ADMIN: {
-          icon: "mdi-cart-outline",
-          color: "bg-orange",
-          desc: "Purchase management",
-        },
-
-        //  LOAD OPT
-        LOADOPT_USER: {
-          icon: "mdi-truck-fast-outline",
-          color: "bg-amber",
-          desc: "Vehicle load optimization",
-        },
-        LOADOPT_ADMIN: {
-          icon: "mdi-truck-cargo-container",
-          color: "bg-deep-orange",
-          desc: "Load optimization admin",
-        },
-
-        // DASHBOARD
-        DASHBOARD_MANAGEMENT: {
-          icon: "mdi-view-dashboard-outline",
-          color: "bg-indigo",
-          desc: "Dashboard access",
-        },
-        DASHBOARD_MANAGEMENT_ADMINS: {
-          icon: "mdi-view-dashboard-edit",
-          color: "bg-yellow",
-          desc: "Dashboard configuration",
-        },
-
-        // SPLAY
-        SPLAY_USERS: {
-          icon: "mdi-gamepad-variant-outline",
-          color: "bg-pink",
-          desc: "Play games",
-        },
-        SPLAY_ADMINS: {
-          icon: "mdi-gamepad-variant",
-          color: "bg-pink",
-          desc: "Game administration",
-        },
-
-        //EVENTS
-        EVENTS: {
-          icon: "mdi-calendar-outline",
-          color: "bg-green",
-          desc: "Events & schedules",
-        },
-        EVENTS_ADMINS: {
-          icon: "mdi-calendar-outline",
-          color: "bg-teal",
-          desc: "Event administration",
-        },
-
-        // GUEST HOUSE
-        GUESTHOUSE_USER: {
-          icon: "mdi-home-city",
-          color: "bg-brown",
-          desc: "Guest house booking",
-        },
-        GUESTHOUSE_ADMIN: {
-          icon: "mdi-home-city-outline",
-          color: "bg-deep-brown",
-          desc: "Guest house administration",
-        },
-
-        // SLOT BOOKING
-        BOOKING_SLOT: {
-          icon: "mdi-clock-outline",
-          color: "bg-blue",
-          desc: "Slot booking",
-        },
-        BOOKING_SLOT_ADMINS: {
-          icon: "mdi-timeline-clock",
-          color: "bg-blue",
-          desc: "Slot management",
-        },
-
-        //  BILLING
-        BILLING_ADMIN: {
-          icon: "mdi-receipt-text-outline",
-          color: "bg-indigo",
-          desc: "Billing & invoices",
-        },
-
-        // CHECKLIST
-        CHECKLIST_ADMIN: {
-          icon: "mdi-format-list-checks",
-          color: "bg-cyan",
-          desc: "Checklist management",
-        },
-
-        //  REWARDS
-        REWARDS_RECOGNITION_USERS: {
-          icon: "mdi-trophy-outline",
-          color: "bg-amber",
-          desc: "Rewards & recognition",
-        },
-        REWARDS_MANAGEMENT_ADMINS: {
-          icon: "mdi-trophy-award",
-          color: "bg-deep-orange",
-          desc: "Rewards administration",
-        },
-
-        //  PAYROLL
-        PAYROLL: {
-          icon: "mdi-cash-outline",
-          color: "bg-green",
-          desc: "Payslips",
-        },
-        PAYROLL_ADMINS: {
-          icon: "mdi-cash-multiple",
-          color: "bg-deep-green",
-          desc: "Payroll administration",
-        },
-
-        //FINANCE
-        EXPENSE: {
-          icon: "mdi-cash-minus",
-          color: "bg-orange",
-          desc: "Expense tracking",
-        },
-        EXPENSE_ADMINS: {
-          icon: "mdi-cash-check",
-          color: "bg-deep-orange",
-          desc: "Expense approval",
-        },
-        AP_AR_USER: {
-          icon: "mdi-bank-outline",
-          color: "bg-indigo",
-          desc: "Accounts payable & receivable",
-        },
-
-        //  SALES / INVENTORY
-        QABM_USERS: {
-          icon: "mdi-chart-line",
-          color: "bg-purple",
-          desc: "Sales Record",
-        },
-        SAIM_USERS: {
-          icon: "mdi-warehouse",
-          color: "bg-blue-grey",
-          desc: "Inventory",
-        },
-        VNDR_USERS: {
-          icon: "mdi-account-group-outline",
-          color: "bg-brown",
-          desc: "Vendor management",
-        },
-        ORDMG_USERS: {
-          icon: "mdi-cart-arrow-right",
-          color: "bg-orange",
-          desc: "Order management",
-        },
-
-        //  DOCS
-        COLLATERALS: {
-          icon: "mdi-folder-multiple-outline",
-          color: "bg-blue",
-          desc: "Manage your documents and folders",
-        },
-        DIRECTORY_USER: {
-          icon: "mdi-account-box-multiple-outline",
-          color: "bg-grey",
-          desc: "Manage your directories and forms",
-        },
-
-        // ASSETS
-        ASSETS_USER: {
-          icon: "mdi-devices",
-          color: "bg-cyan",
-          desc: "User assets",
-        },
-        ASSETS_ADMIN: {
-          icon: "mdi-devices",
-          color: "bg-blue-grey",
-          desc: "Asset administration",
-        },
-
-        //  PROJECT
-        PROJECT_USER: {
-          icon: "mdi-briefcase-outline",
-          color: "bg-purple",
-          desc: "Projects",
-        },
-
-        // TICKETS
-        TICKET_MANAGEMENT: {
-          icon: "mdi-ticket-outline",
-          color: "bg-orange",
-          desc: "Support tickets",
-        },
-        TICKET_MANAGEMENT_ADMINS: {
-          icon: "mdi-ticket-account",
-          color: "bg-deep-orange",
-          desc: "Ticket administration",
-        },
-        TICKET_TECHNICIAN_MANAGEMENT_ADMINS: {
-          icon: "mdi-headset",
-          color: "bg-red",
-          desc: "Assigned tickets",
-        },
-
-        // ================= FARM =================
-        // FARM: {
-        //   icon: "mdi-tractor",
-        //   color: "bg-green",
-        //   desc: "Farm management",
-        // },
-        // FARM_ADMINS: {
-        //   icon: "mdi-tractor-variant",
-        //   color: "bg-deep-green",
-        //   desc: "Farm administration",
-        // },
-
-        // ================= SURVEILLANCE =================
-        // SURVEILLANCE: {
-        //   icon: "mdi-cctv",
-        //   color: "bg-grey",
-        //   desc: "Surveillance monitoring",
-        // },
-        // SURVEILLANCE_ADMINS: {
-        //   icon: "mdi-cctv-off",
-        //   color: "bg-deep-grey",
-        //   desc: "Surveillance control",
-        // },
-
-        // ORG / PLATFORM
-        TEAM: {
-          icon: "mdi-office-building",
-          color: "bg-indigo",
-          desc: "Organization information",
-        },
-        WEBBUILDER_ADMIN: {
-          icon: "mdi-web",
-          color: "bg-blue",
-          desc: "Website builder",
-        },
-        CALLCENTRAL_ADMIN: {
-          icon: "mdi-phone-classic",
-          color: "bg-green",
-          desc: "Call center",
-        },
-        CHECKLIST_ADMIN: {
-          icon: "mdi-format-list-checks",
-          color: "bg-cyan",
-          desc: "Checklist management",
-        },
-        PURCHASE_ADMIN: {
-          icon: "mdi-cart-outline",
-          color: "bg-orange",
-          desc: "Purchase management",
-        },
-        WEBBUILDER_ADMIN: {
-          icon: "mdi-web",
-          color: "bg-blue",
-          desc: "Website builder",
-        },
-      };
-
-      return (
-        APP_UI_MAP[type] || {
-          icon: "mdi-apps",
-          color: this.getColorFromType(type),
-          desc: type.replace(/_/g, " ").toLowerCase(),
-        }
-      );
-    },
+    }, 
+     
 
     getTaskStatusColor(status) {
       if (status === "COMPLETED") return "green";
@@ -1210,7 +679,12 @@ export default {
       this.$router.push("/home/UserTeams");
     },
 
+    navigate_routes(value) {
+      this.$router.push(value);
+    },
+
     async fetch_dashboard_details() {
+      this.overlay = true;
       try {
         let result = await API.graphql(
           graphqlOperation(get_org_dashboard_data, {})
@@ -1358,6 +832,306 @@ export default {
       this.$router.push("/home/Notifications");
     },
 
+    // Quick Action Methods
+    quickAction(actionType) {
+      switch (actionType) {
+        case "chats":
+          this.$store.commit("SetappName", "Chats");
+          this.$store.commit("Setappicon", "mdi-chat-outline");
+          this.$router.push("/home/Chats");
+          break;
+        case "events":
+          this.$store.commit("SetappName", "Events");
+          this.$store.commit("Setappicon", "mdi-calendar-text-outline");
+          this.$router.push("/home/EventsUser");
+          break;
+        case "expense":
+          this.$store.commit("SetappName", "Expenses");
+          this.$store.commit("Setappicon", "mdi-cash-multiple");
+          this.$router.push("/home/UserTransaction");
+          break;
+        case "assets":
+          this.$store.commit("SetappName", "Assets");
+          this.$store.commit("Setappicon", "mdi-dip-switch");
+          this.$router.push("/home/AssetTypes");
+          break;
+        case "timesheet":
+          this.$store.commit("SetappName", "Timesheet");
+          this.$store.commit("Setappicon", "mdi-clock-outline");
+          this.$router.push("/home/UserTimesheetTypes");
+          break;
+        case "directory":
+          this.$store.commit("SetappName", "Directory");
+          this.$store.commit("Setappicon", "mdi-account-group");
+          this.$router.push("/home/DirectoryList");
+          break;
+        case "forms":
+          this.$store.commit("SetappName", "Forms");
+          this.$store.commit("Setappicon", "mdi-file-document-outline");
+          this.$router.push("/home/UserForms");
+          break;
+        case "tickets":
+          this.$store.commit("SetappName", "Tickets");
+          this.$store.commit("Setappicon", "mdi-ticket");
+          this.$router.push("/home/TicketsSub");
+          break;
+        case "booking":
+          this.$store.commit("SetappName", "Booking");
+          this.$store.commit("Setappicon", "mdi-calendar-clock");
+          this.$router.push("/home/UserResources");
+          break;
+        case "presence":
+          this.$store.commit("SetappName", "Attendance");
+          this.$store.commit("Setappicon", "mdi-chart-box");
+          this.$router.push("/home/UserLevel");
+          break;
+        case "projects":
+          this.$store.commit("SetappName", "Projects");
+          this.$store.commit("Setappicon", "mdi-briefcase-outline");
+          this.$router.push("/home/ProjectListing");
+          break;
+        case "collaterals":
+          this.$store.commit("SetappName", "Documents");
+          this.$store.commit("Setappicon", "mdi-file-document-multiple");
+          this.$router.push("/home/RootFolders");
+          break;
+        case "dashboard":
+          this.$store.commit("SetappName", "Dashboard");
+          this.$store.commit("Setappicon", "mdi-view-dashboard");
+          this.$router.push("/home/DashBoard");
+          break;
+        case "payroll":
+          this.$store.commit("SetappName", "Payroll");
+          this.$store.commit("Setappicon", "mdi-cash");
+          this.$router.push("/home/MyPayslip");
+          break;
+        case "ap_ar":
+          this.$store.commit("SetappName", "AP/AR");
+          this.$store.commit("Setappicon", "mdi-cash-plus");
+          this.$router.push("/home/Arap");
+          break;
+        case "guesthouse":
+          this.$store.commit("SetappName", "Guest House");
+          this.$store.commit("Setappicon", "mdi-home-city");
+          this.$router.push("/home/GuestHouseBookingList");
+          break;
+        case "sales":
+          this.$store.commit("SetappName", "Sales");
+          this.$store.commit("Setappicon", "mdi-chart-line");
+          this.$router.push("/home/SalesModule");
+          break;
+        case "inventory":
+          this.$store.commit("SetappName", "Inventory");
+          this.$store.commit("Setappicon", "mdi-package-variant");
+          this.$router.push("/home/Inventory");
+          break;
+        case "vendors":
+          this.$store.commit("SetappName", "Vendors");
+          this.$store.commit("Setappicon", "mdi-account-group");
+          this.$router.push("/home/vendors");
+          break;
+        case "orders":
+          this.$store.commit("SetappName", "Orders");
+          this.$store.commit("Setappicon", "mdi-cart-arrow-right");
+          this.$router.push("/home/OrdersList");
+          break;
+        default:
+          this.$store.commit("SetappName", "Initiate");
+          this.$store.commit("Setappicon", "mdi-timelapse");
+          this.$router.push("/home/UserForms");
+      }
+    },
+
+    // Get Quick Action Configuration
+    getQuickActionConfig(dashboardType) {
+      const configs = {
+        EVENTS_ADMINS: {
+          
+          actionType: "events",
+          text: "Events",
+          icon: "mdi-calendar-text-outline",
+          color: "bg-green",
+          route: "/home/EventPlanner",
+        },
+        EVENTS: {
+          actionType: "events",
+          text: "Events",
+          icon: "mdi-calendar-text-outline",
+          color: "bg-green",
+          route: "/home/EventsUser",
+        },
+        EXPENSE_ADMINS: {
+          actionType: "expense",
+          text: "Expenses",
+          icon: "mdi-cash-multiple",
+          color: "bg-orange",
+          route: "/home/AppadminExpenses",
+        },
+        EXPENSE: {
+          actionType: "expense",
+          text: "Expenses",
+          icon: "mdi-cash-multiple",
+          color: "bg-orange",
+          route: "/home/UserTransaction",
+        },
+        ASSETS_ADMIN: {
+          actionType: "assets",
+          text: "Assets",
+          icon: "mdi-dip-switch",
+          color: "bg-purple",
+          route: "/home/AssetTypes",
+        },
+        ASSETS_USER: {
+          actionType: "assets",
+          text: "Assets",
+          icon: "mdi-dip-switch",
+          color: "bg-purple",
+          route: "/home/UserAsset",
+        },
+        TIMESHEET_ADMINS: {
+          actionType: "timesheet",
+          text: "Timesheet",
+          icon: "mdi-clock-outline",
+          color: "bg-red",
+          route: "/home/AdminTimesheet",
+        },
+        TIMESHEET_USER: {
+          actionType: "timesheet",
+          text: "Timesheet",
+          icon: "mdi-clock-outline",
+          color: "bg-red",
+          route: "/home/UserTimesheetTypes",
+        },
+        DIRECTORY_USER: {
+          actionType: "directory",
+          text: "Directory",
+          icon: "mdi-account-group",
+          color: "bg-grey",
+          route: "/home/DirectoryList",
+        },
+        FORMS_ADMINS: {
+          actionType: "forms",
+          text: "Forms",
+          icon: "mdi-file-document-outline",
+          color: "bg-grey",
+          route: "/home/FormDesignerAdmin",
+        },
+        TICKET_MANAGEMENT_ADMINS: {
+          actionType: "tickets",
+          text: "Tickets",
+          icon: "mdi-ticket",
+          color: "bg-orange",
+          route: "/home/TicketManagement",
+        },
+        TICKET_MANAGEMENT: {
+          actionType: "tickets",
+          text: "Tickets",
+          icon: "mdi-ticket",
+          color: "bg-orange",
+          route: "/home/Usertickets",
+        },
+        BOOKING_SLOT_ADMINS: {
+          actionType: "booking",
+          text: "Booking",
+          icon: "mdi-calendar-clock",
+          color: "bg-blue",
+          route: "/home/SlotSubitems",
+        },
+        BOOKING_SLOT: {
+          actionType: "booking",
+          text: "Booking",
+          icon: "mdi-calendar-clock",
+          color: "bg-blue",
+          route: "/home/UserResources",
+        },
+        PREZENCE_ADMINS: {
+          actionType: "presence",
+          text: "Attendance",
+          icon: "mdi-chart-box",
+          color: "bg-green",
+          route: "/home/AppAdminprezence",
+        },
+        PREZENCE: {
+          actionType: "presence",
+          text: "Attendance",
+          icon: "mdi-chart-box",
+          color: "bg-green",
+          route: "/home/UserLevel",
+        },
+        PROJECT_USER: {
+          actionType: "projects",
+          text: "Projects",
+          icon: "mdi-briefcase-outline",
+          color: "bg-purple",
+          route: "/home/ProjectListing",
+        },
+        COLLATERALS: {
+          actionType: "collaterals",
+          text: "Documents",
+          icon: "mdi-file-document-multiple",
+          color: "bg-blue",
+          route: "/home/RootFolders",
+        },
+        DASHBOARD_MANAGEMENT: {
+          actionType: "dashboard",
+          text: "Dashboard",
+          icon: "mdi-view-dashboard",
+          color: "bg-indigo",
+          route: "/home/DashBoard",
+        },
+        PAYROLL: {
+          actionType: "payroll",
+          text: "Payroll",
+          icon: "mdi-cash",
+          color: "bg-green",
+          route: "/home/MyPayslip",
+        },
+        AP_AR_USER: {
+          actionType: "ap_ar",
+          text: "AP/AR",
+          icon: "mdi-cash-plus",
+          color: "bg-orange",
+          route: "/home/Arap",
+        },
+        GUESTHOUSE_USER: {
+          actionType: "guesthouse",
+          text: "Guest House",
+          icon: "mdi-home-city",
+          color: "bg-brown",
+          route: "/home/GuestHouseBookingList",
+        },
+        QABM_USERS: {
+          actionType: "sales",
+          text: "Sales",
+          icon: "mdi-chart-line",
+          color: "bg-green",
+          route: "/home/SalesModule",
+        },
+        SAIM_USERS: {
+          actionType: "inventory",
+          text: "Inventory",
+          icon: "mdi-package-variant",
+          color: "bg-blue",
+          route: "/home/Inventory",
+        },
+        VNDR_USERS: {
+          actionType: "vendors",
+          text: "Vendors",
+          icon: "mdi-account-group",
+          color: "bg-grey",
+          route: "/home/vendors",
+        },
+        ORDMG_USERS: {
+          actionType: "orders",
+          text: "Orders",
+          icon: "mdi-cart-arrow-right",
+          color: "bg-orange",
+          route: "/home/OrdersList",
+        },
+      };
+
+      return configs[dashboardType] || null;
+    },
     async TakeScreenshot() {
       const target = document.body;
       const canvas = await html2canvas(target, {
@@ -1381,12 +1155,17 @@ export default {
 </script>
 
 <style scoped>
+
+
 .dashboard-root {
   background: #f6f8fc;
   width: 100%;
-  height: calc(100vh - 72px);
+  min-height: calc(100vh - 72px);
+  max-height: calc(100vh - 72px);
+
   padding: 14px;
-  overflow-y: auto;
+  overflow-y:auto; 
+  box-sizing: border-box;
 }
 
 /* App bar fixed height */
@@ -1394,17 +1173,18 @@ export default {
   height: 72px;
 }
 
+
 .welcome-banner {
   border-radius: 20px;
-  padding: 6px 14px;
-  min-height: 120px;
+  padding: 6px 14px;        
+  min-height: 120px;        
   max-height: 160px;
 
-  background: linear-gradient(135deg, #0f569a, #da4c77);
+  background: linear-gradient(135deg, #0F569A, #DA4C77);
   color: white;
 
   display: flex;
-  align-items: center;
+  align-items: center;      
 }
 
 .welcome-inner {
@@ -1416,7 +1196,7 @@ export default {
 }
 
 .welcome-title {
-  font-size: 20px;
+  font-size: 20px;          
   font-weight: 700;
   line-height: 1.2;
 }
@@ -1439,7 +1219,6 @@ export default {
     transform: translateY(24px);
     opacity: 0;
   }
-
   to {
     transform: translateY(0);
     opacity: 1;
@@ -1451,6 +1230,7 @@ export default {
   align-items: center;
 }
 
+
 .modern-card {
   border-radius: 18px;
   padding: 12px;
@@ -1458,7 +1238,7 @@ export default {
   cursor: pointer;
   position: relative;
 
-  min-height: 130px;
+  min-height: 130px; 
 
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.05);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
@@ -1480,14 +1260,14 @@ export default {
   box-shadow: 0 14px 34px rgba(0, 0, 0, 0.08);
 }
 
-.workflow {
+.workflow{
   margin-top: 30px;
 }
-
 .card-top {
   display: flex;
   align-items: center;
 }
+
 
 .icon-wrap {
   width: 42px;
@@ -1499,23 +1279,18 @@ export default {
   color: white;
 }
 
-.pink {
-  background: linear-gradient(135deg, #ff6a7a, #ffc371);
-}
+.pink { background: linear-gradient(135deg, #ff6a7a, #ffc371); }
+.yellow { background: linear-gradient(135deg, #ffb347, #ffcc33); }
+.blue { background: linear-gradient(135deg, #36d1c4, #5b86e5); }
+.green { background: linear-gradient(135deg, #43e97b, #38f9d7); }
 
-.yellow {
-  background: linear-gradient(135deg, #ffb347, #ffcc33);
-}
-
-.blue {
-  background: linear-gradient(135deg, #36d1c4, #5b86e5);
-}
-
-.green {
-  background: linear-gradient(135deg, #43e97b, #38f9d7);
-}
-
+/* ===============================
+   COUNT BADGE
+================================= */
 .count-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
   background: #eef4ff;
   color: #1a4ed8;
   font-size: 16px;
@@ -1526,6 +1301,9 @@ export default {
   text-align: center;
 }
 
+/* ===============================
+   CARD TEXT (TIGHT)
+================================= */
 .card-content h3 {
   margin-top: 12px;
   font-size: 15px;
@@ -1540,241 +1318,93 @@ export default {
   line-height: 1.35;
 }
 
-.deployed-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.app-count-badge {
-  background: #eef4ff;
-  color: #2563eb;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 999px;
-  min-width: 22px;
-  text-align: center;
-  line-height: 1.4;
-}
-
-.apps-unified-card {
+/* ===============================
+   QUICK ACTIONS (HEIGHT CAPPED)
+================================= */
+.quick-actions-card {
   border-radius: 24px;
-  padding: 16px;
+  padding: 14px;
   background: #ffffff;
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.05);
-  display: flex;
-  flex-direction: column;
-  height: 40vh;
-  max-height: 40vh;
+
+  max-height: 120px; /* 🔑 critical */
+  overflow: hidden;
 }
 
-.apps-grid {
-  display: grid;
-
-  /* 10 columns, % based */
-  grid-template-columns: repeat(8, calc((110% - 9 * 2%) / 10));
-
-  gap: 50px;
-
+/* viewport */
+.qa-container {
   width: 100%;
-  padding: 20px 16px;
-
-  justify-items: center;
-
-  overflow-x: auto;
+  overflow: hidden;
 }
 
-.apps-grid::-webkit-scrollbar {
-  height: 6px;
-  width: 6px;
-}
-
-.apps-grid::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.25);
-  border-radius: 6px;
-}
-
-.apps-grid::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.app-card {
-  width: 110px;
-  min-width: 110px;
-  max-width: 110px;
-
+/* moving belt */
+.qa-track,
+.qa-track1 {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-
-  cursor: pointer;
-  transition: transform 0.25s ease;
+  gap: 16px;
+  width: max-content;
+  will-change: transform;
 }
 
-.app-card:not(.disabled):hover {
-  transform: translateY(-6px);
-}
+.qa-track { animation: qa-scroll 28s linear infinite; }
+.qa-track1 { animation: qa-scroll1 28s linear infinite; }
 
-.app-card-inner {
-  transition: transform 0.2s ease;
-}
-
-.app-card:hover .app-card-inner {
-  transform: translateY(-3px);
-}
-
-.app-card.disabled {
-  opacity: 0.45;
-}
-
-.app-card.disabled:hover {
-  transform: none;
-}
-.app-icon-wrap {
-  position: relative;
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
+/* card */
+.qa-item {
+  min-width: 260px;
+  height: 68px; /* 🔑 reduced */
 
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 12px;
 
-  margin-bottom: 8px;
+  padding: 10px 14px;
+  border-radius: 18px;
+  background: #f6f7fb;
+  border: 1px solid #eceef5;
+
+  flex-shrink: 0;
 }
 
-.app-icon-bg {
-  width: 42px;
-  height: 42px;
+/* icon */
+.qa-icon {
+  width: 40px;
+  height: 40px;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.status-badge {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid #ffffff;
-  z-index: 3;
-  pointer-events: none;
-  opacity: 1;
-  visibility: visible;
-  transform: none;
-}
-
-.status-badge.enabled {
-  background: #22c55e;
-}
-
-.status-badge.disabled {
-  background: #f5b301;
-}
-
-.app-name {
+/* text */
+.qa-title {
   font-size: 13px;
-  font-weight: 500;
-  line-height: 1.25;
-  text-align: center;
-
-  max-width: 100%;
-  word-wrap: break-word;
-}
-
-.deployed-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.app-count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  min-width: 24px; /* 👈 stable */
-  height: 24px;
-
-  padding: 0 8px;
-  margin-left: 6px;
-
-  background: #eef4ff;
-  color: #2563eb;
-
-  font-size: 12px;
   font-weight: 600;
+  margin: 0;
+}
 
-  border-radius: 999px;
-
+.qa-desc {
+  font-size: 11px;
+  color: #6b7280;
+  margin: 0;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-::v-deep(.custom-tooltip) {
-  background: linear-gradient(135deg, #0f569a, #da4c77) !important;
-  color: white !important;
-  border-radius: 10px !important;
-  font-weight: 500;
-}
-.icon-not-deployed {
-  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.45),
-    0 6px 14px rgba(245, 158, 11, 0.35);
-  transition: all 0.25s ease;
+/* animations */
+@keyframes qa-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
 }
 
-.icon-deploying {
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.7),
-    0 10px 22px rgba(99, 102, 241, 0.45);
-  transform: scale(1.05);
+@keyframes qa-scroll1 {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
 }
 
-.icon-deployed {
-  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.45),
-    0 12px 26px rgba(34, 197, 94, 0.4);
-}
-
-/* Hover polish (only for deployed) */
-.app-card:hover .icon-deployed {
-  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.6),
-    0 18px 38px rgba(34, 197, 94, 0.55);
-}
-:deep(.tall-snackbar .v-snackbar__content) {
-  min-height: 110px;
-  padding: 20px 26px;
-}
-
-.deploy-snackbar-body {
-  display: flex;
-  align-items: flex-start;
-}
-
-.deploy-title {
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.deploy-text {
-  font-size: 14px;
-  opacity: 0.95;
-  margin-top: 4px;
-}
-.card-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.count-refresh {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+.qa-container:hover .qa-track,
+.qa-container:hover .qa-track1 {
+  animation-play-state: paused;
 }
 </style>

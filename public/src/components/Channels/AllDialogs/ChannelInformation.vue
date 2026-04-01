@@ -36,7 +36,7 @@
                             <v-icon
                                 color="primaryColor"
                                 v-if="
-                                $store.getters.GetUserObj.user?.user_id ==
+                                $store.getters.GetUserObj.user.user_id ==
                                 selectedChat.team_owner_id
                                 "
                                 small
@@ -88,7 +88,7 @@
                                 Created By :
                                 {{ fetch_user_name(selectedChat.team_created_by) }}
                                 <v-icon
-                                    v-if="selectedChat.team_owner_id == $store.getters.GetUserObj.user?.user_id"
+                                    v-if="selectedChat.team_owner_id == $store.getters.GetUserObj.user.user_id"
                                     color="primaryColor"
                                     @click="groupNewOwner = true"
                                 >
@@ -136,7 +136,7 @@
                             small
                             v-if="
                             selectedChat.team_owner_id !=
-                            $store.getters.GetUserObj.user?.user_id
+                            $store.getters.GetUserObj.user.user_id
                             "
                             class="cardCss text-capitalize"
                         >
@@ -145,7 +145,7 @@
                         <v-btn
                             variant="outlined"
                             size="small"
-                            v-if="selectedChat.team_owner_id == $store.getters.GetUserObj.user?.user_id"
+                            v-if="selectedChat.team_owner_id == $store.getters.GetUserObj.user.user_id"
                             :loading="loadingdelete"
                             @click="delete_teams_message()"
                             color="error"
@@ -165,7 +165,7 @@
                         <v-spacer />
                         <v-btn
                             color="primary"
-                            v-if="$store.getters.GetUserObj.user?.user_id == selectedChat.team_owner_id"
+                            v-if="$store.getters.GetUserObj.user.user_id == selectedChat.team_owner_id"
                             class="text-capitalize"
                             @click="memberView = true"
                         >
@@ -183,13 +183,13 @@
                                 <!-- <v-icon
                                 color="red"
                                 v-show="
-                                    $store.getters.GetUserObj.user?.user_id ==
+                                    $store.getters.GetUserObj.user.user_id ==
                                     selectedChat.team_owner_id
                                 "
                                 small
                                 v-if="
                                     selectedChat.team_owner_id != chat &&
-                                    $store.getters.GetUserObj.user?.user_id != chat
+                                    $store.getters.GetUserObj.user.user_id != chat
                                 "
                                 >mdi-delete</v-icon
                                 > -->
@@ -347,7 +347,7 @@
         );
         this.filteredAllUsers = this.filteredAllUsers.filter(
             (user) =>
-            user.user_email_id !== this.$store.getters.GetUserObj.user?.user_email_id
+            user.user_email_id !== this.$store.getters.GetUserObj.user.user_email_id
         );
 
         this.filteredAllUsers = this.filteredAllUsers.filter(

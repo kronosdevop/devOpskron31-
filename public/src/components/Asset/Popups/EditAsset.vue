@@ -1012,7 +1012,7 @@ export default {
       }
     },
     fetch_details() {
-      this.assetassigned = this.$store.getters.GetUserObj.user?.user_email_id;
+      this.assetassigned = this.$store.getters.GetUserObj.user.user_email_id;
       this.assetitemsasigned = [];
       this.orgUsers.forEach((element) => {
         if (element.user_status == "ACTIVE") {

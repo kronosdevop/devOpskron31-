@@ -355,7 +355,7 @@ export default {
           // Filter dashboards based on visibility
           this.dashboardData = this.filterDashboardData(
             this.dashboardData,
-            this.$store.getters.GetUserObj.user?.user_id
+            this.$store.getters.GetUserObj.user.user_id
           );
 
           // If there's more data, fetch it recursively

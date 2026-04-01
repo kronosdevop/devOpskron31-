@@ -188,7 +188,7 @@ export default {
       try {
         let result = await API.graphql(
           graphqlOperation(dashboard_view_edit, {
-            user_id: this.$store.getters.GetUserObj.user?.user_id,
+            user_id: this.$store.getters.GetUserObj.user.user_id,
             dashboard_view: this.view_apps == true ? "CARD_VIEW" : "LIST_VIEW",
           })
         );

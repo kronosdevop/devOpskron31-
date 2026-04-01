@@ -1,0 +1,38 @@
+{
+    "providers": {
+        "awscloudformation": {
+            "AuthRoleName": "amplify-stichh1808-stichport-647ae-authRole",
+            "UnauthRoleArn": "arn:aws:iam::789632715406:role/amplify-stichh1808-stichport-647ae-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::789632715406:role/amplify-stichh1808-stichport-647ae-authRole",
+            "Region": "us-east-1",
+            "DeploymentBucketName": "amplify-stichh1808-stichport-647ae-deployment",
+            "UnauthRoleName": "amplify-stichh1808-stichport-647ae-unauthRole",
+            "StackName": "amplify-stichh1808-stichport-647ae",
+            "StackId": "arn:aws:cloudformation:us-east-1:789632715406:stack/amplify-stichh1808-stichport-647ae/25891570-f5fc-11f0-8c91-0eaca1b929e5",
+            "AmplifyAppId": "dylqw2kcyole9"
+        }
+    },
+    "api": {
+        "stichh_portal": {
+            "service": "AppSync",
+            "output": {
+                "authConfig": {
+                    "defaultAuthentication": {
+                        "authenticationType": "AMAZON_COGNITO_USER_POOLS"
+                    },
+                    "additionalAuthenticationProviders": null,
+                    "userPoolConfig": {
+                        "userPoolId": "us-east-1_xkARtBaPQ",
+                        "awsRegion": "us-east-1",
+                        "defaultAction": "ALLOW"
+                    }
+                },
+                "GraphQLAPIIdOutput": "2kcyn2aqc5dxnjbsaostuhxewu",
+                "GraphQLAPIEndpointOutput": "https://kthsfkinmnfchjiymno4yf6ozy.appsync-api.us-east-1.amazonaws.com/graphql",
+                "name": "stichh_portal",
+                "region": "us-east-1"
+            },
+            "lastPushTimeStamp": "2026-01-23T06:03:54.219Z"
+        }
+    }
+}

@@ -1,32 +1,28 @@
 /* eslint-disable */
-import { createApp } from "vue";
-import App from "./App.vue";
-import vuetify from "./plugins/vuetify";
-import router from "./router";
-import store from "./store";
-import "./assets/Styling.css";
-import "vuetify/styles";
-import { Amplify, Auth } from "aws-amplify";
-import { suppressResizeObserverWarnings } from "./utils/resizeObserverFix";
+import { createApp } from 'vue'
+import App from './App.vue'
+import vuetify from './plugins/vuetify'
+import router from './router'
+import store from './store'
+import './assets/Styling.css'
+import 'vuetify/styles'
+import { Amplify } from 'aws-amplify';
+import { suppressResizeObserverWarnings } from './utils/resizeObserverFix';
+// import awsconfig from './aws-exports'
+// import { createEventBus } from './Eventbus.js'
+// import * as storage from '@aws-amplify/storage';
+// import Croppa from 'vue-croppa';
+// import pdf from "vue-pdf";
 import VueApexCharts from "vue3-apexcharts";
-import { Loader } from "@googlemaps/js-api-loader";
-import { initiateLocalCacheDB } from "./db.js";
-import disableDevtool from "disable-devtool";
-
-disableDevtool({
-  disableMenu: true,
-  clearLog: true,
-  ondevtoolopen: () => {
-    window.location.replace("https://google.com", "__blank");
-  },
-});
+import { Loader } from '@googlemaps/js-api-loader';
+import { initiateLocalCacheDB } from './db.js';
 
 // Create event bus for Vue 3
 export const EventBus = {
   listeners: {},
   $emit(event, ...args) {
     if (this.listeners[event]) {
-      this.listeners[event].forEach((callback) => callback(...args));
+      this.listeners[event].forEach(callback => callback(...args));
     }
   },
   $on(event, callback) {
@@ -38,26 +34,13 @@ export const EventBus = {
   $off(event, callback) {
     if (this.listeners[event]) {
       if (callback) {
-        this.listeners[event] = this.listeners[event].filter(
-          (cb) => cb !== callback,
-        );
+        this.listeners[event] = this.listeners[event].filter(cb => cb !== callback);
       } else {
         delete this.listeners[event];
       }
     }
-  },
+  }
 };
-function hideConsoles() {
-  // if (process.env.NODE_ENV === "development") {
-  console.log = () => {};
-  console.warn = () => {};
-  console.error = () => {};
-  console.info = () => {};
-  console.debug = () => {};
-  // }
-}
-
-hideConsoles();
 
 // Configure Google Maps
 // Note: For PlaceAutocompleteElement (new API), ensure:
@@ -65,64 +48,69 @@ hideConsoles();
 // 2. API key has proper referrer restrictions (add http://localhost:8081/* for local dev)
 // 3. For production, add your production domain to API key restrictions
 const googleMapsLoader = new Loader({
-  apiKey: "AIzaSyCiwPvMBsTQy6yiTJDvDkqZPIWdDerOcRI",
-  version: "weekly",
-  libraries: ["places"],
+  apiKey: 'AIzaSyCiwPvMBsTQy6yiTJDvDkqZPIWdDerOcRI', // Replace with your actual API key
+  version: 'weekly',
+  libraries: ['places'] // Required for both legacy and new Places API
 });
 
+// Make Google Maps loader available globally
 window.googleMapsLoader = googleMapsLoader;
 
+// Amplify.register(Storage);
 Amplify.configure({
   Auth: {
-    region: "us-east-1",
-
     userPoolId: "us-east-1_xkARtBaPQ",
+    region: "us-east-1",
     userPoolWebClientId: "7aihrcpjd61dtqvs4d686fdf0g",
-    identityPoolId: "us-east-1:7cd0aa90-b935-4b30-9d88-daecb7d63558",
-    oauth: {
-      domain: "stichh.auth.us-east-1.amazoncognito.com",
-      scopes: ["openid", "email", "profile"],
-      redirectSignIn: "https://portal.stichh.com/home/DashboardView",
-      redirectSignOut: "https://portal.stichh.com",
-      responseType: "code",
-    },
-  },
+    identityPoolId: "us-east-1:7cd0aa90-b935-4b30-9d88-daecb7d63558"
 
+  },
   API: {
+
     aws_project_region: "us-east-1",
-    aws_appsync_graphqlEndpoint:
-      "https://kthsfkinmnfchjiymno4yf6ozy.appsync-api.us-east-1.amazonaws.com/graphql",
+    aws_appsync_graphqlEndpoint: "https://kthsfkinmnfchjiymno4yf6ozy.appsync-api.us-east-1.amazonaws.com/graphql",
     aws_appsync_region: "us-east-1",
     aws_appsync_authenticationType: "AMAZON_COGNITO_USER_POOLS",
   },
-
+  // ...awsconfig,
+  //
   Storage: {
     AWSS3: {
-      bucket: "stichh-medias",
-      region: "us-east-1",
-    },
-  },
-});
-
-const app = createApp(App);
-app.use(VueApexCharts);
-app.use(vuetify);
-app.use(router);
-app.use(store);
-
-const initializeApp = async () => {
-  try {
-    await initiateLocalCacheDB.methods.ensureDatabaseInitialized();
-  } catch (error) {
-    console.warn(
-      "Database initialization failed, but app will continue:",
-      error,
-    );
+      bucket: 'stichh-medias',
+      region: 'us-east-1'
+    }
   }
 
+
+})
+// Storage: {
+//   AWSS3: {
+//     bucket: awsconfig.aws_user_files_s3_bucket,
+//     region: awsconfig.aws_user_files_s3_bucket_region
+//   }
+// }
+
+const app = createApp(App)
+app.use(VueApexCharts);
+app.use(vuetify)
+app.use(router)
+app.use(store)
+
+// Initialize database before mounting the app
+const initializeApp = async () => {
+  try {
+    // Initialize the database
+    await initiateLocalCacheDB.methods.ensureDatabaseInitialized();
+    // console.log('Database initialized successfully');
+  } catch (error) {
+    console.warn('Database initialization failed, but app will continue:', error);
+  }
+
+  // Suppress ResizeObserver warnings
   suppressResizeObserverWarnings();
 
-  app.mount("#app");
+  // Mount the app
+  app.mount('#app');
 };
 
 initializeApp();

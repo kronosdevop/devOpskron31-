@@ -1499,7 +1499,7 @@ export default {
           // Auto-populate item code
           item.item_code = existingItem.item_code || "";
           // Auto-populate category
-          item.category = existingItem.product_id || "";
+          item.category = existingItem.category_id || "";
           // Auto-populate description if available
           item.description = existingItem.item_description || "";
           // Convert unit ID to unit text for display
@@ -1542,12 +1542,21 @@ export default {
       }, 200);
     },
 
-      filterItems(index) {
-      const search = this.orderForm.items[index].item_name || ""
-    
-      return this.masterItems.filter(item =>
-        (item.product_name || "").toLowerCase().includes(search.toLowerCase())
-      )
+    filterItems(index) {
+      const item = this.orderForm.items[index];
+      const query = item.item_name.toLowerCase();
+
+      if (!query) {
+        return this.masterItems;
+      } else {
+        return this.masterItems.filter(
+          (masterItem) =>
+            masterItem.item_name.toLowerCase().includes(query) ||
+            masterItem.item_code.toLowerCase().includes(query) ||
+            (masterItem.category_name &&
+              masterItem.category_name.toLowerCase().includes(query))
+        );
+      }
     },
 
     selectPredefinedItem(index, predefinedItem) {
@@ -1559,7 +1568,7 @@ export default {
       // Auto-populate item code
       item.item_code = predefinedItem.item_code || "";
       // Auto-populate category
-      item.category = predefinedItem.product_id || "";
+      item.category = predefinedItem.category_id || "";
       // Auto-populate description if available
       item.description = predefinedItem.item_description || "";
       // Convert unit ID to unit text for display

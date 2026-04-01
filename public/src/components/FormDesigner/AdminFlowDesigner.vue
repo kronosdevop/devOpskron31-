@@ -11,23 +11,23 @@
         >
         <v-stepper v-model="flowSteps">
           <v-stepper-header>
-            <v-stepper-item :complete="flowSteps > 0" :value="1">
+            <v-stepper-item :complete="flowSteps > 0" value="1">
               Selected Form
             </v-stepper-item>
             <v-divider></v-divider>
-            <v-stepper-item :complete="flowSteps > 1" :value="2">
+            <v-stepper-item :complete="flowSteps > 1" value="2">
               Create Flow
             </v-stepper-item>
             <v-divider></v-divider>
-            <v-stepper-item :complete="flowSteps > 2" :value="3">
+            <v-stepper-item :complete="flowSteps > 2" value="3">
               Configure Form
             </v-stepper-item>
             <v-divider></v-divider>
-            <v-stepper-item :complete="flowSteps > 3" :value="4">
+            <v-stepper-item :complete="flowSteps > 3" value="4">
               Form Details
             </v-stepper-item>
             <v-divider></v-divider>
-            <v-stepper-item :complete="flowSteps > 4" :value="5">
+            <v-stepper-item :complete="flowSteps > 4" value="5">
               Preview and Publish
             </v-stepper-item>
             <v-divider></v-divider>

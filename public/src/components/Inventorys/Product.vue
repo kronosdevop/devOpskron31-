@@ -631,7 +631,7 @@ import EditServiceDialog from "./EditServiceDialog.vue";
 import DeleteServiceDialog from "./DeleteServiceDialog.vue";
 import { list_items, get_items_transactions } from "@/graphql/queries.js";
 import { API, graphqlOperation } from "aws-amplify";
-import BulkItemImport from "../NewInventory/BulkItemImport.vue";
+import BulkItemImport from "./BulkItemImport.vue";
 import { export_inventory_items } from "@/graphql/mutations.js";
 import { getS3SignedUrl } from "@/mixins/S3GetStorageFile.js";
 const FileSaver = require("file-saver");

@@ -249,7 +249,7 @@ export default {
     );
     this.allusers = this.allusers.filter(
       (user) =>
-        user.user_email_id !== this.$store.getters.GetUserObj.user?.user_email_id
+        user.user_email_id !== this.$store.getters.GetUserObj.user.user_email_id
     );
   },
   methods: {

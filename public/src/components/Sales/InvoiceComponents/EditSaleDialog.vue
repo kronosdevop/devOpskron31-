@@ -1482,7 +1482,7 @@ export default {
           item.item_id = existingItem.item_id;
           item.hsn_code = existingItem.item_hsn || "";
           item.item_code = existingItem.item_code || "";
-          item.category = existingItem.product_id || "";
+          item.category = existingItem.category_id || "";
           item.description = existingItem.item_description || "";
           item.unit = this.getUnitTextById(existingItem.item_unit);
           item.price_per_unit = existingItem.sale_price?.sale_price || "0";
@@ -1551,11 +1551,20 @@ export default {
     },
 
     filterItems(index) {
-      const search = this.orderForm.items[index].item_name || ""
-    
-      return this.masterItems.filter(item =>
-        (item.product_name || "").toLowerCase().includes(search.toLowerCase())
-      )
+      const item = this.invoiceForm.items[index];
+      const query = item.item_name.toLowerCase();
+
+      if (!query) {
+        return this.masterItems;
+      } else {
+        return this.masterItems.filter(
+          (masterItem) =>
+            masterItem.item_name.toLowerCase().includes(query) ||
+            masterItem.item_code.toLowerCase().includes(query) ||
+            (masterItem.category_name &&
+              masterItem.category_name.toLowerCase().includes(query))
+        );
+      }
     },
 
          selectPredefinedItem(index, predefinedItem) {
@@ -1564,7 +1573,7 @@ export default {
        item.item_name = predefinedItem.item_name;
        item.hsn_code = predefinedItem.item_hsn || "";
        item.item_code = predefinedItem.item_code || "";
-       item.category = predefinedItem.product_id || "";
+       item.category = predefinedItem.category_id || "";
        item.description = predefinedItem.item_description || "";
        item.unit = this.getUnitTextById(predefinedItem.item_unit);
        item.price_per_unit = predefinedItem.sale_price?.sale_price || "1";

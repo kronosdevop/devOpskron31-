@@ -286,10 +286,10 @@
                 :class="{
                   sent:
                     message.msg_sent_by ===
-                    $store.getters.GetUserObj.user?.user_email_id,
+                    $store.getters.GetUserObj.user.user_email_id,
                   received:
                     message.msg_sent_by !==
-                    $store.getters.GetUserObj.user?.user_email_id,
+                    $store.getters.GetUserObj.user.user_email_id,
                 }"
               >
                 <!-- Avatar for received messages -->
@@ -771,7 +771,7 @@ export default {
     },
     shouldShowAvatar(group, index) {
       if (
-        this.$store.getters.GetUserObj.user?.user_email_id ===
+        this.$store.getters.GetUserObj.user.user_email_id ===
         group[index].msg_sent_by
       ) {
         return false; // Never show avatar for sent messages
@@ -910,7 +910,7 @@ export default {
       await Auth.currentCredentials();
       const orgDetails = this.$store.getters.GetOrgDetails;
 
-      const userId = this.$store.getters.GetUserObj.user?.user_id;
+      const userId = this.$store.getters.GetUserObj.user.user_id;
       const key =
         "chat" +
         "/" +
@@ -1059,7 +1059,7 @@ export default {
       } else {
         let topic = [
           chat.user_email_id,
-          this.$store.getters.GetUserObj.user?.user_email_id,
+          this.$store.getters.GetUserObj.user.user_email_id,
         ]
           .sort()
           .join("~");

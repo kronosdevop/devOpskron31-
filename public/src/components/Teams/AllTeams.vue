@@ -68,18 +68,15 @@
                 <div class="filter-group" v-if="filterBy == 'groups'">
                   <label class="filter-label">Select Groups</label>
                   <v-select
-                  v-model="filterByGroups"
-                  :items="groupList"
-                  item-title="title"
-                  item-value="value"
-                  multiple
-                  chips
-                  clearable
-                  variant="outlined"
-                  density="compact"
-                  hide-details
-                  class="filter-select"
-                />
+                    v-model="filterByGroups"
+                    :items="groupList"
+                    item-text="title"
+                    item-value="value"
+                    variant="outlined"
+                    density="compact"
+                    hide-details
+                    class="filter-select"
+                  />
                 </div>
 
                 <!-- Locations Filter (when Filter By is 'locations') -->
@@ -303,38 +300,49 @@
             </div>
           </template>
 
-<template v-slot:[`item.full_user_name`]="{ item }">
-  <div class="user-profile-cell">
-    <div class="user-avatar">
-      <v-avatar
-        v-if="
-          item.user_profile_pic_url &&
-          item.user_profile_pic_url !== 'N/A'
-        "
-        size="40"
-        class="user-avatar-img cursor-pointer"
-        @click.stop="openImagePreview(item)"
-      >
-        <v-img :src="item.user_profile_pic_url" />
-      </v-avatar>
-
-      <v-avatar v-else size="40" class="user-avatar-fallback">
-        <span class="avatar-text">
-          {{ (item.full_user_name || 'U').charAt(0).toUpperCase() }}
-        </span>
-      </v-avatar>
-    </div>
-
-    <div class="user-info">
-      <div class="user-name">
-        {{ item.full_user_name || 'N/A' }}
-      </div>
-      <div class="user-id">
-        {{ item.member_id || 'N/A' }}
-      </div>
-    </div>
-  </div>
-</template>
+          <template v-slot:[`item.full_user_name`]="{ item }">
+            <div class="user-profile-cell">
+              <div class="user-avatar">
+                <div
+                  v-if="
+                    item.user_profile_pic_url != undefined &&
+                    item.user_profile_pic_url != 'N/A' &&
+                    item.user_profile_pic_url != ''
+                  "
+                >
+                  <v-avatar size="40" class="user-avatar-img">
+                    <v-img :src="item.user_profile_pic_url" />
+                  </v-avatar>
+                </div>
+                <div v-else>
+                  <v-avatar size="40" class="user-avatar-fallback">
+                    <span class="avatar-text">
+                      {{
+                        (item.full_user_name || "U")
+                          .substring(0, 1)
+                          .toUpperCase()
+                      }}
+                    </span>
+                  </v-avatar>
+                </div>
+              </div>
+              <div class="user-info">
+                <div class="user-name">
+                  {{ item.full_user_name || "N/A" }}
+                </div>
+                <div class="user-id">
+                  {{ item.member_id || "N/A" }}</div>
+                <v-icon
+                  v-if="item.user_type == 'ADMIN' || item.user_type == 'OWNER'"
+                  size="16"
+                  color="primary"
+                  class="admin-icon"
+                >
+                  mdi-account
+                </v-icon>
+              </div>
+            </div>
+          </template>
 
           <template v-slot:[`item.user_contact_number`]="{ item }">
             <div class="contact-cell">
@@ -588,11 +596,6 @@
         v-on:successMsg="success_info"
       />
     </div>
- <ImagePreviewDialog
-  :imagePreviewDialog="imagePreviewDialog"
-    :selectedUserDetail = "selectedUserDetail"
-  @close="imagePreviewDialog = false"
-/>
   </div>
 </template>
 <script>
@@ -617,7 +620,6 @@ import { get_all_org_users } from "@/mixins/GetUsersDropdown.js";
 import SnackBar from "@/components/SnackBar.vue";
 import { formatdisplayDate } from "@/JsonFiles/DateFormate.js";
 import axios from "axios";
-import ImagePreviewDialog from "@/components/Teams/ImagePreviewDialog.vue";
 
 export default {
   // Props
@@ -634,7 +636,6 @@ export default {
 
   // Components
   components: {
-ImagePreviewDialog ,
     AddUser,
     SnackBar,
     EditUser,
@@ -659,10 +660,7 @@ ImagePreviewDialog ,
   data() {
     return {
       // Array properties
-      imagePreviewDialog:false,
-      selectedUserDetail: {},
       tableData: [],
-      
       headers: [
         { title: "Profile & Name", key: "full_user_name", sortable: false },
         {
@@ -739,7 +737,7 @@ ImagePreviewDialog ,
       // String properties
       search: "",
       selectStatusType: "ACTIVE",
-filterByGroups: [],
+      filterByGroups: "",
       filterBy: "",
       searchNum: "",
       userMobNumSelect: "",
@@ -936,8 +934,8 @@ filterByGroups: [],
       }
 
       // Count groups filter
-if (this.filterByGroups && this.filterByGroups.length > 0) {
-          count++;
+      if (this.filterByGroups && this.filterByGroups !== "") {
+        count++;
       }
 
       // Count locations filter
@@ -981,10 +979,6 @@ if (this.filterByGroups && this.filterByGroups.length > 0) {
 
   // Methods
   methods: {
-    openImagePreview(item){
-      this.selectedUserDetail = item;
-      this.imagePreviewDialog = true
-    },
     formatDate(date) {
       return formatdisplayDate(date);
     },
@@ -1307,26 +1301,23 @@ if (this.filterByGroups && this.filterByGroups.length > 0) {
     },
 
     fetch_group_input() {
-  if (this.filterBy == "groups") {
-    if (!this.filterByGroups || this.filterByGroups.length === 0) {
-      this.tableData = this.finalArray;
-    } else {
-      this.tableData = this.finalArray.filter((obj) =>
-        this.filterByGroups.includes(obj.department)
-      );
-    }
+      if (this.filterBy == "groups") {
+        this.tableData = this.finalArray.filter(
+          (obj) => obj.department === this.filterByGroups
+        );
 
-    this.$emit("groupName", this.filterByGroups);
-  } else {
-    this.tableData = this.finalArray.filter(
-      (obj) => obj.location === this.filterByLocations
-    );
+        this.$emit("groupName", this.filterByGroups);
+      } else {
+        this.tableData = this.finalArray.filter(
+          (obj) => obj.location === this.filterByLocations
+        );
 
-    this.$emit("locaName", this.filterByLocations);
-  }
+        this.$emit("locaName", this.filterByLocations);
+      }
 
-  this.currentPage = 1;
-},
+      // Reset to first page after filtering
+      this.currentPage = 1;
+    },
 
     // UI interaction methods
     get_fetch_data(value) {
@@ -1754,13 +1745,5 @@ if (this.filterByGroups && this.filterByGroups.length > 0) {
   .filter-actions {
     justify-content: center;
   }
-}
-.cursor-pointer {
-  cursor: pointer;
-}
-
-.user-avatar-img:hover {
-  transform: scale(1.05);
-  transition: transform 0.2s ease;
 }
 </style>

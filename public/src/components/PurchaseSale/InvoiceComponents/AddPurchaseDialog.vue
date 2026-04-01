@@ -1417,12 +1417,21 @@ export default {
     },
 
     filterItems(index) {
-  const search = this.orderForm.items[index].item_name || ""
+      const item = this.invoiceForm.items[index];
+      const query = item.item_name.toLowerCase();
 
-  return this.masterItems.filter(item =>
-    (item.product_name || "").toLowerCase().includes(search.toLowerCase())
-  )
-},
+      if (!query) {
+        return this.masterItems;
+      } else {
+        return this.masterItems.filter(
+          (masterItem) =>
+            masterItem.item_name.toLowerCase().includes(query) ||
+            masterItem.item_code.toLowerCase().includes(query) ||
+            (masterItem.category_name &&
+              masterItem.category_name.toLowerCase().includes(query))
+        );
+      }
+    },
 
     selectPredefinedItem(index, predefinedItem) {
       const item = this.invoiceForm.items[index];

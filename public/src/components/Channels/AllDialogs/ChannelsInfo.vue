@@ -16,7 +16,7 @@
                   v-show="
                     queryCheck == 1 &&
                     channelocalData.team_created_by ==
-                      $store.getters.GetUserObj.user?.user_email_id &&
+                      $store.getters.GetUserObj.user.user_email_id &&
                     checkDefault == 'FALSE'
                   "
                   class="ml-4 mt-n2"

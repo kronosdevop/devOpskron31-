@@ -417,7 +417,7 @@ export default {
       this.$emit("closeNav", 0);
     },
     async onLogout() {
-      await Auth.signOut();
+      await Auth.signOut({ global: true });
       this.$store.commit("SetFirstSignup", false);
       this.$store.commit("Setappadmins", false);
       this.$store.commit("SetUserEmail", "");
