@@ -517,13 +517,13 @@ app.get('/', (req, res) => {
 
     <div class="container">
         <header>
-            <h1>🚀 DevOps Pipeline Demo</h1>
+            <h1>🚀 DevOps Pipeline Working structure</h1>
             <div class="version-badge">Version 2.0.0 - Interactive</div>
             <p class="subtitle">Click on any stage or technology to learn more!</p>
         </header>
 
         <div class="pipeline-flow">
-            <h2 class="pipeline-title">Pipeline Stages - Click to Explore</h2>
+            <h2 class="pipeline-title">Pipeline Stages - Click to Explore How DevOps Ci/Cd works</h2>
             <div class="stages">
                 <div class="stage" onclick="showStageDetails('code')" data-tooltip="Click to learn about the Code stage">
                     <span class="stage-icon">💻</span>
