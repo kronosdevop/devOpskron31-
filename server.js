@@ -517,7 +517,7 @@ app.get('/', (req, res) => {
 
     <div class="container">
         <header>
-            <h1>🚀 DevOps Pipeline Working structure</h1>
+            <h1>🚀 DevOps Pipeline Working Demo By Lakshmikanth</h1>
             <div class="version-badge">Version 2.0.0 - Interactive</div>
             <p class="subtitle">Click on any stage or technology to learn more!</p>
         </header>
