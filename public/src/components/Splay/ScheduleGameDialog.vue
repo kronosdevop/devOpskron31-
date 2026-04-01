@@ -1,0 +1,449 @@
+<template>
+  <div>
+    <SnackBar :SnackBarComponent="SnackBarComponent" />
+    <v-dialog :model-value="DialogScheduleGame" max-width="475px" persistent>
+      <v-card rounded="lg">
+        <!--Toolbar/Header-->
+        <v-card-title
+          class="d-flex align-center justify-space-between px-6 py-4 sticky-title"
+        >
+          <span class="font-weight-bold text-h5">Schedule Game </span>
+          <v-btn
+            icon
+            variant="text"
+            @click="DialogScheduleGameEmit(1)"
+            size="small"
+          >
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-card-title>
+
+        <v-divider></v-divider>
+
+        <!--Content-->
+        <div class="pa-4">
+          <!--Repo-->
+          <div class="text-start font-weight-bold">Choose a repository 📄</div>
+          <v-radio-group
+            v-model="repo"
+            inline
+            density="compact"
+            :mandatory="false"
+          >
+            <v-radio label="Custom" value="CUSTOM" class="mt-3" />
+            <v-radio label="Default" value="DEFAULT" class="mt-3 ml-3" />
+          </v-radio-group>
+
+          <!--Date Picker and Time Picker-->
+          <v-row>
+            <!--Switch-->
+            <v-col cols="12" class="mt-n10">
+              <div class="d-flex align-center">
+                <div class="font-weight-bold">
+                  Would you like this game to recur 🎮?
+                </div>
+                <v-switch
+                  v-model="recurring"
+                  color="primary"
+                  class="mt-6 ml-4"
+                  :label="recurring ? 'Yes' : 'No'"
+                />
+              </div>
+            </v-col>
+
+            <!--Game Category-->
+            <v-col cols="6" class="mt-n8">
+              <div class="font-weight-bold">
+                Game Category<span class="text-error ml-2">*</span>
+              </div>
+              <v-select
+                v-model="category"
+                variant="outlined"
+                rounded="lg"
+                density="compact"
+                class="mt-2"
+                width="200"
+                :loading="loading"
+                :items="categories"
+                :rules="[(v) => !!v || 'Required']"
+              >
+              </v-select>
+            </v-col>
+
+            <!--No. Of Questions-->
+            <v-col cols="6" class="mt-n8">
+              <div class="font-weight-bold">
+                Question Count<span class="text-error ml-2">*</span>
+              </div>
+              <v-select
+                v-model="qcount"
+                variant="outlined"
+                rounded="lg"
+                density="compact"
+                class="mt-2"
+                width="200"
+                :items="QcountItems"
+                :rules="[(v = !!v || 'Required')]"
+              />
+            </v-col>
+
+            <!--Leaderboard Count-->
+            <v-col cols="12" class="mt-n8">
+              <div class="font-weight-bold">
+                Leaderboard Count<span class="text-error ml-2">*</span>
+              </div>
+              <v-select
+                v-model="count"
+                variant="outlined"
+                rounded="lg"
+                density="compact"
+                class="mt-2"
+                width="432"
+                :items="CountItems"
+                :rules="[(v = !!v || 'Required')]"
+              />
+            </v-col>
+
+            <!--Date-->
+            <v-col cols="6" class="mt-n8">
+              <div class="font-weight-bold">
+                Date<span class="text-error ml-2">*</span>
+              </div>
+              <v-menu v-model="dateMenu" :close-on-content-click="false">
+                <template #activator="{ props }">
+                  <v-text-field
+                    v-bind="props"
+                    variant="outlined"
+                    rounded="lg"
+                    density="compact"
+                    prepend-inner-icon="mdi-calendar"
+                    class="mt-2"
+                    width="200"
+                    :model-value="formattedDate"
+                  />
+                </template>
+                <v-date-picker
+                  v-model="selectedDate"
+                  header-color="primary"
+                  :min="new Date()"
+                  :allowed-dates="allowedDatesByDay"
+                >
+                  <template #actions>
+                    <v-btn
+                      color="transparent"
+                      rounded="xl"
+                      class="text-primary"
+                      @click="dateMenu = false"
+                      >Close</v-btn
+                    >
+                  </template>
+                </v-date-picker>
+              </v-menu>
+            </v-col>
+
+            <!--Time-->
+            <v-col cols="6" class="mt-n8">
+              <div class="font-weight-bold">
+                Time<span class="text-error ml-2">*</span>
+              </div>
+              <v-menu v-model="timeMenu" :close-on-content-click="false">
+                <template #activator="{ props }">
+                  <v-text-field
+                    v-bind="props"
+                    variant="outlined"
+                    rounded="lg"
+                    density="compact"
+                    prepend-inner-icon="mdi-clock-outline"
+                    class="mt-2"
+                    width="200"
+                    :model-value="formattedTime"
+                  />
+                </template>
+                <v-time-picker
+                  v-model="selectedTime"
+                  color="primary"
+                  format="24hr"
+                  width="400"
+                >
+                  <template #actions>
+                    <v-btn
+                      color="transparent"
+                      class="text-primary"
+                      rounded="xl"
+                      @click="timeMenu = false"
+                      >Close</v-btn
+                    >
+                  </template>
+                </v-time-picker>
+              </v-menu>
+            </v-col>
+
+            <!--Frequency-->
+            <v-col cols="6" v-if="recurring" class="mt-n6">
+              <div class="font-weight-bold">
+                Frequency <span class="text-error">*</span>
+              </div>
+              <v-select
+                v-model="frequency"
+                variant="outlined"
+                rounded="lg"
+                density="compact"
+                class="mt-2"
+                width="200"
+                :items="FrequencyItems"
+                :rules="[(v = !!v || 'Required')]"
+              />
+            </v-col>
+
+            <!--Days of the week-->
+            <v-col cols="6" v-if="recurring" class="mt-n6">
+              <div class="font-weight-bold">
+                Days<span class="text-error ml-1">*</span>
+              </div>
+              <v-select
+                v-model="days"
+                variant="outlined"
+                rounded="lg"
+                density="compact"
+                class="mt-2"
+                width="200"
+                :items="DayItems"
+                :rules="[(v = !!v || 'Required')]"
+              />
+            </v-col>
+          </v-row>
+
+          <!--Button-->
+          <v-card-actions class="d-flex justify-center mt-n6">
+            <v-btn
+              variant="flat"
+              color="primary"
+              rounded="lg"
+              size="small"
+              :loading="gameLoader"
+              @click="ScheduleGame"
+            >
+              Schedule
+              <template #loader>
+                <v-progress-circular indeterminate color="white" />
+              </template>
+            </v-btn>
+          </v-card-actions>
+        </div>
+      </v-card>
+    </v-dialog>
+  </div>
+</template>
+
+<script>
+import { schedule_game } from "@/graphql/mutations";
+import { API, graphqlOperation } from "aws-amplify";
+import { GetAllCategories } from "@/mixins/GetAllCategories";
+import { VTimePicker } from "vuetify/components";
+
+import SnackBar from "../SnackBar.vue";
+
+export default {
+  props: { DialogScheduleGame: Boolean, StoreObj: Object },
+
+  mixins: [GetAllCategories],
+
+  components: { SnackBar, VTimePicker },
+
+  data: () => ({
+    frequency: "WEEKLY",
+    days: "MONDAY",
+    count: "10",
+    repo: "DEFAULT",
+    qcount: "7",
+    category: "",
+
+    resolvedCategories: [],
+
+    dateMenu: false,
+    timeMenu: false,
+    loading: false,
+    gameLoader: false,
+    recurring: false,
+
+    selectedDate: new Date(),
+    selectedTime: new Date().toTimeString().slice(0, 5),
+
+    SnackBarComponent: {},
+    signedImageMap: {},
+
+    FrequencyItems: [
+      { title: "Weekly", value: "WEEKLY" },
+      { title: "Monthly", value: "MONTHLY" },
+      { title: "Daily", value: "DAILY" },
+    ],
+    DayItems: [
+      { title: "Monday", value: "MONDAY" },
+      { title: "Tuesday", value: "TUESDAY" },
+      { title: "Wednesday", value: "WEDNESDAY" },
+      { title: "Thursday", value: "THURSDAY" },
+      { title: "Friday", value: "FRIDAY" },
+      { title: "Saturday", value: "SATURDAY" },
+      { title: "Sunday", value: "SUNDAY" },
+    ],
+    CountItems: [
+      { title: "3", value: "3" },
+      { title: "5", value: "5" },
+      { title: "7", value: "7" },
+      { title: "10", value: "10" },
+      { title: "25", value: "25" },
+      { title: "50", value: "50" },
+      { title: "100", value: "100" },
+    ],
+    QcountItems: [
+      { title: "5", value: "5" },
+      { title: "7", value: "7" },
+      { title: "10", value: "10" },
+      { title: "25", value: "25" },
+    ],
+  }),
+
+  watch: {
+    DialogScheduleGame(val) {
+      if (!val) {
+        this.category = "";
+        this.qcount = "7";
+        this.count = "10";
+        this.repo = "DEFAULT";
+        this.recurring = false;
+      }
+    },
+    repo(val) {
+      if (val) {
+        return this.GetAllCategoriesMethod();
+      }
+    },
+  },
+
+  async mounted() {
+    await this.GetAllCategoriesMethod();
+  },
+
+  computed: {
+    formattedDate() {
+      if (!this.selectedDate) return "";
+      return this.formatDate(this.selectedDate);
+    },
+    formattedTime() {
+      if (!this.selectedTime) return "";
+      const [h, m] = this.selectedTime.split(":");
+      return new Date(0, 0, 0, h, m).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    },
+    gameScheduledEpoch() {
+      const [hours, minutes] = this.selectedTime.split(":").map(Number);
+      const date = new Date(this.selectedDate);
+      date.setHours(hours, minutes, 0, 0);
+      return Math.floor(date.getTime() / 1000);
+    },
+    recurringScheduleTime() {
+      if (!this.recurring || !this.selectedTime) return null;
+      const [hour24, minute] = this.selectedTime.split(":").map(Number);
+      const timeStr = `${String(hour24).padStart(2, "0")}:${String(
+        minute,
+      ).padStart(2, "0")}`;
+      return timeStr;
+    },
+    categories() {
+      if (this.repo === "CUSTOM") {
+        return this.ListCustomCategories.map((item) => ({
+          title: item.splay_category_name,
+          value: item.splay_category_id,
+          image: item.splay_category_image,
+        }));
+      } else {
+        return this.ListDefaultCategories.map((item) => ({
+          title: item.splay_category_name,
+          value: item.splay_category_id,
+          image: item.splay_category_image,
+        }));
+      }
+    },
+  },
+
+  methods: {
+    async ScheduleGame() {
+      this.gameLoader = true;
+      try {
+        let input = {};
+        if (this.recurring) {
+          input = {
+            splay_category_id: this.category,
+            reccuring_game: true,
+            reccuring_schedule: this.frequency,
+            reccuring_day: this.days || "MONDAY",
+            reccuring_schedule_time: this.recurringScheduleTime,
+            leaderboard_count: parseInt(this.count) || 10,
+            question_count: parseInt(this.qcount),
+          };
+        } else {
+          input = {
+            splay_category_id: this.category,
+            game_scheduled_time: this.gameScheduledEpoch,
+            leaderboard_count: parseInt(this.count) || 10,
+            question_count: parseInt(this.qcount),
+          };
+        }
+        const result = await API.graphql(
+          graphqlOperation(schedule_game, { input }),
+        );
+        const resultObj = JSON.parse(result.data.schedule_game);
+        if (resultObj.Status === "SUCCESS") {
+          this.SnackBarComponent = {
+            SnackbarVmodel: true,
+            SnackbarColor: "green",
+            SnackbarText: resultObj.message,
+          };
+        } else {
+          this.SnackBarComponent = {
+            SnackbarVmodel: true,
+            SnackbarColor: "red",
+            SnackbarText: resultObj.Message,
+          };
+        }
+        this.DialogScheduleGameEmit(2);
+      } catch (error) {
+        this.SnackBarComponent = {
+          SnackbarVmodel: true,
+          SnackbarColor: "red",
+          SnackbarText: "Failed to schedule game, try again",
+        };
+      } finally {
+        this.gameLoader = false;
+      }
+    },
+    allowedDatesByDay(date) {
+      if (!this.recurring) return true;
+      const dayMap = {
+        SUNDAY: 0,
+        MONDAY: 1,
+        TUESDAY: 2,
+        WEDNESDAY: 3,
+        THURSDAY: 4,
+        FRIDAY: 5,
+        SATURDAY: 6,
+      };
+      const selectedDayNumber = dayMap[this.days];
+      const dateObj = new Date(date);
+      return dateObj.getDay() === selectedDayNumber;
+    },
+    DialogScheduleGameEmit(Toggle) {
+      this.$emit("clicked", Toggle);
+    },
+    formatDate(selectedDate) {
+      const date = new Date(selectedDate);
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+        2,
+        "0",
+      )}-${String(date.getDate()).padStart(2, "0")}`;
+    },
+  },
+};
+</script>

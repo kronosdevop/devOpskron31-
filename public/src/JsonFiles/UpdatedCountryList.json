@@ -1,0 +1,1212 @@
+[
+    {
+        "name": "Afghanistan",
+        "code": "+93",
+        "iso_code": "AF"
+    },
+    {
+        "name": "Aland Islands",
+        "code": "+358",
+        "iso_code": "AX"
+    },
+    {
+        "name": "Albania",
+        "code": "+355",
+        "iso_code": "AL"
+    },
+    {
+        "name": "Algeria",
+        "code": "+213",
+        "iso_code": "DZ"
+    },
+    {
+        "name": "AmericanSamoa",
+        "code": "+1684",
+        "iso_code": "AS"
+    },
+    {
+        "name": "Andorra",
+        "code": "+376",
+        "iso_code": "AD"
+    },
+    {
+        "name": "Angola",
+        "code": "+244",
+        "iso_code": "AO"
+    },
+    {
+        "name": "Anguilla",
+        "code": "+1264",
+        "iso_code": "AI"
+    },
+    {
+        "name": "Antarctica",
+        "code": "+672",
+        "iso_code": "AQ"
+    },
+    {
+        "name": "Antigua and Barbuda",
+        "code": "+1268",
+        "iso_code": "AG"
+    },
+    {
+        "name": "Argentina",
+        "code": "+54",
+        "iso_code": "AR"
+    },
+    {
+        "name": "Armenia",
+        "code": "+374",
+        "iso_code": "AM"
+    },
+    {
+        "name": "Aruba",
+        "code": "+297",
+        "iso_code": "AW"
+    },
+    {
+        "name": "Australia",
+        "code": "+61",
+        "iso_code": "AU"
+    },
+    {
+        "name": "Austria",
+        "code": "+43",
+        "iso_code": "AT"
+    },
+    {
+        "name": "Azerbaijan",
+        "code": "+994",
+        "iso_code": "AZ"
+    },
+    {
+        "name": "Bahamas",
+        "code": "+1242",
+        "iso_code": "BS"
+    },
+    {
+        "name": "Bahrain",
+        "code": "+973",
+        "iso_code": "BH"
+    },
+    {
+        "name": "Bangladesh",
+        "code": "+880",
+        "iso_code": "BD"
+    },
+    {
+        "name": "Barbados",
+        "code": "+1246",
+        "iso_code": "BB"
+    },
+    {
+        "name": "Belarus",
+        "code": "+375",
+        "iso_code": "BY"
+    },
+    {
+        "name": "Belgium",
+        "code": "+32",
+        "iso_code": "BE"
+    },
+    {
+        "name": "Belize",
+        "code": "+501",
+        "iso_code": "BZ"
+    },
+    {
+        "name": "Benin",
+        "code": "+229",
+        "iso_code": "BJ"
+    },
+    {
+        "name": "Bermuda",
+        "code": "+1441",
+        "iso_code": "BM"
+    },
+    {
+        "name": "Bhutan",
+        "code": "+975",
+        "iso_code": "BT"
+    },
+    {
+        "name": "Bolivia, Plurinational State of",
+        "code": "+591",
+        "iso_code": "BO"
+    },
+    {
+        "name": "Bosnia and Herzegovina",
+        "code": "+387",
+        "iso_code": "BA"
+    },
+    {
+        "name": "Botswana",
+        "code": "+267",
+        "iso_code": "BW"
+    },
+    {
+        "name": "Brazil",
+        "code": "+55",
+        "iso_code": "BR"
+    },
+    {
+        "name": "British Indian Ocean Territory",
+        "code": "+246",
+        "iso_code": "IO"
+    },
+    {
+        "name": "Brunei Darussalam",
+        "code": "+673",
+        "iso_code": "BN"
+    },
+    {
+        "name": "Bulgaria",
+        "code": "+359",
+        "iso_code": "BG"
+    },
+    {
+        "name": "Burkina Faso",
+        "code": "+226",
+        "iso_code": "BF"
+    },
+    {
+        "name": "Burundi",
+        "code": "+257",
+        "iso_code": "BI"
+    },
+    {
+        "name": "Cambodia",
+        "code": "+855",
+        "iso_code": "KH"
+    },
+    {
+        "name": "Cameroon",
+        "code": "+237",
+        "iso_code": "CM"
+    },
+    {
+        "name": "Canada",
+        "code": "+1",
+        "iso_code": "CA"
+    },
+    {
+        "name": "Cape Verde",
+        "code": "+238",
+        "iso_code": "CV"
+    },
+    {
+        "name": "Cayman Islands",
+        "code": "+ 345",
+        "iso_code": "KY"
+    },
+    {
+        "name": "Central African Republic",
+        "code": "+236",
+        "iso_code": "CF"
+    },
+    {
+        "name": "Chad",
+        "code": "+235",
+        "iso_code": "TD"
+    },
+    {
+        "name": "Chile",
+        "code": "+56",
+        "iso_code": "CL"
+    },
+    {
+        "name": "China",
+        "code": "+86",
+        "iso_code": "CN"
+    },
+    {
+        "name": "Christmas Island",
+        "code": "+61",
+        "iso_code": "CX"
+    },
+    {
+        "name": "Cocos (Keeling) Islands",
+        "code": "+61",
+        "iso_code": "CC"
+    },
+    {
+        "name": "Colombia",
+        "code": "+57",
+        "iso_code": "CO"
+    },
+    {
+        "name": "Comoros",
+        "code": "+269",
+        "iso_code": "KM"
+    },
+    {
+        "name": "Congo",
+        "code": "+242",
+        "iso_code": "CG"
+    },
+    {
+        "name": "Congo, The Democratic Republic of the Congo",
+        "code": "+243",
+        "iso_code": "CD"
+    },
+    {
+        "name": "Cook Islands",
+        "code": "+682",
+        "iso_code": "CK"
+    },
+    {
+        "name": "Costa Rica",
+        "code": "+506",
+        "iso_code": "CR"
+    },
+    {
+        "name": "Cote d'Ivoire",
+        "code": "+225",
+        "iso_code": "CI"
+    },
+    {
+        "name": "Croatia",
+        "code": "+385",
+        "iso_code": "HR"
+    },
+    {
+        "name": "Cuba",
+        "code": "+53",
+        "iso_code": "CU"
+    },
+    {
+        "name": "Cyprus",
+        "code": "+357",
+        "iso_code": "CY"
+    },
+    {
+        "name": "Czech Republic",
+        "code": "+420",
+        "iso_code": "CZ"
+    },
+    {
+        "name": "Denmark",
+        "code": "+45",
+        "iso_code": "DK"
+    },
+    {
+        "name": "Djibouti",
+        "code": "+253",
+        "iso_code": "DJ"
+    },
+    {
+        "name": "Dominica",
+        "code": "+1767",
+        "iso_code": "DM"
+    },
+    {
+        "name": "Dominican Republic",
+        "code": "+1849",
+        "iso_code": "DO"
+    },
+    {
+        "name": "Ecuador",
+        "code": "+593",
+        "iso_code": "EC"
+    },
+    {
+        "name": "Egypt",
+        "code": "+20",
+        "iso_code": "EG"
+    },
+    {
+        "name": "El Salvador",
+        "code": "+503",
+        "iso_code": "SV"
+    },
+    {
+        "name": "Equatorial Guinea",
+        "code": "+240",
+        "iso_code": "GQ"
+    },
+    {
+        "name": "Eritrea",
+        "code": "+291",
+        "iso_code": "ER"
+    },
+    {
+        "name": "Estonia",
+        "code": "+372",
+        "iso_code": "EE"
+    },
+    {
+        "name": "Ethiopia",
+        "code": "+251",
+        "iso_code": "ET"
+    },
+    {
+        "name": "Falkland Islands (Malvinas)",
+        "code": "+500",
+        "iso_code": "FK"
+    },
+    {
+        "name": "Faroe Islands",
+        "code": "+298",
+        "iso_code": "FO"
+    },
+    {
+        "name": "Fiji",
+        "code": "+679",
+        "iso_code": "FJ"
+    },
+    {
+        "name": "Finland",
+        "code": "+358",
+        "iso_code": "FI"
+    },
+    {
+        "name": "France",
+        "code": "+33",
+        "iso_code": "FR"
+    },
+    {
+        "name": "French Guiana",
+        "code": "+594",
+        "iso_code": "GF"
+    },
+    {
+        "name": "French Polynesia",
+        "code": "+689",
+        "iso_code": "PF"
+    },
+    {
+        "name": "Gabon",
+        "code": "+241",
+        "iso_code": "GA"
+    },
+    {
+        "name": "Gambia",
+        "code": "+220",
+        "iso_code": "GM"
+    },
+    {
+        "name": "Georgia",
+        "code": "+995",
+        "iso_code": "GE"
+    },
+    {
+        "name": "Germany",
+        "code": "+49",
+        "iso_code": "DE"
+    },
+    {
+        "name": "Ghana",
+        "code": "+233",
+        "iso_code": "GH"
+    },
+    {
+        "name": "Gibraltar",
+        "code": "+350",
+        "iso_code": "GI"
+    },
+    {
+        "name": "Greece",
+        "code": "+30",
+        "iso_code": "GR"
+    },
+    {
+        "name": "Greenland",
+        "code": "+299",
+        "iso_code": "GL"
+    },
+    {
+        "name": "Grenada",
+        "code": "+1473",
+        "iso_code": "GD"
+    },
+    {
+        "name": "Guadeloupe",
+        "code": "+590",
+        "iso_code": "GP"
+    },
+    {
+        "name": "Guam",
+        "code": "+1671",
+        "iso_code": "GU"
+    },
+    {
+        "name": "Guatemala",
+        "code": "+502",
+        "iso_code": "GT"
+    },
+    {
+        "name": "Guernsey",
+        "code": "+44",
+        "iso_code": "GG"
+    },
+    {
+        "name": "Guinea",
+        "code": "+224",
+        "iso_code": "GN"
+    },
+    {
+        "name": "Guinea-Bissau",
+        "code": "+245",
+        "iso_code": "GW"
+    },
+    {
+        "name": "Guyana",
+        "code": "+595",
+        "iso_code": "GY"
+    },
+    {
+        "name": "Haiti",
+        "code": "+509",
+        "iso_code": "HT"
+    },
+    {
+        "name": "Holy See (Vatican City State)",
+        "code": "+379",
+        "iso_code": "VA"
+    },
+    {
+        "name": "Honduras",
+        "code": "+504",
+        "iso_code": "HN"
+    },
+    {
+        "name": "Hong Kong",
+        "code": "+852",
+        "iso_code": "HK"
+    },
+    {
+        "name": "Hungary",
+        "code": "+36",
+        "iso_code": "HU"
+    },
+    {
+        "name": "Iceland",
+        "code": "+354",
+        "iso_code": "IS"
+    },
+    {
+        "name": "India",
+        "code": "+91",
+        "iso_code": "IN"
+    },
+    {
+        "name": "Indonesia",
+        "code": "+62",
+        "iso_code": "ID"
+    },
+    {
+        "name": "Iran, Islamic Republic of Persian Gulf",
+        "code": "+98",
+        "iso_code": "IR"
+    },
+    {
+        "name": "Iraq",
+        "code": "+964",
+        "iso_code": "IQ"
+    },
+    {
+        "name": "Ireland",
+        "code": "+353",
+        "iso_code": "IE"
+    },
+    {
+        "name": "Isle of Man",
+        "code": "+44",
+        "iso_code": "IM"
+    },
+    {
+        "name": "Israel",
+        "code": "+972",
+        "iso_code": "IL"
+    },
+    {
+        "name": "Italy",
+        "code": "+39",
+        "iso_code": "IT"
+    },
+    {
+        "name": "Jamaica",
+        "code": "+1876",
+        "iso_code": "JM"
+    },
+    {
+        "name": "Japan",
+        "code": "+81",
+        "iso_code": "JP"
+    },
+    {
+        "name": "Jersey",
+        "code": "+44",
+        "iso_code": "JE"
+    },
+    {
+        "name": "Jordan",
+        "code": "+962",
+        "iso_code": "JO"
+    },
+    {
+        "name": "Kazakhstan",
+        "code": "+77",
+        "iso_code": "KZ"
+    },
+    {
+        "name": "Kenya",
+        "code": "+254",
+        "iso_code": "KE"
+    },
+    {
+        "name": "Kiribati",
+        "code": "+686",
+        "iso_code": "KI"
+    },
+    {
+        "name": "Korea, Democratic People's Republic of Korea",
+        "code": "+850",
+        "iso_code": "KP"
+    },
+    {
+        "name": "Korea, Republic of South Korea",
+        "code": "+82",
+        "iso_code": "KR"
+    },
+    {
+        "name": "Kuwait",
+        "code": "+965",
+        "iso_code": "KW"
+    },
+    {
+        "name": "Kyrgyzstan",
+        "code": "+996",
+        "iso_code": "KG"
+    },
+    {
+        "name": "Laos",
+        "code": "+856",
+        "iso_code": "LA"
+    },
+    {
+        "name": "Latvia",
+        "code": "+371",
+        "iso_code": "LV"
+    },
+    {
+        "name": "Lebanon",
+        "code": "+961",
+        "iso_code": "LB"
+    },
+    {
+        "name": "Lesotho",
+        "code": "+266",
+        "iso_code": "LS"
+    },
+    {
+        "name": "Liberia",
+        "code": "+231",
+        "iso_code": "LR"
+    },
+    {
+        "name": "Libyan Arab Jamahiriya",
+        "code": "+218",
+        "iso_code": "LY"
+    },
+    {
+        "name": "Liechtenstein",
+        "code": "+423",
+        "iso_code": "LI"
+    },
+    {
+        "name": "Lithuania",
+        "code": "+370",
+        "iso_code": "LT"
+    },
+    {
+        "name": "Luxembourg",
+        "code": "+352",
+        "iso_code": "LU"
+    },
+    {
+        "name": "Macao",
+        "code": "+853",
+        "iso_code": "MO"
+    },
+    {
+        "name": "Macedonia",
+        "code": "+389",
+        "iso_code": "MK"
+    },
+    {
+        "name": "Madagascar",
+        "code": "+261",
+        "iso_code": "MG"
+    },
+    {
+        "name": "Malawi",
+        "code": "+265",
+        "iso_code": "MW"
+    },
+    {
+        "name": "Malaysia",
+        "code": "+60",
+        "iso_code": "MY"
+    },
+    {
+        "name": "Maldives",
+        "code": "+960",
+        "iso_code": "MV"
+    },
+    {
+        "name": "Mali",
+        "code": "+223",
+        "iso_code": "ML"
+    },
+    {
+        "name": "Malta",
+        "code": "+356",
+        "iso_code": "MT"
+    },
+    {
+        "name": "Marshall Islands",
+        "code": "+692",
+        "iso_code": "MH"
+    },
+    {
+        "name": "Martinique",
+        "code": "+596",
+        "iso_code": "MQ"
+    },
+    {
+        "name": "Mauritania",
+        "code": "+222",
+        "iso_code": "MR"
+    },
+    {
+        "name": "Mauritius",
+        "code": "+230",
+        "iso_code": "MU"
+    },
+    {
+        "name": "Mayotte",
+        "code": "+262",
+        "iso_code": "YT"
+    },
+    {
+        "name": "Mexico",
+        "code": "+52",
+        "iso_code": "MX"
+    },
+    {
+        "name": "Micronesia, Federated States of Micronesia",
+        "code": "+691",
+        "iso_code": "FM"
+    },
+    {
+        "name": "Moldova",
+        "code": "+373",
+        "iso_code": "MD"
+    },
+    {
+        "name": "Monaco",
+        "code": "+377",
+        "iso_code": "MC"
+    },
+    {
+        "name": "Mongolia",
+        "code": "+976",
+        "iso_code": "MN"
+    },
+    {
+        "name": "Montenegro",
+        "code": "+382",
+        "iso_code": "ME"
+    },
+    {
+        "name": "Montserrat",
+        "code": "+1664",
+        "iso_code": "MS"
+    },
+    {
+        "name": "Morocco",
+        "code": "+212",
+        "iso_code": "MA"
+    },
+    {
+        "name": "Mozambique",
+        "code": "+258",
+        "iso_code": "MZ"
+    },
+    {
+        "name": "Myanmar",
+        "code": "+95",
+        "iso_code": "MM"
+    },
+    {
+        "name": "Namibia",
+        "code": "+264",
+        "iso_code": "NA"
+    },
+    {
+        "name": "Nauru",
+        "code": "+674",
+        "iso_code": "NR"
+    },
+    {
+        "name": "Nepal",
+        "code": "+977",
+        "iso_code": "NP"
+    },
+    {
+        "name": "Netherlands",
+        "code": "+31",
+        "iso_code": "NL"
+    },
+    {
+        "name": "Netherlands Antilles",
+        "code": "+599",
+        "iso_code": "AN"
+    },
+    {
+        "name": "New Caledonia",
+        "code": "+687",
+        "iso_code": "NC"
+    },
+    {
+        "name": "New Zealand",
+        "code": "+64",
+        "iso_code": "NZ"
+    },
+    {
+        "name": "Nicaragua",
+        "code": "+505",
+        "iso_code": "NI"
+    },
+    {
+        "name": "Niger",
+        "code": "+227",
+        "iso_code": "NE"
+    },
+    {
+        "name": "Nigeria",
+        "code": "+234",
+        "iso_code": "NG"
+    },
+    {
+        "name": "Niue",
+        "code": "+683",
+        "iso_code": "NU"
+    },
+    {
+        "name": "Norfolk Island",
+        "code": "+672",
+        "iso_code": "NF"
+    },
+    {
+        "name": "Northern Mariana Islands",
+        "code": "+1670",
+        "iso_code": "MP"
+    },
+    {
+        "name": "Norway",
+        "code": "+47",
+        "iso_code": "NO"
+    },
+    {
+        "name": "Oman",
+        "code": "+968",
+        "iso_code": "OM"
+    },
+    {
+        "name": "Pakistan",
+        "code": "+92",
+        "iso_code": "PK"
+    },
+    {
+        "name": "Palau",
+        "code": "+680",
+        "iso_code": "PW"
+    },
+    {
+        "name": "Palestinian Territory, Occupied",
+        "code": "+970",
+        "iso_code": "PS"
+    },
+    {
+        "name": "Panama",
+        "code": "+507",
+        "iso_code": "PA"
+    },
+    {
+        "name": "Papua New Guinea",
+        "code": "+675",
+        "iso_code": "PG"
+    },
+    {
+        "name": "Paraguay",
+        "code": "+595",
+        "iso_code": "PY"
+    },
+    {
+        "name": "Peru",
+        "code": "+51",
+        "iso_code": "PE"
+    },
+    {
+        "name": "Philippines",
+        "code": "+63",
+        "iso_code": "PH"
+    },
+    {
+        "name": "Pitcairn",
+        "code": "+872",
+        "iso_code": "PN"
+    },
+    {
+        "name": "Poland",
+        "code": "+48",
+        "iso_code": "PL"
+    },
+    {
+        "name": "Portugal",
+        "code": "+351",
+        "iso_code": "PT"
+    },
+    {
+        "name": "Puerto Rico",
+        "code": "+1939",
+        "iso_code": "PR"
+    },
+    {
+        "name": "Qatar",
+        "code": "+974",
+        "iso_code": "QA"
+    },
+    {
+        "name": "Romania",
+        "code": "+40",
+        "iso_code": "RO"
+    },
+    {
+        "name": "Russia",
+        "code": "+7",
+        "iso_code": "RU"
+    },
+    {
+        "name": "Rwanda",
+        "code": "+250",
+        "iso_code": "RW"
+    },
+    {
+        "name": "Reunion",
+        "code": "+262",
+        "iso_code": "RE"
+    },
+    {
+        "name": "Saint Barthelemy",
+        "code": "+590",
+        "iso_code": "BL"
+    },
+    {
+        "name": "Saint Helena, Ascension and Tristan Da Cunha",
+        "code": "+290",
+        "iso_code": "SH"
+    },
+    {
+        "name": "Saint Kitts and Nevis",
+        "code": "+1869",
+        "iso_code": "KN"
+    },
+    {
+        "name": "Saint Lucia",
+        "code": "+1758",
+        "iso_code": "LC"
+    },
+    {
+        "name": "Saint Martin",
+        "code": "+590",
+        "iso_code": "MF"
+    },
+    {
+        "name": "Saint Pierre and Miquelon",
+        "code": "+508",
+        "iso_code": "PM"
+    },
+    {
+        "name": "Saint Vincent and the Grenadines",
+        "code": "+1784",
+        "iso_code": "VC"
+    },
+    {
+        "name": "Samoa",
+        "code": "+685",
+        "iso_code": "WS"
+    },
+    {
+        "name": "San Marino",
+        "code": "+378",
+        "iso_code": "SM"
+    },
+    {
+        "name": "Sao Tome and Principe",
+        "code": "+239",
+        "iso_code": "ST"
+    },
+    {
+        "name": "Saudi Arabia",
+        "code": "+966",
+        "iso_code": "SA"
+    },
+    {
+        "name": "Senegal",
+        "code": "+221",
+        "iso_code": "SN"
+    },
+    {
+        "name": "Serbia",
+        "code": "+381",
+        "iso_code": "RS"
+    },
+    {
+        "name": "Seychelles",
+        "code": "+248",
+        "iso_code": "SC"
+    },
+    {
+        "name": "Sierra Leone",
+        "code": "+232",
+        "iso_code": "SL"
+    },
+    {
+        "name": "Singapore",
+        "code": "+65",
+        "iso_code": "SG"
+    },
+    {
+        "name": "Slovakia",
+        "code": "+421",
+        "iso_code": "SK"
+    },
+    {
+        "name": "Slovenia",
+        "code": "+386",
+        "iso_code": "SI"
+    },
+    {
+        "name": "Solomon Islands",
+        "code": "+677",
+        "iso_code": "SB"
+    },
+    {
+        "name": "Somalia",
+        "code": "+252",
+        "iso_code": "SO"
+    },
+    {
+        "name": "South Africa",
+        "code": "+27",
+        "iso_code": "ZA"
+    },
+    {
+        "name": "South Sudan",
+        "code": "+211",
+        "iso_code": "SS"
+    },
+    {
+        "name": "South Georgia and the South Sandwich Islands",
+        "code": "+500",
+        "iso_code": "GS"
+    },
+    {
+        "name": "Spain",
+        "code": "+34",
+        "iso_code": "ES"
+    },
+    {
+        "name": "Sri Lanka",
+        "code": "+94",
+        "iso_code": "LK"
+    },
+    {
+        "name": "Sudan",
+        "code": "+249",
+        "iso_code": "SD"
+    },
+    {
+        "name": "Suriname",
+        "code": "+597",
+        "iso_code": "SR"
+    },
+    {
+        "name": "Svalbard and Jan Mayen",
+        "code": "+47",
+        "iso_code": "SJ"
+    },
+    {
+        "name": "Swaziland",
+        "code": "+268",
+        "iso_code": "SZ"
+    },
+    {
+        "name": "Sweden",
+        "code": "+46",
+        "iso_code": "SE"
+    },
+    {
+        "name": "Switzerland",
+        "code": "+41",
+        "iso_code": "CH"
+    },
+    {
+        "name": "Syrian Arab Republic",
+        "code": "+963",
+        "iso_code": "SY"
+    },
+    {
+        "name": "Taiwan",
+        "code": "+886",
+        "iso_code": "TW"
+    },
+    {
+        "name": "Tajikistan",
+        "code": "+992",
+        "iso_code": "TJ"
+    },
+    {
+        "name": "Tanzania, United Republic of Tanzania",
+        "code": "+255",
+        "iso_code": "TZ"
+    },
+    {
+        "name": "Thailand",
+        "code": "+66",
+        "iso_code": "TH"
+    },
+    {
+        "name": "Timor-Leste",
+        "code": "+670",
+        "iso_code": "TL"
+    },
+    {
+        "name": "Togo",
+        "code": "+228",
+        "iso_code": "TG"
+    },
+    {
+        "name": "Tokelau",
+        "code": "+690",
+        "iso_code": "TK"
+    },
+    {
+        "name": "Tonga",
+        "code": "+676",
+        "iso_code": "TO"
+    },
+    {
+        "name": "Trinidad and Tobago",
+        "code": "+1868",
+        "iso_code": "TT"
+    },
+    {
+        "name": "Tunisia",
+        "code": "+216",
+        "iso_code": "TN"
+    },
+    {
+        "name": "Turkey",
+        "code": "+90",
+        "iso_code": "TR"
+    },
+    {
+        "name": "Turkmenistan",
+        "code": "+993",
+        "iso_code": "TM"
+    },
+    {
+        "name": "Turks and Caicos Islands",
+        "code": "+1649",
+        "iso_code": "TC"
+    },
+    {
+        "name": "Tuvalu",
+        "code": "+688",
+        "iso_code": "TV"
+    },
+    {
+        "name": "Uganda",
+        "code": "+256",
+        "iso_code": "UG"
+    },
+    {
+        "name": "Ukraine",
+        "code": "+380",
+        "iso_code": "UA"
+    },
+    {
+        "name": "United Arab Emirates",
+        "code": "+971",
+        "iso_code": "AE"
+    },
+    {
+        "name": "United Kingdom",
+        "code": "+44",
+        "iso_code": "GB"
+    },
+    {
+        "name": "United States",
+        "code": "+1",
+        "iso_code": "US"
+    },
+    {
+        "name": "Uruguay",
+        "code": "+598",
+        "iso_code": "UY"
+    },
+    {
+        "name": "Uzbekistan",
+        "code": "+998",
+        "iso_code": "UZ"
+    },
+    {
+        "name": "Vanuatu",
+        "code": "+678",
+        "iso_code": "VU"
+    },
+    {
+        "name": "Venezuela, Bolivarian Republic of Venezuela",
+        "code": "+58",
+        "iso_code": "VE"
+    },
+    {
+        "name": "Vietnam",
+        "code": "+84",
+        "iso_code": "VN"
+    },
+    {
+        "name": "Virgin Islands, British",
+        "code": "+1284",
+        "iso_code": "VG"
+    },
+    {
+        "name": "Virgin Islands, U.S.",
+        "code": "+1340",
+        "iso_code": "VI"
+    },
+    {
+        "name": "Wallis and Futuna",
+        "code": "+681",
+        "iso_code": "WF"
+    },
+    {
+        "name": "Yemen",
+        "code": "+967",
+        "iso_code": "YE"
+    },
+    {
+        "name": "Zambia",
+        "code": "+260",
+        "iso_code": "ZM"
+    },
+    {
+        "name": "Zimbabwe",
+        "code": "+263",
+        "iso_code": "ZW"
+    }
+]

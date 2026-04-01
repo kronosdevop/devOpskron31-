@@ -1,0 +1,65 @@
+.maindiv {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .cardCss1 {
+    background: Radial-gradient(circle at right, #39B3C8  1%, #4747fe 100%);
+  
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  }
+  .cardCss {
+    background: linear-gradient(120deg, #39B3C8  10%, #39B3C8  100%);
+  
+    /* box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23); */
+  }
+  .appBar{
+    background-image: linear-gradient( #2a2a2a,#2a2a2a  );
+  }
+  .mininavbar{
+    /* background-image: linear-gradient( #262626,#757575  ); */
+    /* background-image: linear-gradient( #39B3C8  10%, #ef3f6e 100%) */
+    background-image: linear-gradient(#31efb0 , #31efb0 )
+  }
+  .navBar{
+    /* background-image: linear-gradient( #2a2a2a ,#2a2a2a ); */
+    /* background-image: linear-gradient( #39B3C8  10%, #ef3f6e 100%) */
+}
+.dtwidth {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+    
+  .select-items .v-list-item .v-list-item__title {
+ 
+    text-align: left;
+   position: relative;
+  
+  
+  }
+  .sm-main-style {
+    margin: auto;
+    width: 95%;
+  }
+  .md-main-style {
+    margin: auto;
+    width: 70%;
+  }
+  nav {
+    padding: 0px;
+  }
+  .button-corner {
+    position: relative;
+    bottom: 16px;
+    right:8px;
+  
+  }
+  .my-tabs [role="tab"] {
+    justify-content: flex-start;
+  }
+  .gradient-1 {
+    background-image: linear-gradient(120deg, rgba(59,205,205,1) 10%, rgba(44,255,163,1) 100%);
+  }
+  
