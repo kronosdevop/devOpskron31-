@@ -23,7 +23,7 @@
         <!--Form Fields-->
         <v-row class="pa-5">
           <!--Category-->
-          <v-col cols="6">
+          <v-col cols="6" class="mt-n4">
             <div class="font-weight-bold">Category</div>
             <v-text-field
               v-model="category"
@@ -31,11 +31,12 @@
               density="compact"
               rounded="lg"
               prepend-inner-icon="mdi-view-list"
+              class="mt-2"
             />
           </v-col>
 
           <!--Question Interval-->
-          <v-col cols="6">
+          <v-col cols="6" class="mt-n4">
             <div class="font-weight-bold">Question Interval</div>
             <v-select
               v-model="interval"
@@ -43,6 +44,7 @@
               density="compact"
               rounded="lg"
               prepend-inner-icon="mdi-clock-outline"
+              class="mt-2"
               :items="intervalItems"
             />
           </v-col>
@@ -99,14 +101,12 @@
 <script>
 import { create_list_edit_delete_splay_categories } from "@/graphql/mutations";
 import { API, graphqlOperation } from "aws-amplify";
-import { uploadToS3 } from "@/mixins/uploadToS3.js";
+import { uploadImgS3 } from "@/mixins/S3Upload.js";
 
 import SnackBar from "../SnackBar.vue";
 
 export default {
   props: { DialogCreateCategory: Boolean },
-
-  mixins: [uploadToS3],
 
   components: { SnackBar },
 
@@ -144,32 +144,26 @@ export default {
   methods: {
     async CreateCategory() {
       this.loading = true;
-
       try {
         let uploadedImageUrl = null;
-
         if (this.selectedFile) {
           const key = `categories/${Date.now()}-${this.selectedFile.name}`;
-
-          uploadedImageUrl = await uploadToS3(this.selectedFile, key);
+          uploadedImageUrl = await uploadImgS3(this.selectedFile, key);
         }
-
         const result = await API.graphql(
           graphqlOperation(create_list_edit_delete_splay_categories, {
             input: {
               action_type: "CREATE",
+              repository_source: "CUSTOM",
               question_interval: this.interval,
               splay_category_name: this.category,
-              repository_source: "CUSTOM",
               splay_category_image: uploadedImageUrl,
             },
           }),
         );
-
         const resultObj = JSON.parse(
           result.data.create_list_edit_delete_splay_categories,
         );
-
         if (resultObj.Status === "SUCCESS") {
           this.SnackBarComponent = {
             SnackbarVmodel: true,
@@ -177,11 +171,8 @@ export default {
             SnackbarText: resultObj.Message,
           };
         }
-
         this.DialogCreateCategoryEmit(2);
       } catch (error) {
-        console.error(error);
-
         this.SnackBarComponent = {
           SnackbarVmodel: true,
           SnackbarColor: "red",
@@ -211,31 +202,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.preview-wrapper {
-  height: 260px;
-  border: 1px dashed rgba(0, 0, 0, 0.2);
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #fafafa;
-}
-.preview-image {
-  width: 100%;
-  height: 100%;
-  border-radius: 12px;
-}
-.preview-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: #9e9e9e;
-  text-align: center;
-}
-.clickable {
-  cursor: pointer;
-}
-</style>

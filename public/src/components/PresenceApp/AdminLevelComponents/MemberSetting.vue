@@ -40,6 +40,13 @@
           class="modern-data-table dtwidth"
           @click:row="handle_row_click"
         >
+          <template v-slot:loading>
+                  <div class="text-center">
+                    <v-progress-circular indeterminate color="primary" size="32" class="mt-6" />
+                    <div class="text-subtitle-2 mt-4 text-grey">Loading Member Settings</div>
+                  </div>
+
+                </template>
           <template v-slot:[`item.full_user_name`]="{ item }">
             <div class="d-flex align-center">
               <!-- <v-icon color="primary">mdi-account</v-icon> -->

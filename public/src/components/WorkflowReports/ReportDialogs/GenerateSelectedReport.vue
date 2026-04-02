@@ -48,11 +48,10 @@
                   <v-dialog v-model="fromDateDialog" persistent max-width="325">
                     <v-card>
                       <v-date-picker
-                        v-model="tempFromDate"
-                        :min="minallowedDate"
-                        :max="maxAllowedDate"
-                        color="#DB4C77"
-                      />
+  v-model="tempFromDate"
+  :max="maxAllowedDate"
+  color="#DB4C77"
+/>
                       <v-card-actions>
                         <v-spacer />
                         <v-btn text @click="fromDateDialog = false"
@@ -111,6 +110,18 @@
                   label="Workflow Status"
                 />
               </v-col>
+              <v-col cols="12">
+                <v-radio-group
+                  v-model="selectGenerate"
+                  label="Generate By"
+                  color="primary"
+                  inline
+                >
+                  <v-radio label="XLXS" value="xlxs"></v-radio>
+                  <v-radio label="PDF" value="SINGLE"></v-radio>
+                  <v-radio label="Individual PDF" value="MULTIPLE"></v-radio>
+                </v-radio-group>
+              </v-col>
             </v-row>
           </v-form>
         </v-card-text>
@@ -118,11 +129,12 @@
           <v-btn
             dark
             size="small"
-            @click="validate_data()"
             :loading="loading"
             class="text-capitalize cardCss text-white"
-            >Generate</v-btn
+            @click="handleGenerate"
           >
+            Generate
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -131,6 +143,7 @@
 <script>
 /* eslint-disable */
 import { generate_reports_for_particularWorkflows } from "@/graphql/mutations.js";
+import { generate_pdf_reports_for_particular_workflows } from "@/graphql/mutations.js";
 import { API, graphqlOperation } from "aws-amplify";
 
 export default {
@@ -148,13 +161,13 @@ export default {
       loading: false,
       maxAllowedDate: null,
       versionsNumber: "",
-      minallowedDate: null,
       changecheck: false,
       allVerionsList: [],
       fromDateDialog: false,
       tempFromDate: "",
       toDateDialog: false,
       tempToDate: "",
+      selectGenerate: "xlxs",
     };
   },
   computed: {
@@ -182,8 +195,6 @@ export default {
       async handler() {
         if (this.genrateSelectedReport == true) {
           this.maxAllowedDate = null;
-          this.minallowedDate = null;
-          this.changecheck = false;
           await this.fetch_versions_list();
           // Find the object in allVerionsList that matches the workflow_id
           const matchingVersion = this.allVerionsList.find(
@@ -192,9 +203,7 @@ export default {
           this.versionsNumber = matchingVersion || null;
           this.maxAllowedDate = new Date().toISOString().split("T")[0];
 
-          this.minallowedDate = this.fetch_value(
-            this.rowInfo.workflow_created_on
-          );
+
 
           this.selectStatus = "COMPLETED";
 
@@ -204,6 +213,7 @@ export default {
 
           this.tempFromDate = this.fromDate;
           this.tempToDate = this.toDate;
+          this.selectGenerate = "xlxs";
         }
       },
       immediate: true,
@@ -294,27 +304,171 @@ export default {
       // );
     },
 
-    async validate_data() {
+    // async handleGenerate() {
+    //   // Validate form first
+    //   const { valid } = await this.$refs.form.validate();
+
+    //   if (!valid) return;
+
+    //   // After validation decide which API to call
+    //   if (this.selectGenerate === "xlxs") {
+    //     await this.generate_report();      // XLSX
+    //   } else {
+    //     await this.generate_pdf();         // SINGLE or MULTIPLE PDF
+    //   }
+    // },
+    //   async generate_report() {
+    //     this.loading = true;
+    //     const data = this.$store.getters.GetUserObj;
+
+    //     if (!this.versionsNumber) {
+    //       this.loading = false;
+    //       this.$emit("errorMsg", "Please select a valid version");
+    //       return;
+    //     }
+
+    //     try {
+    //       // FROM date (keep as selected date – midnight)
+    //       const fromDateObj = new Date(this.fromDate);
+
+    //       // TO date (selected date + current time)
+    //       const toDateObj = new Date(this.toDate);
+    //       const now = new Date();
+
+    //       toDateObj.setHours(
+    //         now.getHours(),
+    //         now.getMinutes(),
+    //         now.getSeconds(),
+    //         now.getMilliseconds()
+    //       );
+
+    //       let result = await API.graphql(
+    //         graphqlOperation(generate_reports_for_particularWorkflows, {
+    //           input: {
+    //             workflow_id:
+    //               this.changecheck === true
+    //                 ? this.versionsNumber.workflow_id
+    //                 : this.versionsNumber,
+
+    //             report_from_date: Math.floor(fromDateObj.getTime() / 1000),
+    //             report_to_date: Math.floor(toDateObj.getTime() / 1000),
+
+    //             user_email_id: data.user.user_email_id,
+    //             workflow_status: this.selectStatus,
+    //           },
+    //         })
+    //       );
+
+    //       this.loading = false;
+
+    //       const response = JSON.parse(
+    //         result.data.generate_reports_for_particularWorkflows
+    //       );
+
+    //       if (response.Status === "SUCCESS") {
+    //         this.$emit("successMsg", response.Message);
+    //         this.$refs.form.reset();
+    //         this.changecheck = false;
+    //       } else {
+    //         this.$emit("errorMsg", response.Message);
+    //       }
+    //     } catch (error) {
+    //       console.error(error);
+    //       this.loading = false;
+    //       this.$emit(
+    //         "errorMsg",
+    //         error?.errorType?.errorMessage || "Something went wrong"
+    //       );
+    //     }
+    //   },
+    //   async generate_pdf() {
+    //     this.loading = true;
+    //     const data = this.$store.getters.GetUserObj;
+
+    //     if (!this.versionsNumber) {
+    //       this.loading = false;
+    //       this.$emit("errorMsg", "Please select a valid version");
+    //       return;
+    //     }
+
+    //     try {
+    //       // FROM date (keep as selected date – midnight)
+    //       const fromDateObj = new Date(this.fromDate);
+
+    //       // TO date (selected date + current time)
+    //       const toDateObj = new Date(this.toDate);
+    //       const now = new Date();
+
+    //       toDateObj.setHours(
+    //         now.getHours(),
+    //         now.getMinutes(),
+    //         now.getSeconds(),
+    //         now.getMilliseconds()
+    //       );
+
+    //       let result = await API.graphql(
+    //         graphqlOperation(generate_pdf_reports_for_particular_workflows, {
+    //           input: {
+    //             workflow_id:
+    //               this.changecheck === true
+    //                 ? this.versionsNumber.workflow_id
+    //                 : this.versionsNumber,
+
+    //             report_from_date: Math.floor(fromDateObj.getTime() / 1000),
+    //             report_to_date: Math.floor(toDateObj.getTime() / 1000),
+
+    //             user_email_id: data.user.user_email_id,
+    //             workflow_status: this.selectStatus,
+    //             pdf_mode: this.selectGenerate,
+    //             organization_id: this.$store.getters.GetUserObj.organization.organization_id
+    //           },
+    //         })
+    //       );
+
+    //       this.loading = false;
+
+    //       const response = JSON.parse(
+    //         result.data.generate_pdf_reports_for_particular_workflows
+    //       );
+
+    //       if (response.Status === "SUCCESS") {
+    //         // this.$emit("successMsg", response.Message);
+    //         console.log("response", response)
+    //         this.$refs.form.reset();
+    //         this.changecheck = false;
+    //       } else {
+    //         this.$emit("errorMsg", response.Message);
+    //       }
+    //     } catch (error) {
+    //       console.error(error);
+    //       this.loading = false;
+    //       this.$emit(
+    //         "errorMsg",
+    //         error?.errorType?.errorMessage || "Something went wrong"
+    //       );
+    //     }
+    //   },
+    async handleGenerate() {
+      console.log("Selected Generate Type:", this.selectGenerate);
+
       const { valid } = await this.$refs.form.validate();
-      if (valid) {
+      if (!valid) return;
+
+      if (this.selectGenerate === "xlxs") {
+        console.log("Calling XLSX API");
         await this.generate_report();
+      } else {
+        console.log("Calling PDF API");
+        await this.generate_pdf();
       }
     },
+
     async generate_report() {
       this.loading = true;
       const data = this.$store.getters.GetUserObj;
 
-      if (!this.versionsNumber) {
-        this.loading = false;
-        this.$emit("errorMsg", "Please select a valid version");
-        return;
-      }
-
       try {
-        // FROM date (keep as selected date – midnight)
         const fromDateObj = new Date(this.fromDate);
-
-        // TO date (selected date + current time)
         const toDateObj = new Date(this.toDate);
         const now = new Date();
 
@@ -325,24 +479,20 @@ export default {
           now.getMilliseconds()
         );
 
-        let result = await API.graphql(
+        const result = await API.graphql(
           graphqlOperation(generate_reports_for_particularWorkflows, {
             input: {
-              workflow_id:
-                this.changecheck === true
-                  ? this.versionsNumber.workflow_id
-                  : this.versionsNumber,
+              workflow_id: this.changecheck
+                ? this.versionsNumber.workflow_id
+                : this.versionsNumber,
 
               report_from_date: Math.floor(fromDateObj.getTime() / 1000),
               report_to_date: Math.floor(toDateObj.getTime() / 1000),
-
               user_email_id: data.user.user_email_id,
               workflow_status: this.selectStatus,
             },
           })
         );
-
-        this.loading = false;
 
         const response = JSON.parse(
           result.data.generate_reports_for_particularWorkflows
@@ -350,20 +500,99 @@ export default {
 
         if (response.Status === "SUCCESS") {
           this.$emit("successMsg", response.Message);
-          this.$refs.form.reset();
-          this.changecheck = false;
         } else {
           this.$emit("errorMsg", response.Message);
         }
       } catch (error) {
-        console.error(error);
+        this.$emit("errorMsg", "Something went wrong");
+      } finally {
         this.loading = false;
-        this.$emit(
-          "errorMsg",
-          error?.errorType?.errorMessage || "Something went wrong"
-        );
       }
     },
+
+    async generate_pdf() {
+      this.loading = true;
+      const data = this.$store.getters.GetUserObj;
+
+      try {
+        const fromDateObj = new Date(this.fromDate);
+        const toDateObj = new Date(this.toDate);
+        const now = new Date();
+
+        toDateObj.setHours(
+          now.getHours(),
+          now.getMinutes(),
+          now.getSeconds(),
+          now.getMilliseconds()
+        );
+
+        const result = await API.graphql(
+          graphqlOperation(generate_pdf_reports_for_particular_workflows, {
+            input: {
+              workflow_id: this.changecheck
+                ? this.versionsNumber.workflow_id
+                : this.versionsNumber,
+
+              report_from_date: Math.floor(fromDateObj.getTime() / 1000),
+              report_to_date: Math.floor(toDateObj.getTime() / 1000),
+              user_email_id: data.user.user_email_id,
+              workflow_status: this.selectStatus,
+              pdf_mode: this.selectGenerate,
+              organization_id: data.organization.organization_id,
+            },
+          })
+        );
+
+        const response = JSON.parse(
+          result.data.generate_pdf_reports_for_particular_workflows
+        );
+
+        if (response.Status === "SUCCESS") {
+          // If single PDF
+          if (this.selectGenerate === "SINGLE") {
+            this.downloadFile(response.report_url);
+          }
+
+          // If multiple PDFs
+          if (
+            this.selectGenerate === "MULTIPLE" &&
+            response.report_urls?.length
+          ) {
+            response.report_urls.forEach((url, index) => {
+              this.downloadFile(url, `Report_${index + 1}.pdf`);
+            });
+          }
+
+          this.$emit("successMsg", response.Message);
+        } else {
+          this.$emit("errorMsg", response.Message);
+        }
+      } catch (error) {
+        this.$emit("errorMsg", "Something went wrong");
+      } finally {
+        this.loading = false;
+      }
+    },
+    async downloadFile(url, fileName = "Report.pdf") {
+  try {
+    const response = await fetch(url);
+    const blob = await response.blob();
+
+    const blobUrl = window.URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = blobUrl;
+    link.download = fileName;   // forces download
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(blobUrl);
+  } catch (error) {
+    console.error("Download failed:", error);
+  }
+},
+
     saveFromDate() {
       this.fromDate = this.tempFromDate;
       this.fromDateDialog = false;

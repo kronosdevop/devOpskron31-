@@ -8,7 +8,7 @@
           <v-icon class="mr-2" color="#DB4C77">mdi-cog</v-icon>
           Report Configuration
         </v-card-title>
-        <v-card-text>
+        <v-card-text class="card-title">
           <v-row>
             <v-col cols="12" sm="6" md="2">
               <v-select
@@ -132,6 +132,18 @@
                 item-title="text"
                 item-value="value"
                 :items="reporttypeitems"
+                class="modern-select"
+              />
+            </v-col>
+            <v-col cols="12" sm="6" md="2">
+              <v-select
+                density="compact"
+                variant="outlined"
+                v-model="selectedGroup"
+                label="Select Group"
+                item-title="department_name"
+                item-value="department_name"
+                :items="groupItems"
                 class="modern-select"
               />
             </v-col>
@@ -383,8 +395,10 @@
 <script>
 import { formatedatetime } from "@/JsonFiles/DateFormate.js";
 import { presence_reports } from "@/graphql/mutations.js";
+import { group_presence_reports } from "@/graphql/mutations.js";
 import { list_presence_reports } from "@/graphql/queries.js";
 import { API, graphqlOperation } from "aws-amplify";
+import { get_department_details } from "@/mixins/GetDepartments.js";
 
 import SnackBar from "@/components/SnackBar.vue";
 import { get_all_org_users } from "@/mixins/GetUsersDropdown.js";
@@ -395,7 +409,7 @@ export default {
   components: {
     SnackBar,
   },
-  mixins: [get_all_org_users],
+  mixins: [get_all_org_users, get_department_details],
   data() {
     return {
       userStatus: "ACTIVE",
@@ -417,6 +431,7 @@ export default {
         { name: "Inactive", value: "DEACTIVE" },
       ],
       absentpresentitems: [
+        { name: "All", value: "ALL" },
         { name: "Present", value: "PRESENT" },
         { name: "Absent", value: "ABSENT" },
         { name: "Leave", value: "LEAVE" },
@@ -428,7 +443,7 @@ export default {
         { text: "Present-Absent-Leave", value: "PRESENT_AND_ABSENT_MONTHLY" },
       ],
       listUser: "ALL",
-      absentpresent: "PRESENT",
+      absentpresent: "ALL",
       selectedMonth: "",
       tableLoading: false,
       search: "",
@@ -467,6 +482,8 @@ export default {
       date: null,
       itemsPerPage: 20,
       currentPage: 1,
+      selectedGroup: "",
+      groupItems: [],
     };
   },
 
@@ -539,6 +556,17 @@ export default {
       this.$store.commit("Setnamesearch", this.search);
       await this.get_all_org_users();
       await this.get_report();
+      await this.get_department_details();
+
+      this.groupItems = [
+        {
+          department_name: "All",
+          department_id: "ALL",
+        },
+        ...this.departmentList,
+      ];
+
+      this.selectedGroup = "ALL";
       this.fetch_details();
     } catch (error) {
       console.error("Error in created lifecycle:", error);
@@ -615,12 +643,24 @@ export default {
     },
 
     generatereport() {
-      if (this.duration == "Daily") {
-        this.get_dailyreport();
-      } else if (this.duration == "Monthly") {
-        this.get_monthlyreport();
+      // If "All" selected → existing functions
+      if (this.selectedGroup === "ALL" || !this.selectedGroup) {
+        if (this.duration === "Daily") {
+          this.get_dailyreport();
+        } else if (this.duration === "Monthly") {
+          this.get_monthlyreport();
+        } else {
+          this.get_yearlyreport();
+        }
       } else {
-        this.get_yearlyreport();
+        // If specific group selected → group APIs
+        if (this.duration === "Daily") {
+          this.get_dailyreport_group();
+        } else if (this.duration === "Monthly") {
+          this.get_monthlyreport_group();
+        } else {
+          this.get_yearlyreport_group();
+        }
       }
     },
 
@@ -898,6 +938,168 @@ export default {
         this.buttonload = false;
 
         var response = JSON.parse(result.data.presence_reports);
+
+        if (response.Status == "SUCCESS") {
+          this.buttonload = false;
+          this.get_report();
+          this.SnackBarComponent = {
+            SnackbarVmodel: true,
+            SnackbarColor: "green",
+            SnackbarText: response.Message,
+            timeout: 5000,
+            Top: true,
+          };
+        } else {
+          this.buttonload = false;
+          this.SnackBarComponent = {
+            SnackbarVmodel: true,
+            SnackbarColor: "red",
+            SnackbarText: response.Message,
+            timeout: 5000,
+            Top: true,
+          };
+        }
+      } catch (error) {
+        this.tableLoading = false;
+        this.SnackBarComponent = {
+          SnackbarVmodel: true,
+          SnackbarColor: "red",
+          SnackbarText: error.errors[0].message,
+          timeout: 5000,
+          Top: true,
+        };
+      }
+    },
+    async get_dailyreport_group() {
+      this.buttonload = true;
+      var data = this.$store.getters.GetUserObj;
+      try {
+        let result = await API.graphql(
+          graphqlOperation(group_presence_reports, {
+            input: {
+              action_type: "DAILY",
+              action_value: this.absentpresent,
+              organization_id: data.organization.organization_id,
+              group_name: this.selectedGroup,
+              user_id: this.listUser,
+              swipe_date: this.computedDateFormatted,
+              user_status: this.userStatus,
+              user_email_id: data.user.user_email_id,
+            },
+          })
+        );
+        this.buttonload = false;
+
+        var response = JSON.parse(result.data.group_presence_reports);
+
+        if (response.Status == "SUCCESS") {
+          this.buttonload = false;
+          this.get_report();
+          this.SnackBarComponent = {
+            SnackbarVmodel: true,
+            SnackbarColor: "green",
+            SnackbarText: response.Message,
+            timeout: 5000,
+            Top: true,
+          };
+        } else {
+          this.buttonload = false;
+          this.SnackBarComponent = {
+            SnackbarVmodel: true,
+            SnackbarColor: "red",
+            SnackbarText: response.Message,
+            timeout: 5000,
+            Top: true,
+          };
+        }
+      } catch (error) {
+        this.tableLoading = false;
+        this.SnackBarComponent = {
+          SnackbarVmodel: true,
+          SnackbarColor: "red",
+          SnackbarText: error.errors[0].message,
+          timeout: 5000,
+          Top: true,
+        };
+      }
+    },
+
+    async get_monthlyreport_group() {
+      this.buttonload = true;
+      var data = this.$store.getters.GetUserObj;
+      try {
+        let result = await API.graphql(
+          graphqlOperation(group_presence_reports, {
+            input: {
+              action_type: "MONTHLY",
+              action_value: this.reporttype,
+              organization_id: data.organization.organization_id,
+              group_name: this.selectedGroup,
+              user_id: this.listUser,
+              user_status: this.userStatus,
+              swipe_year: this.selectedYear,
+              swipe_month: this.selectedMonth,
+              user_email_id: data.user.user_email_id,
+            },
+          })
+        );
+        this.buttonload = false;
+
+        var response = JSON.parse(result.data.group_presence_reports);
+
+        if (response.Status == "SUCCESS") {
+          this.buttonload = false;
+          this.get_report();
+          this.SnackBarComponent = {
+            SnackbarVmodel: true,
+            SnackbarColor: "green",
+            SnackbarText: response.Message,
+            timeout: 5000,
+            Top: true,
+          };
+        } else {
+          this.buttonload = false;
+          this.SnackBarComponent = {
+            SnackbarVmodel: true,
+            SnackbarColor: "red",
+            SnackbarText: response.Message,
+            timeout: 5000,
+            Top: true,
+          };
+        }
+      } catch (error) {
+        this.tableLoading = false;
+        this.SnackBarComponent = {
+          SnackbarVmodel: true,
+          SnackbarColor: "red",
+          SnackbarText: error.errors[0].message,
+          timeout: 5000,
+          Top: true,
+        };
+      }
+    },
+
+    async get_yearlyreport_group() {
+      this.buttonload = true;
+      var data = this.$store.getters.GetUserObj;
+      try {
+        let result = await API.graphql(
+          graphqlOperation(group_presence_reports, {
+            input: {
+              action_type: "YEARLY",
+              action_value: "YEAR_BOTH",
+              organization_id: data.organization.organization_id,
+              group_name: this.selectedGroup,
+              user_id: this.listUser,
+              user_status: this.userStatus,
+              swipe_year: this.selectedYear,
+              user_email_id: data.user.user_email_id,
+            },
+          })
+        );
+        this.buttonload = false;
+
+        var response = JSON.parse(result.data.group_presence_reports);
 
         if (response.Status == "SUCCESS") {
           this.buttonload = false;

@@ -2,7 +2,6 @@
   <div>
     <!-- eslint-disable -->
     <v-dialog
-      
       :model-value="addUserTaskDialogue"
       @update:model-value="$emit('update:addUserTaskDialogue', $event)"
       persistent
@@ -11,13 +10,15 @@
     >
       <v-card>
         <v-toolbar flat density="compact" class="navBar">
-          <v-toolbar-title class="text-black ml-2">
+          <v-toolbar-title class="text-black ml-4">
             <div class="custom-title">
               Add Activities {{ phaseItem.project_name }}
             </div>
           </v-toolbar-title>
           <v-spacer />
-          <v-icon class="icon-class" @click="close_dialog()">mdi-close</v-icon>
+          <v-icon class="icon-class mr-4" @click="close_dialog()"
+            >mdi-close</v-icon
+          >
         </v-toolbar>
         <v-card-text>
           <v-form ref="form">
@@ -40,8 +41,8 @@
                       label="Task Details"
                       :rules="[(v) => !!v || 'required ']"
                       variant="outlined"
-                      maxlength="200"
-                      counter="200"
+                      maxlength="5000"
+                      counter="5000"
                       rows="2"
                       density="compact"
                     ></v-textarea>
@@ -54,7 +55,7 @@
                       variant="outlined"
                       item-title="name"
                       item-value="email"
-                      :items="userArray"
+                      :items="sortedUserArray"
                       :rules="[(v) => !!v || 'required ']"
                       v-model:search="searchF"
                       @update:model-value="searchF = ''"
@@ -75,10 +76,16 @@
                       @click="dueDateDialog = true"
                     >
                       <template #append-inner>
-                        <v-icon @click="dueDateDialog = true">mdi-calendar</v-icon>
+                        <v-icon @click="dueDateDialog = true"
+                          >mdi-calendar</v-icon
+                        >
                       </template>
                     </v-text-field>
-                    <v-dialog v-model="dueDateDialog" persistent max-width="325">
+                    <v-dialog
+                      v-model="dueDateDialog"
+                      persistent
+                      max-width="325"
+                    >
                       <v-card>
                         <v-date-picker
                           v-model="tempDueDate"
@@ -87,8 +94,18 @@
                         ></v-date-picker>
                         <v-card-actions>
                           <v-spacer />
-                          <v-btn variant="text" color="primary" @click="dueDateDialog = false">Cancel</v-btn>
-                          <v-btn variant="text" color="primary" @click="saveDueDate">OK</v-btn>
+                          <v-btn
+                            variant="text"
+                            color="primary"
+                            @click="close_datepicker()"
+                            >Cancel</v-btn
+                          >
+                          <v-btn
+                            variant="text"
+                            color="primary"
+                            @click="saveDueDate"
+                            >OK</v-btn
+                          >
                         </v-card-actions>
                       </v-card>
                     </v-dialog>
@@ -96,22 +113,39 @@
                   <v-col cols="12">
                     <v-select
                       v-model="taskStatus"
-                      label="Status"
+                      label="Priority"
                       :rules="[(v) => !!v || 'required ']"
                       :items="[
-                        { title: 'High', value: 'HIGH' },
                         { title: 'Low', value: 'LOW' },
                         { title: 'Medium', value: 'MEDIUM' },
+                        { title: 'High', value: 'HIGH' },
                       ]"
                       variant="outlined"
                       density="compact"
                     ></v-select>
                   </v-col>
+                  <v-col cols="12" sm="12">
+                    <v-radio-group
+                      v-model="billingDetail"
+                      inline
+                      color="primary"
+                    >
+                      <v-radio label="Billable" value="BILLABLE"></v-radio>
+                      <v-radio
+                        class="ml-10"
+                        label="Non-Billable"
+                        value="NONBILLABLE"
+                      ></v-radio>
+                    </v-radio-group>
+                  </v-col>
                 </v-row>
               </v-col>
               <v-col cols="5" class="mt-4">
-                <v-toolbar density="compact" class="rounded elevation-1 FontSize bg-white">
-                  <b> Add Attachments</b>
+                <v-toolbar
+                  density="compact"
+                  class="rounded elevation-1 FontSize bg-white"
+                >
+                  <b class="ml-4"> Add Attachments</b>
                   <v-spacer />
                   <input
                     type="file"
@@ -140,6 +174,13 @@
                         <div class="mt-2" v-if="signimagesarrayurls.length > 0">
                           Max 5 Attachments
                         </div>
+                        <div
+                          v-if="attachmentError"
+                          class="text-red text-caption mt-2"
+                        >
+                          Attachment is required for Billable tasks
+                        </div>
+
                         <v-card
                           class="mt-5 ma-2 rounded-lg elevation-1"
                           v-for="(
@@ -263,21 +304,28 @@ export default {
       documentFiles: null,
       dueDateDialog: false,
       tempDueDate: "",
+      billingDetail: "BILLABLE",
+      attachmentError: false,
     };
   },
   computed: {
     displayDueDate() {
-      if (!this.fromDate) return '';
+      if (!this.fromDate) return "";
       const d = new Date(this.fromDate);
       if (isNaN(d)) return this.fromDate;
-      const day = String(d.getDate()).padStart(2, '0');
-      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, "0");
+      const month = String(d.getMonth() + 1).padStart(2, "0");
       const year = d.getFullYear();
       return `${day}-${month}-${year}`;
     },
     minDueDate() {
       return new Date().toISOString().substr(0, 10);
-    }
+    },
+    sortedUserArray() {
+      return [...this.userArray].sort((a, b) =>
+        (a.name || "").localeCompare(b.name || "")
+      );
+    },
   },
   watch: {
     addUserTaskDialogue: {
@@ -289,12 +337,23 @@ export default {
           await this.fetch_project_list();
           // await this.get_all_org_users();
           // this.fetch_details();
+          var data = this.$store.getters.GetUserObj;
+          console.log("data", data);
         }
       },
       immediate: true,
     },
+    billingDetail(val) {
+      if (val === "NONBILLABLE") {
+        this.attachmentError = false;
+      }
+    },
   },
   methods: {
+    close_datepicker() {
+      this.dueDateDialog = false;
+      this.tempDueDate = this.fromDate;
+    },
     convertArrayToRegularS3URLs(presignedURLs) {
       this.arrayurls = [];
 
@@ -432,14 +491,26 @@ export default {
     },
     async validate_data() {
       const { valid } = await this.$refs.form.validate();
-      if (valid) {
-        if (this.signimagesarrayurls.length != 0) {
-          this.regularS3URLsnew = this.convertArrayToRegularS3URLs(
-            this.signimagesarrayurls
-          );
-        }
-        this.add_mutation();
+
+      this.attachmentError = false;
+
+      if (!valid) return;
+
+      if (
+        this.billingDetail === "BILLABLE" &&
+        this.signimagesarrayurls.length === 0
+      ) {
+        this.attachmentError = true;
+        return;
       }
+
+      if (this.signimagesarrayurls.length !== 0) {
+        this.regularS3URLsnew = this.convertArrayToRegularS3URLs(
+          this.signimagesarrayurls
+        );
+      }
+
+      this.add_mutation();
     },
     displayPDFFileName(url) {
       if (url.endsWith(".jpg")) {
@@ -469,6 +540,7 @@ export default {
               action_type: "CREATE",
               task_completion_date: this.formatDateForAPI(this.fromDate),
               attachments_keys: this.regularS3URLsnew,
+              is_billabale: this.billingDetail,
             },
           })
         );
@@ -481,6 +553,7 @@ export default {
           this.$emit("successMsg", response.Message);
 
           this.$refs.form.reset();
+          this.tempDueDate = this.fromDate;
         } else {
           this.$emit("errorMsg", response.Message);
         }
@@ -497,6 +570,8 @@ export default {
     },
     close_dialog() {
       this.$emit("clicked", 0);
+      this.tempDueDate = this.fromDate;
+
       this.$refs.form.reset();
       this.$refs.form.resetValidation();
     },
@@ -505,12 +580,12 @@ export default {
       this.dueDateDialog = false;
     },
     formatDateForAPI(date) {
-      if (!date) return '';
+      if (!date) return "";
       const d = new Date(date);
       if (isNaN(d)) return date;
       const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
       return `${year}-${month}-${day}`;
     },
   },

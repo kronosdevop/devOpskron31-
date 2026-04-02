@@ -23,16 +23,29 @@
             <v-row no-gutters class="">
               <v-col cols="12">
                 <v-col cols="12">
-                  <v-select
-                    density="compact"
+                  <v-autocomplete
                     v-model="expensecategory"
                     label="Expense Category"
                     :items="expensecategoryitems"
-                    item-text="title"
+                    item-title="title"
                     item-value="value"
-                    :rules="[(v) => !!v || 'required ']"
                     variant="outlined"
-                  ></v-select>
+                    density="compact"
+                    :rules="[(v) => !!v || 'required ']"
+                    clearable
+                  />
+                </v-col>
+                <v-col cols="12" class="mt-n6">
+                  <v-text-field
+                    v-if="
+                      this.$store.getters.GetOrgDetails?.organization
+                        ?.is_expense_subcategory_enabled
+                    "
+                    density="compact"
+                    v-model="subCatName"
+                    label="Subcategory Name"
+                    variant="outlined"
+                  ></v-text-field>
                 </v-col>
                 <v-col cols="12" class="mt-n6">
                   <v-radio-group
@@ -46,40 +59,57 @@
                   </v-radio-group>
                 </v-col>
                 <v-col cols="12" v-if="toggle_exclusive == 'PROJECT'">
-                  <v-select
-                    density="compact"
+                  <v-autocomplete
                     v-model="Projects"
                     label="Project Name"
-                    class="mt-n4"
                     :items="ProjectsItems"
-                    item-text="title"
+                    item-title="title"
                     item-value="value"
+                    return-object
+                    variant="outlined"
+                    density="compact"
+                    clearable
                     :rules="
                       toggle_exclusive == 'PROJECT'
                         ? [(v) => !!v || 'required ']
                         : []
                     "
-                    variant="outlined"
-                    return-object
-                  ></v-select>
+                  />
                 </v-col>
                 <v-col cols="12" v-if="toggle_exclusive == 'GROUP'">
-                  <v-select
-                    density="compact"
+                  <v-autocomplete
                     v-model="expenseGroup"
                     label="Group Name"
-                    class="mt-n8"
                     :items="expenseGroupHead"
                     item-title="title"
                     item-value="value"
+                    return-object
+                    variant="outlined"
+                    density="compact"
+                    clearable
                     :rules="
                       toggle_exclusive == 'GROUP'
                         ? [(v) => !!v || 'required ']
                         : []
                     "
-                    variant="outlined"
+                  />
+                </v-col>
+                <v-col cols="12">
+                  <v-autocomplete
+                    v-model="Selectedvendor"
+                    label="Vendor"
+                    :items="vendorItems"
+                    item-title="supplier_name"
+                    item-value="suppliers_id"
                     return-object
-                  ></v-select>
+                    variant="outlined"
+                    density="compact"
+                    clearable
+                    v-if="
+                      this.$store.getters.GetOrgDetails?.organization
+                        ?.is_expense_vendor_enabled
+                    "
+                  />
                 </v-col>
                 <v-col cols="12">
                   <v-menu
@@ -195,7 +225,7 @@ import { get_expense_groups_users } from "@/mixins/GetExpenseGroups.js";
 // import { update_audit_logs } from "@/mixins/AuditLogActions.js";
 import { Storage, Auth } from "aws-amplify";
 import { uploadToS3 } from "@/mixins/S3PutStorageFile.js";
-
+import { get_all_org_suppliers } from "@/mixins/GetSuppliers.js";
 import { Buffer } from "buffer";
 export default {
   props: {
@@ -204,7 +234,8 @@ export default {
   mixins: [
     get_expense_groups_users,
     get_project_list,
-    // update_audit_logs
+    // update_audit_logs,
+    get_all_org_suppliers,
   ],
 
   data() {
@@ -236,6 +267,9 @@ export default {
       Projects: "",
       expenseGroup: "",
       documentFiles: null,
+      subCatName: "",
+      Selectedvendor: "",
+      vendorItems: [],
     };
   },
 
@@ -256,6 +290,9 @@ export default {
           await this.get_project_list();
           await this.get_expense_groups_users();
           this.fetch_all_groups();
+          await this.get_all_org_suppliers();
+          this.vendorItems = this.orgSupplier;
+          console.log("vendorItems", this.vendorItems);
         }
       },
       immediate: true,
@@ -402,6 +439,7 @@ export default {
       this.$refs.form.resetValidation();
       this.$refs.form.reset();
       this.urls = "";
+      this.billdate = "";
       this.uploadedFiles = [];
       this.$emit("clicked", 0);
     },
@@ -466,7 +504,7 @@ export default {
       await Auth.currentCredentials();
       const orgDetails = this.$store.getters.GetOrgDetails;
 
-      const userId = this.$store.getters.GetUserObj.user.user_id;
+      const userId = this.$store.getters.GetUserObj.user?.user_id;
 
       const key = [
         "workflow",
@@ -487,7 +525,8 @@ export default {
           this.documentFiles = null;
         }
       } catch (err) {
-        this.$emit("errorMsg", "Upload failed. Check console");
+        console.log("err", err)
+        this.$emit("errorMsg", err);
         // this.uploadStatus = "❌ Upload failed. Check console.";
         // this.uploadStatusType = "error";
         this.loading = false;
@@ -572,6 +611,9 @@ export default {
                 this.toggle_exclusive == "PROJECT"
                   ? this.Projects.title
                   : undefined,
+              vendor_name: this.Selectedvendor.supplier_name,
+              vendor_id: this.Selectedvendor.suppliers_id,
+              sub_category_text: this.subCatName,
             },
           })
         );
@@ -581,6 +623,7 @@ export default {
           // this.fetch_audit_message();
           this.$emit("successMsg", response.Message);
           this.$emit("myexpense", "refresh");
+          this.billdate = "";
           this.urls = "";
           this.uploadedFiles = [];
           this.$refs.form.reset();

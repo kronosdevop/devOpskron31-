@@ -12,19 +12,31 @@
         </div>
       </div>
       <v-spacer></v-spacer>
+      <v-select
+        v-model="selectedFilterPhase"
+        :items="filterPhaseItem"
+        variant="outlined"
+        density="compact"
+        label="Status"
+        v-show="allProjectDetails == 1"
+        style="max-width: 200px"
+        class="mt-6"
+      ></v-select>
       <v-btn
         v-show="allProjectDetails == 1"
         dark
         class="text-capitalize cardCss"
         @click="project_phases()"
         v-if="
-          projData.project_created_by ==
-            $store.getters.GetUserObj.user.user_email_id &&
+          (projData.project_created_by ==
+            $store.getters.GetUserObj.user?.user_email_id ||
+            isProjectAdmin) &&
           new Date() <= new Date(projData.project_end_date) &&
           projData.project_progress == 'LIVE'
         "
-        >Create Phases</v-btn
       >
+        Create Phases
+      </v-btn>
       <v-btn
         v-show="allProjectDetails == 2"
         dark
@@ -32,7 +44,7 @@
         @click="add_project_members()"
         v-if="
           projData.project_created_by ==
-          $store.getters.GetUserObj.user.user_email_id
+            $store.getters.GetUserObj.user?.user_email_id || isProjectAdmin
         "
         >Add</v-btn
       >
@@ -55,6 +67,7 @@
         <v-tab class="tab-btn">Status Report</v-tab>
         <v-tab class="tab-btn">TimeSheet</v-tab>
         <v-tab class="tab-btn">Cost</v-tab>
+        <v-tab class="tab-btn">Configuration</v-tab>
       </v-tabs>
       <v-spacer />
     </v-toolbar>
@@ -68,7 +81,10 @@
       </div>
       <div v-if="allProjectDetails == 1">
         <v-card flat :height="cardHeight" class="overflow-auto">
-          <ProjectPhases :key="projectPhases" />
+          <ProjectPhases
+            :key="projectPhases"
+            :selectedFilterPhase="selectedFilterPhase"
+          />
         </v-card>
       </div>
       <div v-if="allProjectDetails == 2">
@@ -89,6 +105,11 @@
       <div v-if="allProjectDetails == 5">
         <v-card flat :height="cardHeight" class="overflow-auto">
           <VendorExpensereport />
+        </v-card>
+      </div>
+      <div v-if="allProjectDetails == 6">
+        <v-card variant="flat" :height="cardHeight" class="overflow-auto">
+          <ProjectConfiguration />
         </v-card>
       </div>
     </v-card>
@@ -123,6 +144,7 @@ import AddMemberDialogue from "@/components/ProjectManagement/ProjectDialogues/A
 import SnackBar from "@/components/SnackBar.vue";
 import ProjectReports from "@/components/ProjectManagement/ProjectReports.vue";
 import ProjectTimeSheet from "@/components/ProjectManagement/ProjectTimeSheet.vue";
+import ProjectConfiguration from "./ProjectConfiguration.vue";
 export default {
   components: {
     ProjectInfo,
@@ -134,6 +156,7 @@ export default {
     ProjectReports,
     ProjectTimeSheet,
     VendorExpensereport,
+    ProjectConfiguration,
   },
   data() {
     return {
@@ -146,12 +169,30 @@ export default {
       addProjectMemberDialogue: false,
       projectMembers: 0,
       cardHeight: 0,
+      selectedFilterPhase: "ALL",
+      filterPhaseItem: [
+        { title: "All", value: "ALL" },
+        { title: "Completed", value: "COMPLETED" },
+        { title: "Inprogress", value: "INPROGRESS" },
+      ],
     };
   },
   created() {
     var Projecctdetails = JSON.parse(localStorage.getItem("projectInfo"));
     this.projData = Projecctdetails;
+    console.log("projData", this.projData);
     this.cardHeight = window.innerHeight - 125;
+  },
+  computed: {
+    isProjectAdmin() {
+      const userEmail = this.$store.getters.GetUserObj.user?.user_email_id;
+
+      if (!this.projData.project_visible_members) return false;
+
+      return this.projData.project_visible_members.some(
+        (member) => member.email === userEmail && member.role === "Admin",
+      );
+    },
   },
   methods: {
     back_call() {

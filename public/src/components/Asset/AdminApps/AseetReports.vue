@@ -1,10 +1,6 @@
 <template>
   <div>
-    <v-overlay v-model="loading" class="align-center justify-center">
-      <v-progress-circular color="primary" size="44" indeterminate>
-      </v-progress-circular>
-      <span class="ml-4">Loading...</span>
-    </v-overlay>
+  <OverlayComp :overlay="overlay"/>
     <v-card flat >
       <v-card-text>
         <v-row no-gutters>
@@ -51,12 +47,19 @@
               :headers="adminassetHeaders"
               :fixed-header="fixed"
               :items="adminassetRecords"
-              :loading="tableLoading"
+              :loading="loading"
               hide-default-footer
               :items-per-page="20"
               density="compact"
               class="elevation-1 dtwidth"
             >
+            <template v-slot:loading>
+                 <div class="text-center">
+                    <v-progress-circular indeterminate color="primary" size="32" class="mt-6" />
+                    <div class="text-subtitle-2 mt-4 text-grey">Loading Asset Reports</div>
+                  </div>
+
+            </template>
               <template v-slot:[`item.sub_category_id_text`]="{ item }">
                 <span>{{
                   item.sub_category_id_text == null ||
@@ -110,13 +113,18 @@ import SnackBar from "@/components/SnackBar.vue";
 import { asset_dashboard_reports } from "@/graphql/queries.js";
 import { API, graphqlOperation } from "aws-amplify";
 import { GChart } from "vue-google-charts";
+import OverlayComp from "@/components/OverlayComp.vue";
+
 export default {
   components: {
     GChart,
     SnackBar,
+    OverlayComp,
+
   },
   data() {
     return {
+            overlay: false,
       chartData1: [["labels", "Data"]],
       chartData2: [["labels", "Data"]],
       chartData3: [["labels", "Data"]],
@@ -188,6 +196,7 @@ export default {
           sortable: false,
         },
       ],
+      
     };
   },
   async mounted() {
@@ -201,6 +210,7 @@ export default {
     },
     async get_asset_graph() {
       this.loading = true;
+      this.overlay = true;
       try {
         let result = await API.graphql(
           graphqlOperation(asset_dashboard_reports, {
@@ -212,7 +222,7 @@ export default {
 
         var response = JSON.parse(result.data.asset_dashboard_reports).data;
         // console.log(response);
-        this.loading = false;
+      this.overlay = false;
         this.graphdata = response.asset_details;
         this.adminassetRecords = response.recently_added_assets;
 
@@ -236,7 +246,7 @@ export default {
 
         // console.log(this.chartData1);
       } catch (error) {
-        this.loading = false;
+      this.overlay = false;
         console.log(error);
         this.SnackBarComponent = {
           SnackbarVmodel: true,
@@ -245,6 +255,9 @@ export default {
           timeout: 5000,
           Top: true,
         };
+      }
+      finally{
+        this.loading = false;
       }
     },
   },

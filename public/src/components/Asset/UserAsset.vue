@@ -131,14 +131,14 @@
               </div>
             </template>
 
-            <template v-slot:[`item.last_assigned_to`]="{ item }">
+            <template v-slot:[`item.last_assigned_to_name`]="{ item }">
               <span class="caption">
                 {{
-                  item.last_assigned_to == null ||
-                  item.last_assigned_to == undefined ||
-                  item.last_assigned_to == ""
+                  item.last_assigned_to_name == null ||
+                  item.last_assigned_to_name == undefined ||
+                  item.last_assigned_to_name == ""
                     ? "N/A"
-                    : item.last_assigned_to
+                    : item.last_assigned_to_name
                 }}
               </span>
             </template>
@@ -314,7 +314,7 @@ export default {
         },
         {
           title: "Last Assigned To",
-          key: "last_assigned_to",
+          key: "last_assigned_to_name",
           sortable: false,
         },
         { title: "Location", key: "asset_location", sortable: false },
@@ -378,7 +378,7 @@ export default {
       asset.sub_category_id_text,
       asset.asset_location,
       asset.asset_product_serial_no,
-      asset.last_assigned_to,
+      asset.last_assigned_to_name,
       asset.asset_value,
     ]
       .filter(Boolean)

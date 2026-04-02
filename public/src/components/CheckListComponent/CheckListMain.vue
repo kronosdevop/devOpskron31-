@@ -7,7 +7,7 @@
       @clicked="DialogCreateExternalTicketEmit"
     />
     <!-- App Bar -->
-    <v-app-bar class="modern-header-section">
+    <v-app-bar class="modern-header-section" elevation="0">
       <div class="header-left">
         <div class="header-icon-container">
           <div class="header-icon-bg">
@@ -44,7 +44,7 @@
         <v-btn
           v-if="adminToggle == 'apps'"
           @click="Add_Checklist()"
-          class="action-btn"
+          class="action-btn mr-3"
           size="small"
         >
           <v-icon>mdi-plus</v-icon>

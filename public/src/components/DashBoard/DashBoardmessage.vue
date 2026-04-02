@@ -14,7 +14,7 @@
                   $store.getters.GetdashboardDetails.dashboard_type == 'CUSTOM'
                 ? 12
                 : $store.getters.GetdashboardDetails.dashboard_created_by ==
-                  $store.getters.GetUserObj.user.user_email_id
+                  $store.getters.GetUserObj.user?.user_email_id
                 ? 6
                 : 12
             "
@@ -66,7 +66,7 @@
                 'DASHBOARD' &&
               $store.getters.GetdashboardDetails.dashboard_type == 'CUSTOM' &&
               $store.getters.GetdashboardDetails.dashboard_created_by ==
-                $store.getters.GetUserObj.user.user_email_id
+                $store.getters.GetUserObj.user?.user_email_id
             "
             cols="6"
           >

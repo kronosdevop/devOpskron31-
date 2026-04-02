@@ -163,7 +163,7 @@ export default {
       memberType: "",
       countryitems: [],
       projectMembers: [],
-      roleItems: ["Member", "Observer"],
+      roleItems: ["Member", "Observer", "Admin"],
       contactNumber: "",
       countrycode: "+91",
       externalEmail: "",

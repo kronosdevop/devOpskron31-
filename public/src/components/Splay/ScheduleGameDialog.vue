@@ -22,12 +22,20 @@
 
         <!--Content-->
         <div class="pa-4">
-          <div class="d-flex justify-center font-weight-bold">
-            You are about to schedule a game for category -
-            {{ StoreObj.splay_category_name }} 🚨
-          </div>
+          <!--Repo-->
+          <div class="text-start font-weight-bold">Choose a repository 📄</div>
+          <v-radio-group
+            v-model="repo"
+            inline
+            density="compact"
+            :mandatory="false"
+          >
+            <v-radio label="Custom" value="CUSTOM" class="mt-3" />
+            <v-radio label="Default" value="DEFAULT" class="mt-3 ml-3" />
+          </v-radio-group>
+
           <!--Date Picker and Time Picker-->
-          <v-row class="mt-3">
+          <v-row>
             <!--Switch-->
             <v-col cols="12" class="mt-n10">
               <div class="d-flex align-center">
@@ -38,13 +46,66 @@
                   v-model="recurring"
                   color="primary"
                   class="mt-6 ml-4"
-                  :label="recurring ? 'No' : 'Yes'"
+                  :label="recurring ? 'Yes' : 'No'"
                 />
               </div>
             </v-col>
 
+            <!--Game Category-->
+            <v-col cols="6" class="mt-n8">
+              <div class="font-weight-bold">
+                Game Category<span class="text-error ml-2">*</span>
+              </div>
+              <v-select
+                v-model="category"
+                variant="outlined"
+                rounded="lg"
+                density="compact"
+                class="mt-2"
+                width="200"
+                :loading="loading"
+                :items="categories"
+                :rules="[(v) => !!v || 'Required']"
+              >
+              </v-select>
+            </v-col>
+
+            <!--No. Of Questions-->
+            <v-col cols="6" class="mt-n8">
+              <div class="font-weight-bold">
+                Question Count<span class="text-error ml-2">*</span>
+              </div>
+              <v-select
+                v-model="qcount"
+                variant="outlined"
+                rounded="lg"
+                density="compact"
+                class="mt-2"
+                width="200"
+                :items="QcountItems"
+                :rules="[(v = !!v || 'Required')]"
+              />
+            </v-col>
+
+            <!--Leaderboard Count-->
+            <v-col cols="12" class="mt-n8">
+              <div class="font-weight-bold">
+                Leaderboard Count<span class="text-error ml-2">*</span>
+              </div>
+              <v-select
+                v-model="count"
+                variant="outlined"
+                rounded="lg"
+                density="compact"
+                class="mt-2"
+                width="432"
+                :items="CountItems"
+                :rules="[(v = !!v || 'Required')]"
+              />
+            </v-col>
+
             <!--Date-->
-            <v-col cols="6" class="mt-n10">
+            <v-col cols="6" class="mt-n8">
               <div class="font-weight-bold">
                 Date<span class="text-error ml-2">*</span>
               </div>
@@ -81,7 +142,7 @@
             </v-col>
 
             <!--Time-->
-            <v-col cols="6" class="mt-n10">
+            <v-col cols="6" class="mt-n8">
               <div class="font-weight-bold">
                 Time<span class="text-error ml-2">*</span>
               </div>
@@ -115,22 +176,6 @@
                   </template>
                 </v-time-picker>
               </v-menu>
-            </v-col>
-
-            <!--Leaderboard Count-->
-            <v-col cols="12" class="mt-n5">
-              <div class="font-weight-bold">
-                Leaderboard Count<span class="text-error ml-2">*</span>
-              </div>
-              <v-select
-                v-model="count"
-                variant="outlined"
-                rounded="lg"
-                density="compact"
-                class="mt-2"
-                :items="CountItems"
-                :rules="[(v = !!v || 'Required')]"
-              />
             </v-col>
 
             <!--Frequency-->
@@ -175,10 +220,10 @@
               color="primary"
               rounded="lg"
               size="small"
-              :loading="loading"
+              :loading="gameLoader"
               @click="ScheduleGame"
             >
-              Update
+              Schedule
               <template #loader>
                 <v-progress-circular indeterminate color="white" />
               </template>
@@ -193,28 +238,39 @@
 <script>
 import { schedule_game } from "@/graphql/mutations";
 import { API, graphqlOperation } from "aws-amplify";
+import { GetAllCategories } from "@/mixins/GetAllCategories";
+import { VTimePicker } from "vuetify/components";
 
 import SnackBar from "../SnackBar.vue";
 
 export default {
   props: { DialogScheduleGame: Boolean, StoreObj: Object },
 
-  components: { SnackBar },
+  mixins: [GetAllCategories],
+
+  components: { SnackBar, VTimePicker },
 
   data: () => ({
     frequency: "WEEKLY",
     days: "MONDAY",
-    count: "3",
+    count: "10",
+    repo: "DEFAULT",
+    qcount: "7",
+    category: "",
+
+    resolvedCategories: [],
 
     dateMenu: false,
     timeMenu: false,
     loading: false,
+    gameLoader: false,
     recurring: false,
 
     selectedDate: new Date(),
     selectedTime: new Date().toTimeString().slice(0, 5),
 
     SnackBarComponent: {},
+    signedImageMap: {},
 
     FrequencyItems: [
       { title: "Weekly", value: "WEEKLY" },
@@ -238,9 +294,35 @@ export default {
       { title: "25", value: "25" },
       { title: "50", value: "50" },
       { title: "100", value: "100" },
-
+    ],
+    QcountItems: [
+      { title: "5", value: "5" },
+      { title: "7", value: "7" },
+      { title: "10", value: "10" },
+      { title: "25", value: "25" },
     ],
   }),
+
+  watch: {
+    DialogScheduleGame(val) {
+      if (!val) {
+        this.category = "";
+        this.qcount = "7";
+        this.count = "10";
+        this.repo = "DEFAULT";
+        this.recurring = false;
+      }
+    },
+    repo(val) {
+      if (val) {
+        return this.GetAllCategoriesMethod();
+      }
+    },
+  },
+
+  async mounted() {
+    await this.GetAllCategoriesMethod();
+  },
 
   computed: {
     formattedDate() {
@@ -269,22 +351,45 @@ export default {
       ).padStart(2, "0")}`;
       return timeStr;
     },
+    categories() {
+      if (this.repo === "CUSTOM") {
+        return this.ListCustomCategories.map((item) => ({
+          title: item.splay_category_name,
+          value: item.splay_category_id,
+          image: item.splay_category_image,
+        }));
+      } else {
+        return this.ListDefaultCategories.map((item) => ({
+          title: item.splay_category_name,
+          value: item.splay_category_id,
+          image: item.splay_category_image,
+        }));
+      }
+    },
   },
 
   methods: {
     async ScheduleGame() {
-      this.loading = true;
+      this.gameLoader = true;
       try {
-        const input = {
-          splay_category_id: this.StoreObj.splay_category_id,
-          game_scheduled_time: this.gameScheduledEpoch,
-          leaderboard_count: parseInt(this.count),
-        };
+        let input = {};
         if (this.recurring) {
-          input.reccuring_game = true;
-          input.reccuring_schedule = this.frequency;
-          input.reccuring_day = this.days;
-          input.reccuring_schedule_time = this.recurringScheduleTime;
+          input = {
+            splay_category_id: this.category,
+            reccuring_game: true,
+            reccuring_schedule: this.frequency,
+            reccuring_day: this.days || "MONDAY",
+            reccuring_schedule_time: this.recurringScheduleTime,
+            leaderboard_count: parseInt(this.count) || 10,
+            question_count: parseInt(this.qcount),
+          };
+        } else {
+          input = {
+            splay_category_id: this.category,
+            game_scheduled_time: this.gameScheduledEpoch,
+            leaderboard_count: parseInt(this.count) || 10,
+            question_count: parseInt(this.qcount),
+          };
         }
         const result = await API.graphql(
           graphqlOperation(schedule_game, { input }),
@@ -311,18 +416,8 @@ export default {
           SnackbarText: "Failed to schedule game, try again",
         };
       } finally {
-        this.loading = false;
+        this.gameLoader = false;
       }
-    },
-    DialogScheduleGameEmit(Toggle) {
-      this.$emit("clicked", Toggle);
-    },
-    formatDate(selectedDate) {
-      const date = new Date(selectedDate);
-      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-        2,
-        "0",
-      )}-${String(date.getDate()).padStart(2, "0")}`;
     },
     allowedDatesByDay(date) {
       if (!this.recurring) return true;
@@ -338,6 +433,16 @@ export default {
       const selectedDayNumber = dayMap[this.days];
       const dateObj = new Date(date);
       return dateObj.getDay() === selectedDayNumber;
+    },
+    DialogScheduleGameEmit(Toggle) {
+      this.$emit("clicked", Toggle);
+    },
+    formatDate(selectedDate) {
+      const date = new Date(selectedDate);
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+        2,
+        "0",
+      )}-${String(date.getDate()).padStart(2, "0")}`;
     },
   },
 };

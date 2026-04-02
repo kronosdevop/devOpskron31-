@@ -121,7 +121,7 @@
                   <v-avatar size="24" class="mr-2 modern-comment-avatar"><v-icon>mdi-account</v-icon></v-avatar>
                   <div class="flex-grow-1">
                     <div class="modern-comment-meta mb-1">
-                      <span class="modern-comment-author">{{ item.commented_by }}</span>
+                      <span class="modern-comment-author">{{ item.commented_by_name }}</span>
                       <span class="modern-comment-date ml-2">({{ fetch_date(item.commented_on) }})</span>
                     </div>
                     <div class="modern-comment-text">{{ item.comment_texts }}</div>

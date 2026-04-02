@@ -181,7 +181,14 @@
                     title="View Purchase Order"
                   />
                   <v-list-item
-                    v-if="item.order_status != 'CONVERTED'"
+                    v-if="
+                      item.order_status != 'CONVERTED' &&
+                      (item.created_by ===
+                        $store.getters.GetUserObj.user?.user_name ||
+                        ['ADMIN', 'OWNER'].includes(
+                          $store.getters.GetUserObj.user?.user_type
+                        ))
+                    "
                     @click="editOrder(item)"
                     prepend-icon="mdi-pencil"
                     title="Edit Purchase Order"
@@ -342,7 +349,7 @@ export default {
       previewEntityData: {},
       showAddPurchaseDialog: false,
       selectedPurchaseOrderForInvoice: {},
-        generalSettings: {
+      generalSettings: {
         billing_currency: " ", // Default currency
       },
       purchaseOrderSuccessConfig: {
@@ -353,12 +360,13 @@ export default {
         detailsTitle: "Purchase Order Details",
         detailsIcon: "mdi-file-document-multiple",
         viewButtonText: "View Purchase Order",
-        successMessage: "You can now view, edit, or process this purchase order.",
+        successMessage:
+          "You can now view, edit, or process this purchase order.",
         statusField: "order_status",
         statusFallbackField: "payment_status",
         theme: "default",
         partyLabel: "Supplier",
-        partyField: "supplier_name"
+        partyField: "supplier_name",
       },
       headers: [
         {
@@ -556,7 +564,7 @@ export default {
         Top: true,
       };
       this.loadPurchaseOrders();
-      
+
       // Store the purchase order data and show success dialog
       if (data) {
         this.successPurchaseOrderData = data;

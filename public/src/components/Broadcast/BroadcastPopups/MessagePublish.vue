@@ -273,7 +273,7 @@ export default {
           "/" +
           deatils.organization.organization_id +
           "/" +
-          self.$store.getters.GetUserObj.user.user_id +
+          self.$store.getters.GetUserObj.user?.user_id +
           "/" +
           Date.now() +
           "/" +

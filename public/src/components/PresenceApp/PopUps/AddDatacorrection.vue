@@ -159,7 +159,8 @@ import {
   all_users_of_organization,
 } from "@/graphql/queries";
 import { get_location_details } from "@/mixins/GetLocations";
-import { VTimePicker } from "vuetify/labs/VTimePicker";
+import { VTimePicker } from 'vuetify/components'
+
 
 export default {
   components: {
@@ -204,10 +205,10 @@ export default {
         if (val) {
           this.resetForm();
           this.selectedDate = this.get_orgdate(
-            this.$store.getters.GetUserObj.organization.organization_created_on
+            this.$store.getters.GetUserObj.organization.organization_created_on,
           );
           this.minmonth = moment(this.selectedDate, "MM/DD/YYYY").format(
-            "YYYY-MM-DD"
+            "YYYY-MM-DD",
           );
 
           this.$store.commit("Setnamesearch", "");
@@ -263,13 +264,13 @@ export default {
         const result = await API.graphql(
           graphqlOperation(all_users_of_organization, {
             input: { organization_id: orgId, name_search: this.search || "" },
-          })
+          }),
         );
         const users =
           JSON.parse(result.data.all_users_of_organization)?.data || [];
         this.types_item = users
           .filter(
-            (u) => u.user_status === "ACTIVE" && u.user_type !== "CHATBOT"
+            (u) => u.user_status === "ACTIVE" && u.user_type !== "CHATBOT",
           )
           .map((u) => ({ title: u.full_user_name, value: u.user_id }));
       } catch (err) {
@@ -288,10 +289,10 @@ export default {
         const result = await API.graphql(
           graphqlOperation(datacorrection_comments_list_edit, {
             input: { organization_id: orgId, action_type: "LIST" },
-          })
+          }),
         );
         this.CommentsItems = JSON.parse(
-          result.data.datacorrection_comments_list_edit
+          result.data.datacorrection_comments_list_edit,
         ).data.datacorrection_comments;
       } catch (err) {
         console.error("Comments fetch error", err);
@@ -328,8 +329,8 @@ export default {
           dateString.split("-")[1] - 1,
           dateString.split("-")[2],
           timeString.split(":")[0],
-          timeString.split(":")[1]
-        ).getTime() / 1000
+          timeString.split(":")[1],
+        ).getTime() / 1000,
       );
 
       try {
@@ -343,10 +344,10 @@ export default {
               datacorrection_swiped_time: new_time,
               datacorrected_comments: this.Datacomments,
             },
-          })
+          }),
         );
         var response = JSON.parse(
-          result.data.data_correction_swipes_from_admins
+          result.data.data_correction_swipes_from_admins,
         );
         this.loading = false;
         if (response.Status == "SUCCESS") {
@@ -392,7 +393,7 @@ export default {
       if (selectedHour === currentHour) {
         return Array.from(
           { length: 60 - now.getMinutes() - 1 },
-          (_, i) => now.getMinutes() + 1 + i
+          (_, i) => now.getMinutes() + 1 + i,
         );
       }
 
@@ -407,13 +408,13 @@ export default {
 
       return Array.from(
         { length: 24 - currentHour - 1 },
-        (_, i) => currentHour + 1 + i
+        (_, i) => currentHour + 1 + i,
       );
     },
     getCurrentTime() {
       const now = new Date();
       return `${String(now.getHours()).padStart(2, "0")}:${String(
-        now.getMinutes()
+        now.getMinutes(),
       ).padStart(2, "0")}`;
     },
     formatDate(date) {

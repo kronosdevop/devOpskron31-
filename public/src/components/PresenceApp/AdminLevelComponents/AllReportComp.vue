@@ -15,43 +15,28 @@
       <v-spacer />
       <div class="header-actions">
         <!-- Filter Button for Monthly, Yearly, and ESA Reports -->
-        <v-btn
-          v-if="
-            toggle_exclusive === 'monthlyReport' ||
-            toggle_exclusive === 'yearlyReport' ||
-            toggle_exclusive === 'esaReport'
-          "
-          :class="
-            activeFiltersCount > 0
+        <v-btn v-if="
+          toggle_exclusive === 'monthlyReport' ||
+          toggle_exclusive === 'yearlyReport' ||
+          toggle_exclusive === 'esaReport' ||
+          toggle_exclusive === 'proofofwork'
+        " :class="activeFiltersCount > 0
               ? 'action-btn filter-btn active'
               : 'action-btn filter-btn'
-          "
-          @click="showFilterDrawer = true"
-          size="small"
-        >
+            " @click="showFilterDrawer = true" size="small">
           <v-icon>mdi-filter-variant</v-icon>
           <span>Filter</span>
-          <v-badge
-            v-if="activeFiltersCount > 0"
-            :content="activeFiltersCount"
-            color="white"
-            class="ml-2"
-          />
+          <v-badge v-if="activeFiltersCount > 0" :content="activeFiltersCount" color="white" class="ml-2" />
         </v-btn>
 
         <!-- Generate Report Button for ESA Reports -->
-        <v-btn
-          v-if="toggle_exclusive === 'esaReport'"
-          @click="generateESAReport()"
-          :loading="esaReportLoading"
-          size="small"
-          class="action-btn generate-btn ml-2"
-        >
+        <v-btn v-if="toggle_exclusive === 'esaReport'" @click="generateESAReport()" :loading="esaReportLoading"
+          size="small" class="action-btn generate-btn ml-2">
           <v-icon>mdi-file-excel</v-icon>
           <span>Generate Report</span>
         </v-btn>
 
-        <v-btn class="action-btn back-btn" @click="back_action()">
+        <v-btn class="action-btn back-btn mr-4" @click="back_action()">
           <v-icon>mdi-arrow-left</v-icon>
           <span>Back</span>
         </v-btn>
@@ -65,20 +50,15 @@
           <v-tab value="yearlyReport" class="tab-btn"> Yearly </v-tab>
           <v-tab value="exportReport" class="tab-btn"> Export </v-tab>
           <v-tab value="esaReport" class="tab-btn"> ESA </v-tab>
-        </v-tabs>
+          <v-tab value="proofofwork" class="tab-btn">
+            Proof of Work
+          </v-tab> </v-tabs>
       </template>
     </v-toolbar>
 
     <!-- Filter Navigation Drawer -->
-    <v-navigation-drawer
-      :model-value="showFilterDrawer"
-      @update:model-value="showFilterDrawer = $event"
-      location="right"
-      temporary
-      width="400"
-      class="pa-0 filter-drawer"
-      style="z-index: 1000; margin-top: 64px"
-    >
+    <v-navigation-drawer :model-value="showFilterDrawer" @update:model-value="showFilterDrawer = $event"
+      location="right" temporary width="400" class="pa-0 filter-drawer" style="z-index: 1000; margin-top: 64px">
       <v-card flat>
         <v-toolbar elevation="1" density="compact" class="navBar">
           <v-toolbar-title class="text--white ml-2">
@@ -91,28 +71,13 @@
           <v-form ref="filterForm">
             <div class="filter-content">
               <!-- Month Picker (for Monthly Reports) -->
-              <div
-                v-if="toggle_exclusive === 'monthlyReport'"
-                class="filter-group"
-              >
+              <div v-if="toggle_exclusive === 'monthlyReport'" class="filter-group">
                 <label class="filter-label">Select Month</label>
-                <v-text-field
-                  v-model="datedisplay"
-                  label="Select a Month"
-                  readonly
-                  density="compact"
-                  variant="outlined"
-                  @click="monthPicker = true"
-                  class="filter-select cursor-pointer"
-                ></v-text-field>
+                <v-text-field v-model="datedisplay" label="Select a Month" readonly density="compact" variant="outlined"
+                  @click="monthPicker = true" class="filter-select cursor-pointer"></v-text-field>
 
                 <!-- Month Picker Dialog -->
-                <v-dialog
-                  v-model="monthPicker"
-                  max-width="350"
-                  persistent
-                  content-class="month-picker-dialog"
-                >
+                <v-dialog v-model="monthPicker" max-width="350" persistent content-class="month-picker-dialog">
                   <v-card>
                     <v-card-text class="pa-4">
                       <v-row>
@@ -122,50 +87,23 @@
                           </span>
                         </v-col>
                         <v-col>
-                          <v-select
-                            label="Select Year"
-                            v-model="yearfilter"
-                            :items="itemyears"
-                            density="compact"
-                            variant="outlined"
-                            style="max-width: 100px"
-                          ></v-select>
+                          <v-select label="Select Year" v-model="yearfilter" :items="itemyears" density="compact"
+                            variant="outlined" style="max-width: 100px"></v-select>
                         </v-col>
                       </v-row>
                       <v-row class="ml-n2" dense>
-                        <v-col
-                          v-for="(month, index) in monthNames"
-                          :key="index"
-                          cols="4"
-                          class="d-flex justify-center"
-                        >
-                          <v-btn
-                            class="ma-1"
-                            :class="{ 'active-btn': month === monthfilter }"
-                            density="compact"
-                            :disabled="isMonthDisabled(index)"
-                            @click="selectMonth(month)"
-                          >
+                        <v-col v-for="(month, index) in monthNames" :key="index" cols="4" class="d-flex justify-center">
+                          <v-btn class="ma-1" :class="{ 'active-btn': month === monthfilter }" density="compact"
+                            :disabled="isMonthDisabled(index)" @click="selectMonth(month)">
                             {{ month }}
                           </v-btn>
                         </v-col>
                       </v-row>
                       <v-row class="mt-4 justify-end">
-                        <v-btn
-                          variant="text"
-                          class="ma-1"
-                          color="#DB4C77"
-                          density="compact"
-                          @click="closedialog()"
-                        >
+                        <v-btn variant="text" class="ma-1" color="#DB4C77" density="compact" @click="closedialog()">
                           Cancel
                         </v-btn>
-                        <v-btn
-                          color="#DB4C77"
-                          variant="text"
-                          density="compact"
-                          @click="saveSelection"
-                        >
+                        <v-btn color="#DB4C77" variant="text" density="compact" @click="saveSelection">
                           Save
                         </v-btn>
                       </v-row>
@@ -175,41 +113,20 @@
               </div>
 
               <!-- Year Selection (for Yearly Reports) -->
-              <div
-                v-if="toggle_exclusive === 'yearlyReport'"
-                class="filter-group"
-              >
+              <div v-if="toggle_exclusive === 'yearlyReport'" class="filter-group">
                 <label class="filter-label">Select Year</label>
-                <v-select
-                  v-model="yearlyYearFilter"
-                  label="Select Year"
-                  density="compact"
-                  variant="outlined"
-                  :items="itemyears"
-                  class="filter-select"
-                ></v-select>
+                <v-select v-model="yearlyYearFilter" label="Select Year" density="compact" variant="outlined"
+                  :items="itemyears" class="filter-select"></v-select>
               </div>
 
               <!-- Month Selection (for ESA Reports) -->
               <div v-if="toggle_exclusive === 'esaReport'" class="filter-group">
                 <label class="filter-label">Select Month</label>
-                <v-text-field
-                  v-model="esaDateDisplay"
-                  label="Select a Month"
-                  readonly
-                  density="compact"
-                  variant="outlined"
-                  @click="esaMonthPicker = true"
-                  class="filter-select cursor-pointer"
-                ></v-text-field>
+                <v-text-field v-model="esaDateDisplay" label="Select a Month" readonly density="compact"
+                  variant="outlined" @click="esaMonthPicker = true" class="filter-select cursor-pointer"></v-text-field>
 
                 <!-- ESA Month Picker Dialog -->
-                <v-dialog
-                  v-model="esaMonthPicker"
-                  max-width="350"
-                  persistent
-                  content-class="month-picker-dialog"
-                >
+                <v-dialog v-model="esaMonthPicker" max-width="350" persistent content-class="month-picker-dialog">
                   <v-card>
                     <v-card-text class="pa-4">
                       <v-row>
@@ -219,50 +136,23 @@
                           </span>
                         </v-col>
                         <v-col>
-                          <v-select
-                            label="Select Year"
-                            v-model="esaYearFilter"
-                            :items="itemyears"
-                            density="compact"
-                            variant="outlined"
-                            style="max-width: 100px"
-                          ></v-select>
+                          <v-select label="Select Year" v-model="esaYearFilter" :items="itemyears" density="compact"
+                            variant="outlined" style="max-width: 100px"></v-select>
                         </v-col>
                       </v-row>
                       <v-row class="ml-n2" dense>
-                        <v-col
-                          v-for="(month, index) in monthNames"
-                          :key="index"
-                          cols="4"
-                          class="d-flex justify-center"
-                        >
-                          <v-btn
-                            class="ma-1"
-                            :class="{ 'active-btn': month === esaMonthFilter }"
-                            density="compact"
-                            :disabled="isESAMonthDisabled(index)"
-                            @click="selectESAMonth(month)"
-                          >
+                        <v-col v-for="(month, index) in monthNames" :key="index" cols="4" class="d-flex justify-center">
+                          <v-btn class="ma-1" :class="{ 'active-btn': month === esaMonthFilter }" density="compact"
+                            :disabled="isESAMonthDisabled(index)" @click="selectESAMonth(month)">
                             {{ month }}
                           </v-btn>
                         </v-col>
                       </v-row>
                       <v-row class="mt-4 justify-end">
-                        <v-btn
-                          variant="text"
-                          class="ma-1"
-                          color="#DB4C77"
-                          density="compact"
-                          @click="closeESADialog()"
-                        >
+                        <v-btn variant="text" class="ma-1" color="#DB4C77" density="compact" @click="closeESADialog()">
                           Cancel
                         </v-btn>
-                        <v-btn
-                          color="#DB4C77"
-                          variant="text"
-                          density="compact"
-                          @click="saveESASelection"
-                        >
+                        <v-btn color="#DB4C77" variant="text" density="compact" @click="saveESASelection">
                           Save
                         </v-btn>
                       </v-row>
@@ -274,41 +164,21 @@
               <!-- User Selection -->
               <div class="filter-group">
                 <label class="filter-label">Search User</label>
-                <v-autocomplete
-                  v-model="userselect"
-                  label="Search User"
-                  density="compact"
-                  variant="outlined"
-                  item-text="title"
-                  item-value="user_id"
-                  :items="userArray"
-                  hide-no-data
-                  placeholder="Min 3 Character"
-                  hide-selected
-                  class="filter-select"
-                >
+                <v-autocomplete v-model="userselect" label="Search User" density="compact" variant="outlined"
+                  item-text="title" item-value="user_id" :items="userArray" hide-no-data placeholder="Min 3 Character"
+                  hide-selected class="filter-select">
                 </v-autocomplete>
               </div>
             </div>
           </v-form>
         </v-card-text>
         <v-card-actions class="justify-space-between">
-          <v-btn
-            variant="outlined"
-            size="small"
-            @click="clearFilters"
-            class="text-capitalize"
-          >
+          <v-btn variant="outlined" size="small" @click="clearFilters" class="text-capitalize">
             <v-icon class="mr-2">mdi-close</v-icon>
             Clear All
           </v-btn>
-          <v-btn
-            dark
-            size="small"
-            @click="applyFilterFromDrawer"
-            :loading="goLoading"
-            class="text-capitalize cardCss text-white"
-          >
+          <v-btn dark size="small" @click="applyFilterFromDrawer" :loading="goLoading"
+            class="text-capitalize cardCss text-white">
             <v-icon class="mr-2">mdi-filter</v-icon>
             Apply Filter
           </v-btn>
@@ -318,56 +188,34 @@
 
     <div class="text-left" v-if="toggle_exclusive === 'monthlyReport'">
       <v-card flat class="overflow-auto" :style="{ backgroundColor: 'white' }">
-        <MonthlyReport
-          ref="monthlyReportRef"
-          :selectedYear="yearfilter"
-          :selectedMonth="monthfilter"
-          :selectedUser="userselect"
-          @filter-applied="handleFilterApplied"
-        />
+        <MonthlyReport ref="monthlyReportRef" :selectedYear="yearfilter" :selectedMonth="monthfilter"
+          :selectedUser="userselect" @filter-applied="handleFilterApplied" />
       </v-card>
     </div>
 
     <div class="text-left" v-if="toggle_exclusive === 'exportReport'">
-      <v-card
-        flat
-        :height="cardHeight"
-        class="overflow-auto"
-        :style="{ backgroundColor: 'white' }"
-      >
+      <v-card flat :height="cardHeight" class="overflow-auto" :style="{ backgroundColor: 'white' }">
         <ExportReport />
       </v-card>
     </div>
 
     <div class="text-left" v-if="toggle_exclusive === 'esaReport'">
-      <v-card
-        flat
-        :height="cardHeight"
-        class="overflow-auto"
-        :style="{ backgroundColor: 'white' }"
-      >
-        <ESAReports
-          ref="esaReportRef"
-          :selectedYear="esaYearFilter"
-          :selectedMonth="esaMonthFilter"
-          @filter-applied="handleFilterApplied"
-        />
+      <v-card flat :height="cardHeight" class="overflow-auto" :style="{ backgroundColor: 'white' }">
+        <ESAReports ref="esaReportRef" :selectedYear="esaYearFilter" :selectedMonth="esaMonthFilter"
+          @filter-applied="handleFilterApplied" />
       </v-card>
     </div>
 
     <div class="text-left" v-if="toggle_exclusive === 'yearlyReport'">
-      <v-card
-        flat
-        :height="cardHeight"
-        class="overflow-auto"
-        :style="{ backgroundColor: 'white' }"
-      >
-        <YearlyReport
-          ref="yearlyReportRef"
-          :selectedYear="yearlyYearFilter"
-          :selectedUser="userselect"
-          @filter-applied="handleFilterApplied"
-        />
+      <v-card flat :height="cardHeight" class="overflow-auto" :style="{ backgroundColor: 'white' }">
+        <YearlyReport ref="yearlyReportRef" :selectedYear="yearlyYearFilter" :selectedUser="userselect"
+          @filter-applied="handleFilterApplied" />
+      </v-card>
+    </div>
+
+    <div class="text-left" v-if="toggle_exclusive === 'proofofwork'">
+      <v-card flat :height="cardHeight" class="overflow-auto" :style="{ backgroundColor: 'white' }">
+        <PowReport />
       </v-card>
     </div>
   </div>
@@ -378,6 +226,8 @@ import MonthlyReport from "@/components/PresenceApp/AdminLevelComponents/Monthly
 import ExportReport from "@/components/PresenceApp/AdminLevelComponents/ExportReport.vue";
 import ESAReports from "@/components/PresenceApp/AdminLevelComponents/ESAReports.vue";
 import YearlyReport from "@/components/PresenceApp/AdminLevelComponents/YearlyReport.vue";
+import PowReport from "@/components/PresenceApp/AdminLevelComponents/PowReport.vue";
+
 import { all_users_of_organization } from "@/graphql/queries.js";
 import { API, graphqlOperation } from "aws-amplify";
 
@@ -386,7 +236,7 @@ export default {
     MonthlyReport,
     ExportReport,
     ESAReports,
-    YearlyReport,
+    YearlyReport, PowReport
   },
   data: () => ({
     toggle_exclusive: "monthlyReport",

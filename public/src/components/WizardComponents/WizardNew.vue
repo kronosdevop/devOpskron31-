@@ -1,56 +1,75 @@
 <template>
   <!-- eslint-disable -->
-  <v-dialog 
-    :model-value="signupwizard" 
-    @update:model-value="$emit('update:signupwizard', $event)" 
-    persistent 
-    max-width="800" 
+  <v-dialog
+    :model-value="signupwizard"
+    @update:model-value="$emit('update:signupwizard', $event)"
+    persistent
+    max-width="800"
     transition="dialog-top-transition"
   >
     <SnackBar :SnackBarComponent="SnackBarComponent" />
     <v-card elevation="0">
       <v-card-text>
-        <v-stepper v-model="stepper" flat>
+        <v-stepper
+          :model-value="stepper"
+          @update:model-value="stepper = $event"
+          flat
+        >
           <v-row class="mt-3" no-gutters>
-            <v-col cols="12" class="d-flex flex-column align-center justify-center">
+            <v-col
+              cols="12"
+              class="d-flex flex-column align-center justify-center"
+            >
               <v-stepper-header class="stepper-header-centered mt-2">
-                <v-stepper-item :complete="stepper > 0" value="0"></v-stepper-item>
+                <v-stepper-item
+                  :complete="stepper > 0"
+                  :value="0"
+                ></v-stepper-item>
                 <hr class="solid step-divider" />
-                <v-stepper-item :complete="stepper > 1" value="1"></v-stepper-item>
+                <v-stepper-item
+                  :complete="stepper > 1"
+                  :value="1"
+                ></v-stepper-item>
                 <v-divider class="step-divider"></v-divider>
-                <v-stepper-item :complete="stepper > 2" value="2"></v-stepper-item>
+                <v-stepper-item
+                  :complete="stepper > 2"
+                  :value="2"
+                ></v-stepper-item>
                 <v-divider class="step-divider"></v-divider>
-                <v-stepper-item :complete="stepper > 3" value="3"></v-stepper-item>
+                <v-stepper-item
+                  :complete="stepper > 3"
+                  :value="3"
+                ></v-stepper-item>
                 <v-divider class="step-divider"></v-divider>
-                <v-stepper-item value="4"></v-stepper-item>
+                <v-stepper-item :value="4"></v-stepper-item>
               </v-stepper-header>
             </v-col>
           </v-row>
           <v-stepper-window>
-            <v-stepper-window-item value="0">
+            <v-stepper-window-item :value="0">
               <OrgNewDetails v-on:emitSecondSTep="second_step" />
             </v-stepper-window-item>
-            <v-stepper-window-item value="1">
-              <EmployeSelections 
-                v-on:emitSecondStepData="fetch_second_step" 
+            <v-stepper-window-item :value="1">
+              <EmployeSelections
+                v-on:emitSecondStepData="fetch_second_step"
                 v-on:secondsetepValid="validation_msg"
-                v-on:previousfirstStep="prev_first_step" 
+                v-on:previousfirstStep="prev_first_step"
               />
             </v-stepper-window-item>
-            <v-stepper-window-item value="2">
-              <AppSelection 
-                v-on:emitToFourth="four_step" 
+            <v-stepper-window-item :value="2">
+              <AppSelection
+                v-on:emitToFourth="four_step"
                 v-on:prevsecondStep="prev_second_step"
-                v-on:selectedApps="selected_app_info" 
+                v-on:selectedApps="selected_app_info"
               />
             </v-stepper-window-item>
-            <v-stepper-window-item value="3">
-              <AdvanceSettings 
-                v-on:fifthstep="move_to_last" 
-                v-on:prevthirdstep="prev_third_step" 
+            <v-stepper-window-item :value="3">
+              <AdvanceSettings
+                v-on:fifthstep="move_to_last"
+                v-on:prevthirdstep="prev_third_step"
               />
             </v-stepper-window-item>
-            <v-stepper-window-item value="4">
+            <v-stepper-window-item :value="4">
               <v-card flat>
                 <v-form ref="form">
                   <v-row class="mt-3" no-gutters>
@@ -58,35 +77,31 @@
                       <b>Provide your Billing Details </b>
                     </v-col>
                     <v-col class="mt-3" cols="12">
-                      <v-text-field 
-                        density="compact" 
-                        variant="outlined" 
-                        label="Tax ID/GST NO:" 
+                      <v-text-field
+                        density="compact"
+                        variant="outlined"
+                        label="Tax ID/GST NO:"
                         v-model="taxIDGst"
                       ></v-text-field>
                     </v-col>
                     <v-col cols="12">
-                      <v-textarea 
-                        density="compact" 
-                        variant="outlined" 
-                        label="Billing Address" 
+                      <v-textarea
+                        density="compact"
+                        variant="outlined"
+                        label="Billing Address"
                         v-model="billingAddress"
                       ></v-textarea>
                     </v-col>
                   </v-row>
                 </v-form>
                 <v-card-actions class="justify-center mt-4">
-                  <v-btn 
-                    variant="flat" 
-                    @click="back_action()" 
-                    color="primary"
-                  >
+                  <v-btn variant="flat" @click="back_action()" color="primary">
                     Back
                   </v-btn>
-                  <v-btn 
-                    :loading="loading" 
-                    variant="flat" 
-                    @click="final_save()" 
+                  <v-btn
+                    :loading="loading"
+                    variant="flat"
+                    @click="final_save()"
                     color="primary"
                     class="cardCss"
                   >
@@ -127,7 +142,7 @@ export default {
   },
   data() {
     return {
-      stepper: 0,
+      stepper: "0",
       firstStepInfo: {},
       SnackBarComponent: {},
       secondStepInfo: {},

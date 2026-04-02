@@ -3,7 +3,6 @@
     <v-card flat class="">
       <div>
         <SnackBar :SnackBarComponent="SnackBarComponent" />
-
         <div class="card-container" style="position: relative">
           <v-card class="" flat>
             <v-card-text class="pa-4">
@@ -61,7 +60,7 @@
                           item.user_profile_pic_url != ''
                         "
                       >
-                        <v-avatar size="40" class="user-avatar-img">
+                        <v-avatar size="40" class="user-avatar-img" @click.stop="openImagePreview(item)">
                           <v-img :src="item.user_profile_pic_url" />
                         </v-avatar>
                       </div>
@@ -142,12 +141,15 @@
                 </template>
 
                 <!-- Reporting Manager -->
-                <template v-slot:[`item.reporting_manager`]="{ item }">
-                  <span class="custom-cell">{{ item.reporting_manager }}</span>
-                </template>
+             <template v-slot:[`item.reporting_manager`]="{ item }">
+  <span class="custom-cell">
+    {{ getReportingManagerName(item.reporting_manager) }}
+  </span>
+</template>
+
 
                 <!-- Actions -->
-                <template v-slot:[`item.actions`]="{ item }">
+                <!-- <template v-slot:[`item.actions`]="{ item }">
                   <v-btn
                     icon
                     variant="text"
@@ -157,7 +159,7 @@
                   >
                     <v-icon color="#1976D2">mdi-card-account-details</v-icon>
                   </v-btn>
-                </template>
+                </template> -->
               </v-data-table>
 
               <!-- Modern Table Footer -->
@@ -216,6 +218,11 @@
         </div>
       </div>
     </v-card>
+        <ImagePreviewDialog
+      :imagePreviewDialog="imagePreviewDialog"
+      :selectedUserDetail="selectedUserDetail"
+      @close="imagePreviewDialog = false"
+    />
   </div>
 </template>
 <script>
@@ -224,6 +231,7 @@
 import SnackBar from "@/components/SnackBar.vue";
 import LoadingNew from "@/components/LoadingNew.vue";
 import { my_team_user_list } from "@/graphql/queries.js";
+import ImagePreviewDialog from "@/components/Teams/ImagePreviewDialog.vue";
 import { API, graphqlOperation } from "aws-amplify";
 
 export default {
@@ -231,6 +239,7 @@ export default {
   components: {
     SnackBar,
     LoadingNew,
+    ImagePreviewDialog,
   },
 
   //Props
@@ -251,12 +260,15 @@ export default {
           key: "reporting_manager",
           sortable: false,
         },
-        { title: "Actions", key: "actions", sortable: false },
+        // { title: "Actions", key: "actions", sortable: false },
       ],
       tableData: [],
+      fullTableData: [],
       originalTableData: [],
       roles: [],
       statuses: [],
+      selectedUserDetail: {},
+      imagePreviewDialog: false,
 
       // Object properties
       SnackBarComponent: {},
@@ -316,19 +328,50 @@ export default {
 
   // Computed properties
   computed: {
-    searchReadyItems() {
-      const text = this.searchValue.toLowerCase();
+    filteredItems() {
+  if (!this.searchValue) return this.tableData;
 
-      return this.sortedAndPaginatedItems?.filter(
-        (item) =>
-          item.full_user_name.toLowerCase().includes(text) ||
-          item.user_email_id.toLowerCase().includes(text) ||
-          item.member_id.toLowerCase().includes(text) ||
-          item.location.toLowerCase().includes(text) ||
-          item.department.toLowerCase().includes(text) ||
-          item.reporting_manager.toLowerCase().includes(text),
-      );
-    },
+  const text = this.searchValue.toLowerCase();
+
+  return this.tableData.filter((item) => {
+    return (
+      item.full_user_name?.toLowerCase().includes(text) ||
+      item.user_email_id?.toLowerCase().includes(text) ||
+      item.member_id?.toLowerCase().includes(text) ||
+      item.location?.toLowerCase().includes(text) ||
+      item.department?.toLowerCase().includes(text) ||
+      item.reporting_manager?.toLowerCase().includes(text)
+    );
+  });
+},
+   searchReadyItems() {
+  if (!this.searchValue) {
+    return this.sortedAndPaginatedItems;
+  }
+
+  const text = this.searchValue.toLowerCase();
+
+  // ✅ STEP 1: FILTER FULL DATA
+  const filtered = this.tableData.filter((item) => {
+    return (
+      item.full_user_name?.toLowerCase().includes(text) ||
+      item.user_email_id?.toLowerCase().includes(text) ||
+      item.member_id?.toLowerCase().includes(text) ||
+      item.location?.toLowerCase().includes(text) ||
+      item.department?.toLowerCase().includes(text) ||
+      item.reporting_manager?.toLowerCase().includes(text)
+    );
+  });
+
+  // ✅ STEP 2: RESET PAGE
+  this.currentPage = 1;
+
+  // ✅ STEP 3: APPLY PAGINATION AFTER FILTER
+  const start = (this.currentPage - 1) * this.itemsPerPage;
+  const end = start + this.itemsPerPage;
+
+  return filtered.slice(start, end);
+},
     sortedAndPaginatedItems() {
       const sortedItems = this.tableData.slice().sort((a, b) => {
         const aValue = a.full_user_name ? a.full_user_name : "";
@@ -371,6 +414,12 @@ export default {
 
   // Methods
   methods: {
+    getReportingManagerName(email) {
+ if(!email || email === "N/A") return "_";
+ const manager = this.originalTableData.find((u) => u.user_email_id === email);
+ return manager?.full_user_name || email;
+}
+,
     // Admin methods
     fetch_admin_apps() {
       const userObj = this.$store.getters.GetUserObj;
@@ -726,7 +775,10 @@ export default {
         this.get_my_team();
       }
     },
-
+  openImagePreview(item) {
+      this.selectedUserDetail = item;
+      this.imagePreviewDialog = true;
+    },
     // Notification methods
     error_info(val) {
       this.SnackBarComponent = {

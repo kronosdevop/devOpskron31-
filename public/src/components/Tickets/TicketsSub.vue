@@ -271,10 +271,10 @@ export default {
 
   data: () => {
     return {
-      toggle_exclusive: "mytickets",
-      currentConfigView: "categories",
       search: "",
       filterStatus: "",
+      toggle_exclusive: "mytickets",
+      currentConfigView: "categories",
 
       fromDate: null,
       toDate: null,
@@ -349,10 +349,10 @@ export default {
               start_date: this.formattedFromDate || null,
               end_date: this.formattedToDate || null,
             },
-          })
+          }),
         );
         const resultObj = JSON.parse(
-          result.data.generate_my_tickets_excel_report
+          result.data.generate_my_tickets_excel_report,
         );
         if (resultObj.Status === "SUCCESS") {
           this.SnackBarComponent = {
@@ -381,10 +381,10 @@ export default {
               start_date: this.formattedFromDate || null,
               end_date: this.formattedToDate || null,
             },
-          })
+          }),
         );
         let resultObj = JSON.parse(
-          result.data.generate_all_tickets_excel_report
+          result.data.generate_all_tickets_excel_report,
         );
         if (resultObj.Status === "SUCCESS") {
           this.SnackBarComponent = {
@@ -433,7 +433,7 @@ export default {
       const userObj = this.$store.getters.GetUserObj;
 
       const userApp = userObj?.user_apps?.find(
-        (a) => a.dashboard_unique_type === "TICKET_MANAGEMENT"
+        (a) => a.dashboard_unique_type === "TICKET_MANAGEMENT",
       );
 
       if (!userApp?.is_visible) {
@@ -442,7 +442,7 @@ export default {
       }
 
       const adminApp = userObj?.admin_apps?.find(
-        (a) => a.dashboard_unique_type === "TICKET_MANAGEMENT_ADMINS"
+        (a) => a.dashboard_unique_type === "TICKET_MANAGEMENT_ADMINS",
       );
 
       this.adminAppExists =

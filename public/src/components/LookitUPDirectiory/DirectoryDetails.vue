@@ -18,10 +18,12 @@
         <!-- Export Button for Entry Management -->
         <v-btn
           v-show="allDirectoryEntries == 1"
-          class="action-btn export-btn"
+          class="ml-15"
+          color="primary"
+          variant="flat"
           @click="export_entries()"
         >
-          <v-icon>mdi-file-export</v-icon>
+          <v-icon>mdi-download</v-icon>
           <span>Export</span>
         </v-btn>
 
@@ -53,7 +55,7 @@
         </v-btn>
 
         <!-- Back Button -->
-        <v-btn class="action-btn back-btn" @click="back_call()">
+        <v-btn class="mr-2" variant="flat" color="primary" @click="back_call()">
           <v-icon>mdi-step-backward</v-icon>
           <span>Back</span>
         </v-btn>

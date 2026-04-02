@@ -731,7 +731,7 @@ export default {
             input: {
               organization_id: data.organization.organization_id,
               user_email_id: data.user.user_email_id,
-              limit: 21,
+              limit: 101,
               nextToken: this.next_token,
               workflow_name:
                 this.filterByAction != "" ? this.filterByAction : undefined,

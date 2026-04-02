@@ -74,13 +74,13 @@
                   size="32"
                   class="mb-4"
                 ></v-progress-circular>
-                <div class="text-body-2 text-grey">Loading dashboards...</div>
+                <div class="text-body-2 text-grey">Loading Other dashboards...</div>
               </div>
             </template>
 
             <!-- Dashboard Name -->
             <template v-slot:[`item.dashboard_name`]="{ item }">
-              <div class="d-flex align-center">
+              <div class="d-flex align-center"> 
                 <!-- <v-icon size="16" color="red" class="mr-2">mdi-lock-outline</v-icon> -->
                 <span class="caption font-weight-medium">{{ item.dashboard_name }}</span>
               </div>
@@ -355,7 +355,7 @@ export default {
           // Filter dashboards based on visibility
           this.dashboardData = this.filterDashboardData(
             this.dashboardData,
-            this.$store.getters.GetUserObj.user.user_id
+            this.$store.getters.GetUserObj.user?.user_id
           );
 
           // If there's more data, fetch it recursively

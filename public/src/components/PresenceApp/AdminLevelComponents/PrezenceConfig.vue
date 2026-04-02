@@ -24,12 +24,9 @@
         rounded="lg"
         style="overflow-y: auto"
         class="mt-n3"
-        :height="CommonVuetifyObj.height - 195"
       >
         <v-card-text>
-          <div class="font-weight-bold">
-            Configure different color codes for different Attendance duration
-          </div>
+        
           <v-row class="mt-1">
             <!-- Configure different color-->
             <v-col cols="6">
@@ -38,8 +35,11 @@
                 elevation="6"
                 rounded="lg"
                 class="pa-2"
-                height="62vh"
               >
+              <div class="font-weight-bold mt-6">
+                <v-icon color="primary" class="mr-2">mdi-cog</v-icon>
+            Configure different color codes for different Attendance duration
+          </div>
                 <v-form ref="form">
                   <v-row>
                     <v-col cols="3">
@@ -47,7 +47,7 @@
                         style="max-width: 200px"
                         density="compact"
                         variant="outlined"
-                        class="ml-4 mt-2"
+                        class="ml-4 mt-4"
                         label="From Hr"
                         v-model="from_hr"
                         @change="setduration"
@@ -59,7 +59,7 @@
                         style="max-width: 200px"
                         density="compact"
                         variant="outlined"
-                        class="ml-4 mt-2"
+                        class="ml-4 mt-4"
                         label="To Hr"
                         v-model="to_hr"
                         :rules="[
@@ -73,7 +73,7 @@
                     </v-col>
                     <v-col cols="1">
                       <v-btn
-                        class="mx-2 mt-2"
+                        class="mx-2 mt-4"
                         fab
                         @click="colordailog()"
                         height="40"
@@ -84,7 +84,7 @@
                     <v-col cols="2">
                       <v-btn
                         @click="add_action()"
-                        class="elevation-0 ml-8 mt-2 cardCss"
+                        class="elevation-0 ml-8 mt-4 cardCss"
                         height="40"
                       >
                         <v-icon color="white" dark> mdi-plus </v-icon>
@@ -94,7 +94,6 @@
                 </v-form>
                 <v-card-text elevation="0">
                   <v-data-table
-                    :height="CommonVuetifyObj.height - 380"
                     :fixed-header="fixed"
                     :headers="headers"
                     :items="tableData"
@@ -124,7 +123,9 @@
                       >
                     </template>
                   </v-data-table>
+               
                 </v-card-text>
+         
               </v-card>
             </v-col>
 
@@ -132,11 +133,11 @@
             <v-col cols="6">
               <!--Attendance Report Configuration-->
               <div class="font-weight-bold mt-n9">
-                Attendance Report Configuration
               </div>
-              <v-card elevation="6" rounded="lg" height="35vh" class="mt-4">
-                <v-toolbar density="compact" color="transparent">
-                  <div class="font-weight-bold ml-3">Report Settings</div>
+              <v-card elevation="6" rounded="lg" height="46vh" class="mt-8">
+                <v-toolbar density="compact" color="transparent" height="100">
+                  <div class="font-weight-bold ml-3">  <v-icon color="primary" class="mr-2">mdi-file-document-outline</v-icon>            Attendance Report Configuration
+</div>
                   <v-spacer></v-spacer>
 
                   <!--Daily and Monthly Time Pickers-->
@@ -323,6 +324,7 @@
         </v-card-text>
       </v-card>
     </v-container>
+     
 
     <!--Color Picker-->
     <v-dialog
@@ -376,6 +378,7 @@ export default {
 
   components: {
     SnackBar,
+    
   },
 
   data() {
@@ -385,7 +388,7 @@ export default {
       monthly_report_members_array: [],
       scanTolerance: "",
       color: "#191A1BFF",
-
+ScanEdit : false,
       height: 0,
       from_hr: 0,
       to_hr: 0,
@@ -402,7 +405,6 @@ export default {
       fixed: true,
       dailyTimeMenu: false,
       monthlyTimeMenu: false,
-
       SnackBarComponent: {},
       CommonVuetifyObj: {},
 
@@ -511,7 +513,9 @@ export default {
 
   async mounted() {
     this.CommonVuetifyObj = useDisplay();
+const data = this.$store.getters.GetOrgDetails;
 
+this.scanTolerance = data?.organization?.organization_scan_tolerance || "";
     await this.GetAllDailyReportMembersMethod();
     await this.GetAllListMonthlyReportMembersMethod();
     await this.get_all_org_users();
@@ -572,6 +576,9 @@ export default {
   },
 
   methods: {
+    EditScanDialog(){
+      this.ScanEdit = true;
+    },
     async validate_user() {
       const newData = this.tableData.map(
         ({ color_code, from_duration, to_duration }) => ({
@@ -629,6 +636,7 @@ export default {
         this.loading = false;
         var response = JSON.parse(result.data.edit_organization);
         if (response.Status == "SUCCESS") {
+          this.ScanEdit = false;
           this.SnackBarComponent = {
             SnackbarVmodel: true,
             SnackbarColor: "green",
@@ -743,7 +751,6 @@ export default {
 
 <style scoped>
 .combobox-fixed :deep(.v-field__input) {
-  max-height: 120px;
   overflow-y: auto;
   align-items: flex-start !important;
   padding-bottom: 8px;

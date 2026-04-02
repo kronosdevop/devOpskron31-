@@ -7,7 +7,7 @@
         <v-card-title
           class="d-flex align-center justify-space-between px-6 py-4 sticky-title"
         >
-          <span class="font-weight-bold text-h5">Create Question </span>
+          <span class="font-weight-bold text-h5">Create Question {{ StoreObj.splay_category_name }}</span>
           <v-btn
             icon
             variant="text"

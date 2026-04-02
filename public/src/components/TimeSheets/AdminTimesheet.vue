@@ -1,5 +1,11 @@
 <template>
   <div>
+    <ExportDialog
+      :ExportDialog="ExportDialog"
+      @clicked="ExportDialog = false"
+      v-on:successMsg="success_info"
+      v-on:errorMsg="error_info"
+    />
     <CreateExternalTicketDialog
       :DialogCreateExternalTicket="DialogCreateExternalTicket"
       :screenshot-file="ScreenshotFile"
@@ -32,7 +38,7 @@
         <v-text-field
           v-if="toggle_exclusive == 'userlevel'"
           v-model="searchValue"
-          placeholder="Search timesheets..."
+          label="Search timesheets..."
           prepend-inner-icon="mdi-magnify"
           variant="outlined"
           density="compact"
@@ -40,21 +46,43 @@
           class="header-search"
           clearable
           @update:model-value="handleSearchChange"
-          width="250"
+          width="200"
         />
-        <!-- <v-btn variant="flat" color="primary" @click="back_call()" rounded="lg"
-          ><v-icon>mdi-step-backward</v-icon>
-          <div class="FontVariant1">Back</div>
-        </v-btn> -->
-        <v-btn
+        <v-menu
           v-if="toggle_exclusive == 'userlevel'"
-          height="40"
-          class="cardCss"
-          @click="Updatetime()"
+          offset-y
+          class="actions-menu"
+          transition="scale-transition"
         >
-          <v-icon start color="white">mdi-plus</v-icon>
-          <span color="white" class="FontVariant1">Add</span>
-        </v-btn>
+          <template #activator="{ props }">
+            <v-btn v-bind="props" class="action-btn mr-4" size="small">
+              <v-icon>mdi-dots-vertical</v-icon>
+              <span>Actions</span>
+            </v-btn>
+          </template>
+
+          <v-list density="compact" class="actions-list">
+            <!-- Export -->
+            <v-list-item @click="open_Export_Dialog">
+              <template #prepend>
+                <v-icon color="primary">mdi-download</v-icon>
+              </template>
+
+              <v-list-item-title> Export Timesheet </v-list-item-title>
+            </v-list-item>
+
+            <v-divider class="my-1" />
+
+            <!-- Add -->
+            <v-list-item @click="Updatetime()">
+              <template #prepend>
+                <v-icon color="primary">mdi-plus</v-icon>
+              </template>
+
+              <v-list-item-title> Add Timesheet </v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
       </div>
     </v-app-bar>
     <v-card>
@@ -128,6 +156,7 @@ import TimesheetProjects from "./PopUps/TimesheetProjects.vue";
 import UserLevelTimeSheet from "@/components/TimeSheets/UserLevelTimeSheet.vue";
 import html2canvas from "html2canvas";
 import CreateExternalTicketDialog from "../Tickets/CreateExternalTicketDialog.vue";
+import ExportDialog from "@/components/TimeSheets/ExportDialog.vue";
 
 export default {
   components: {
@@ -140,6 +169,7 @@ export default {
     ExportTimesheetreport,
     TimesheetProjects,
     CreateExternalTicketDialog,
+    ExportDialog,
   },
   data: () => ({
     toggle_exclusive: "userlevel",
@@ -149,7 +179,10 @@ export default {
     componentCheck: 0,
     usrtimesheetKey: 0,
     SnackBarComponent: {},
-
+    ExportDialog: false,
+    actionsMenuOpen: false,
+    exportLoad: false,
+    addLoad: false,
     // Screenshot Values
     DialogCreateExternalTicket: false,
     ScreenshotFile: null,
@@ -162,6 +195,41 @@ export default {
     this.fetch_admin_apps();
   },
   methods: {
+    async handleAdd() {
+      if (this.addLoad) return;
+
+      try {
+        this.addLoad = true;
+
+        this.componentCheck = 1;
+        this.timesheetUpdate = true;
+
+        this.actionsMenuOpen = false;
+      } catch (error) {
+        this.error_info("Unable to open timesheet form");
+      } finally {
+        setTimeout(() => {
+          this.addLoad = false;
+        }, 400);
+      }
+    },
+
+    async handleExport() {
+      if (this.exportLoad) return;
+
+      try {
+        this.exportLoad = true;
+
+        this.ExportDialog = true;
+
+        this.actionsMenuOpen = false;
+      } catch (error) {
+        this.error_info("Export failed");
+      } finally {
+        this.exportLoad = false;
+      }
+    },
+
     async TakeScreenshot() {
       const target = document.body;
       const canvas = await html2canvas(target, {
@@ -213,7 +281,7 @@ export default {
       const userObj = this.$store.getters.GetUserObj;
 
       const userapp = userObj.user_apps.find(
-        (app) => app.dashboard_unique_type === "TIMESHEET_USER"
+        (app) => app.dashboard_unique_type === "TIMESHEET_USER",
       );
 
       if (userapp == undefined) {
@@ -236,7 +304,7 @@ export default {
       }
 
       const adminExists = userObj.admin_apps.find(
-        (app) => app.dashboard_unique_type === "TIMESHEET_ADMINS"
+        (app) => app.dashboard_unique_type === "TIMESHEET_ADMINS",
       );
 
       this.adminAppExists =
@@ -246,6 +314,9 @@ export default {
     },
     back_call() {
       this.$router.push("/home/UserTimesheetTypes");
+    },
+    open_Export_Dialog() {
+      this.ExportDialog = true;
     },
   },
 };

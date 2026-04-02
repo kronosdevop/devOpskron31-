@@ -95,7 +95,7 @@
                   <v-icon
                     v-if="
                       item.user_type != 'OWNER' &&
-                      $store.getters.GetUserObj.user.user_id != item.user_id
+                      $store.getters.GetUserObj.user?.user_id != item.user_id
                     "
                     small
                     color="error"
@@ -116,7 +116,7 @@
                     @click="change_admin(item)"
                     v-if="
                       item.user_type == 'OWNER' &&
-                      $store.getters.GetUserObj.user.user_id == item.user_id
+                      $store.getters.GetUserObj.user?.user_id == item.user_id
                     "
                     v-bind="props"
                     class="cursor-pointer"

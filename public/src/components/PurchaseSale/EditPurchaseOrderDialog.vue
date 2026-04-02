@@ -1524,7 +1524,7 @@ export default {
           item.item_code = existingItem.item_code || "";
           // Auto-populate category
           if (this.itemConfiguration.item_category) {
-            item.category = existingItem.category_id || "";
+            item.category = existingItem.product_id || "";
           }
           // Auto-populate description if available
           if (this.itemConfiguration.description) {
@@ -1572,22 +1572,13 @@ export default {
       }, 200);
     },
 
-    filterItems(index) {
-      const item = this.orderForm.items[index];
-      const query = item.item_name.toLowerCase();
+  filterItems(index) {
+  const search = this.orderForm.items[index].item_name || ""
 
-      if (!query) {
-        return this.masterItems;
-      } else {
-        return this.masterItems.filter(
-          (masterItem) =>
-            masterItem.item_name.toLowerCase().includes(query) ||
-            masterItem.item_code.toLowerCase().includes(query) ||
-            (masterItem.category_name &&
-              masterItem.category_name.toLowerCase().includes(query))
-        );
-      }
-    },
+  return this.masterItems.filter(item =>
+    (item.product_name || "").toLowerCase().includes(search.toLowerCase())
+  )
+},    
 
     selectPredefinedItem(index, predefinedItem) {
       const item = this.orderForm.items[index];

@@ -59,7 +59,7 @@
                 size="32"
                 class="mb-4"
               ></v-progress-circular>
-              <div class="text-body-2 grey--text">Loading locations...</div>
+              <div class="text-body-2 text-grey">Loading locations...</div>
             </div>
           </template>
 

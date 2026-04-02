@@ -176,7 +176,7 @@
                     class="ml-2"
                     v-if="
                       item.directory_created_by ==
-                      $store.getters.GetUserObj.user.user_email_id
+                      $store.getters.GetUserObj.user?.user_email_id
                     "
                     >mdi-account</v-icon
                   >
@@ -230,7 +230,7 @@
                     location="top"
                     v-if="
                       item.directory_created_by ==
-                      $store.getters.GetUserObj.user.user_email_id
+                      $store.getters.GetUserObj.user?.user_email_id
                     "
                   >
                     <template v-slot:activator="{ props }">
@@ -250,7 +250,7 @@
                     location="top"
                     v-if="
                       item.directory_created_by ==
-                      $store.getters.GetUserObj.user.user_email_id
+                      $store.getters.GetUserObj.user?.user_email_id
                     "
                   >
                     <template v-slot:activator="{ props }">
@@ -268,7 +268,7 @@
                   <span
                     v-if="
                       item.directory_created_by !=
-                      $store.getters.GetUserObj.user.user_email_id
+                      $store.getters.GetUserObj.user?.user_email_id
                     "
                     class="caption grey--text"
                     >-</span

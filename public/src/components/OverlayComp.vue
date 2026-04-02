@@ -1,22 +1,21 @@
 <template>
   <v-overlay
     :model-value="overlay"
-    class="d-flex align-center justify-center"
+    class="overlay-center d-flex align-center justify-center"
     persistent
-    scrim
   >
-    <v-card
-      class="pa-6 rounded-xl d-flex align-center justify-center"
-      elevation="10"
-      width="100"
-      height="100"
-    >
-      <img
-        src="@/assets/favicon.png"
-        alt="Loading"
-        class="rotating-image"
+    <div class="loader-wrapper">
+      <v-progress-circular
+        indeterminate
+        size="80"
+        width="4"
+        color="#DB4C77"
       />
-    </v-card>
+
+      <p class="loading-text" color="white">
+        Loading, please wait...
+      </p>
+    </div>
   </v-overlay>
 </template>
 
@@ -25,20 +24,36 @@ defineProps({
   overlay: Boolean,
 });
 </script>
-
 <style scoped>
-.rotating-image {
-  width: 80px;
-  height: 80px;
-  animation: spin 2s linear infinite;
+.overlay-center {
+  background-color: rgba(0, 0, 0, 0.35);
 }
 
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
+.loader-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.loading-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: #e8e7e7;
+  letter-spacing: 0.3px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
   }
-  100% {
-    transform: rotate(360deg);
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
+
+
 </style>

@@ -111,15 +111,7 @@
         <template v-slot:append>
           <div class="user-info-section">
             <div class="user-email" @click="sign_out()">
-              <v-badge
-                :color="$store.getters.GetmqqtColor"
-                dot
-                location="top right"
-                :offset-x="-20"
-                :offset-y="10"
-              >
-                <span class=""> {{ userEmail }}</span>
-              </v-badge>
+              <span class=""> {{ userEmail }}</span>
             </div>
             <div class="user-org">
               {{ userOrg }}
@@ -165,7 +157,6 @@
             v-on:closefunc="close_func"
             v-on:successValue="success_func"
             v-on:unsubcribe="unsubcribecall"
-            v-on:endMqqt="disconnect"
             :orgObject="orgObject"
           />
         </div>
@@ -191,7 +182,6 @@ import UpdateProfileDetails from "@/components/UserDialogs/UpdateProfileDetails"
 import StichhLogo from "@/assets/StichhLogo_Hz_Blk.png";
 import { openDB } from "idb";
 import {} from "@/db.js";
-import { connecttoMQTTMethod } from "@/mixins/MqttConnect.js";
 import { initiateLocalCacheDB } from "@/db.js";
 import { get_all_org_users } from "@/mixins/GetUsersDropdown.js";
 import LogoutPannel from "@/components/LogoutPannel.vue";
@@ -214,7 +204,6 @@ export default {
   mixins: [
     get_current_details,
     get_Org_details,
-    connecttoMQTTMethod,
     initiateLocalCacheDB,
     get_all_org_users,
   ],
@@ -300,7 +289,7 @@ export default {
       this.isLoading = false;
 
       // Phase 3: Defer non-essential operations
-      this.loadNonEssentialData();
+      // this.loadNonEssentialData();
     } catch (error) {
       console.error("Error during initialization:", error);
       this.isLoading = false;
@@ -322,8 +311,8 @@ export default {
     },
 
     async handleLogoutConfirm() {
-      this.disconnect();
-      await Auth.signOut({ global: true });
+      // this.disconnect();
+      await Auth.signOut();
 
       this.$store.commit("SetFirstSignup", false);
       this.$store.commit("Setappadmins", false);
@@ -385,6 +374,8 @@ export default {
       } else {
         console.warn("User data not available, redirecting to login");
         this.$router.push("/");
+        this.$store.commit("SetUserObj", {});
+
         return;
       }
 
@@ -423,6 +414,8 @@ export default {
       } else {
         console.warn("User data not available for navigation setup");
         this.$router.push("/");
+        this.$store.commit("SetUserObj", {});
+
         return;
       }
     },
@@ -458,111 +451,103 @@ export default {
     },
 
     // Non-essential data loading methods
-    async loadNonEssentialData() {
-      // Check if organization details are properly loaded
-      if (!this.orgDetails || !this.orgDetails.organization) {
-        return;
-      }
+    // async loadNonEssentialData() {
+    //   // Check if organization details are properly loaded
+    //   if (!this.orgDetails || !this.orgDetails.organization) {
+    //     return;
+    //   }
 
-      // Defer MQTT connection and other heavy operations
-      setTimeout(async () => {
-        try {
-          await this.initializeMQTTConnection();
-        } catch (error) {
-          console.error("MQTT connection failed:", error);
-        }
-      }, 100);
-    },
+    //   // Defer MQTT connection and other heavy operations
+    //   setTimeout(async () => {
+    //     try {
+    //       await this.initializeMQTTConnection();
+    //     } catch (error) {
+    //       console.error("MQTT connection failed:", error);
+    //     }
+    //   }, 100);
+    // },
 
     // Initialize MQTT connection
-    async initializeMQTTConnection() {
-      // Check if currentObject and user data are available
-      if (!this.currentObject || !this.currentObject.user) {
-        console.warn("User data not available for MQTT connection");
-        return;
-      }
+    // async initializeMQTTConnection() {
+    //   // Check if currentObject and user data are available
+    //   if (!this.currentObject || !this.currentObject.user) {
+    //     console.warn("User data not available for MQTT connection");
+    //     return;
+    //   }
 
-      let clientdata = this.currentObject.user.mqtt_web_configure;
-      let topicid =
-        this.currentObject.organization.organization_display_id +
-        "_" +
-        this.currentObject.user.user_email_id +
-        "_" +
-        "RESTRICTEDGROUPCHATS";
-      let notificationTopic = this.currentObject.user.user_id + "NOTIFICATION";
-      let taskTopic =
-        this.currentObject.organization.organization_display_id +
-        "_" +
-        this.currentObject.user.user_email_id +
-        "_" +
-        "TASK";
-      let pendingTopic =
-        this.currentObject.organization.organization_display_id +
-        "_" +
-        this.currentObject.user.user_email_id +
-        "_" +
-        "PENDINGWORKFLOW";
-      let restrictedChannels =
-        this.currentObject.organization.organization_display_id +
-        "_" +
-        this.currentObject.user.user_email_id +
-        "_" +
-        "RESTRICTEDCHANNELS";
-      let logoutuser = this.currentObject.user.user_email_id + "WEBLOGOUT";
-      let openChannelTopic =
-        this.currentObject.organization.organization_display_id +
-        "OPENCHANNELS";
+    //   let clientdata = this.currentObject.user.mqtt_web_configure;
+    //   let topicid =
+    //     this.currentObject.organization.organization_display_id +
+    //     "_" +
+    //     this.currentObject.user.user_email_id +
+    //     "_" +
+    //     "RESTRICTEDGROUPCHATS";
+    //   let notificationTopic = this.currentObject.user.user_id + "NOTIFICATION";
+    //   let taskTopic =
+    //     this.currentObject.organization.organization_display_id +
+    //     "_" +
+    //     this.currentObject.user.user_email_id +
+    //     "_" +
+    //     "TASK";
+    //   let pendingTopic =
+    //     this.currentObject.organization.organization_display_id +
+    //     "_" +
+    //     this.currentObject.user.user_email_id +
+    //     "_" +
+    //     "PENDINGWORKFLOW";
+    //   let restrictedChannels =
+    //     this.currentObject.organization.organization_display_id +
+    //     "_" +
+    //     this.currentObject.user.user_email_id +
+    //     "_" +
+    //     "RESTRICTEDCHANNELS";
+    //   let logoutuser = this.currentObject.user.user_email_id + "WEBLOGOUT";
+    //   let openChannelTopic =
+    //     this.currentObject.organization.organization_display_id +
+    //     "OPENCHANNELS";
 
-      // Connect to MQTT
-      await this.connecttoMQTTMethod(
-        `wss://broker.stichh.com:9002/mqtt`,
-        clientdata.user_name,
-        clientdata.password,
-        topicid
-      );
+    //   // Subscribe to topics
+    //   // this.subscribeToTopicMethod(notificationTopic);
+    //   // this.subscribeToTopicMethod(taskTopic);
+    //   // this.subscribeToTopicMethod(pendingTopic);
+    //   // this.subscribeToTopicMethod(logoutuser);
+    //   // this.subscribeToTopicMethod(restrictedChannels);
+    //   // this.subscribeToTopicMethod(openChannelTopic);
 
-      // Subscribe to topics
-      this.subscribeToTopicMethod(notificationTopic);
-      this.subscribeToTopicMethod(taskTopic);
-      this.subscribeToTopicMethod(pendingTopic);
-      this.subscribeToTopicMethod(logoutuser);
-      this.subscribeToTopicMethod(restrictedChannels);
-      this.subscribeToTopicMethod(openChannelTopic);
+    //   // Subscribe to user-specific topics if org users are loaded
 
-      // Subscribe to user-specific topics if org users are loaded
+    //   await this.get_all_org_users();
+    //   // console.log(this.orgUsers, 'this.orgUsers');
+    //   setTimeout(() => {
+    //     if (this.orgUsers && this.orgUsers.length > 0) {
+    //       const activeUsers = this.orgUsers
+    //         .filter((user) => user.user_status === "ACTIVE")
+    //         .map((user) => user.user_email_id);
 
-      await this.get_all_org_users();
-      // console.log(this.orgUsers, 'this.orgUsers');
-      setTimeout(() => {
-        if (this.orgUsers && this.orgUsers.length > 0) {
-          const activeUsers = this.orgUsers
-            .filter((user) => user.user_status === "ACTIVE")
-            .map((user) => user.user_email_id);
+    //       const updatedArray = activeUsers.filter(
+    //         (email) => email !== this.currentObject.user.user_email_id
+    //       );
+    //       const emailcurrent = this.currentObject.user.user_email_id;
+    //       const updatedEmailArray = updatedArray.sort();
 
-          const updatedArray = activeUsers.filter(
-            (email) => email !== this.currentObject.user.user_email_id
-          );
-          const emailcurrent = this.currentObject.user.user_email_id;
-          const updatedEmailArray = updatedArray.sort();
+    //       const beforeGeorge = updatedEmailArray.filter(
+    //         (email) => email < emailcurrent
+    //       );
+    //       const afterGeorge = updatedEmailArray.filter(
+    //         (email) => email > emailcurrent
+    //       );
 
-          const beforeGeorge = updatedEmailArray.filter(
-            (email) => email < emailcurrent
-          );
-          const afterGeorge = updatedEmailArray.filter(
-            (email) => email > emailcurrent
-          );
-
-          const combinedArray = [
-            ...beforeGeorge.map((email) => `${email}~${emailcurrent}`),
-            ...afterGeorge.map((email) => `${emailcurrent}~${email}`),
-          ];
-          //  console.log(combinedArray, 'combinedArray');
-          for (let i = 0; i < combinedArray.length; i++) {
-            this.subscribeToTopicMethod(combinedArray[i]);
-          }
-        }
-      }, 10000);
-    },
+    //       const combinedArray = [
+    //         ...beforeGeorge.map((email) => `${email}~${emailcurrent}`),
+    //         ...afterGeorge.map((email) => `${emailcurrent}~${email}`),
+    //       ];
+    //       //  console.log(combinedArray, 'combinedArray');
+    //       for (let i = 0; i < combinedArray.length; i++) {
+    //         this.subscribeToTopicMethod(combinedArray[i]);
+    //       }
+    //     }
+    //   }, 10000);
+    // },
 
     // Wizard methods
     completed_vizard() {
@@ -637,6 +622,9 @@ export default {
         return "Customers";
       } else if (value2.dashboard_unique_type === "SPLAY_ADMINS") {
         return "Splay";
+      }
+      else if(value2.dashboard_unique_type === "INVENTORY_ADMINS"){
+        return "Inventory"
       }
       // else if(value2.das)
       else {
@@ -1323,6 +1311,9 @@ export default {
 
         case "CUSTOMERS_ADMINS":
           return require("@/assets/customer.png");
+        
+          case "INVENTORY_ADMINS":
+            return require("@/assets/inventory.png")
         default:
           return "mdi-help";
       }
@@ -1360,6 +1351,7 @@ export default {
         "TICKET_MANAGEMENT_ADMINS",
         "TICKET_MANAGEMENT",
         "SPLAY_ADMINS",
+        "INVENTORY_ADMINS"
       ];
       return imageTypes.includes(dashboardType);
     },
@@ -1578,8 +1570,10 @@ export default {
           return "/RewardsManagement";
         case "REWARDS_RECOGNITION_USERS":
           return "/RewardsManagement";
+          
         case "SPLAY_ADMINS":
           return "/Splay";
+       
         case "CUSTOMERS_ADMINS":
           //   return this.userAppsList.some(
           //   (item) => item.dashboard_unique_type === "QABM_USERS"
@@ -1591,15 +1585,18 @@ export default {
         // default:
         //   console.warn(`Unrecognized dashboardType: ${dashboardType}`);
         //   return "/DashboardView";
+        case "INVENTORY_ADMINS":
+          return "/Inventory_latest"
         default:
           break;
+
       }
     },
 
     // Utility methods
-    disconnect() {
-      this.disconnectmqqt();
-    },
+    // disconnect() {
+    //   this.disconnectmqqt();
+    // },
 
     close_func() {
       this.emailCheckText = false;

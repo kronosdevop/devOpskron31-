@@ -147,8 +147,8 @@ export default {
     },
 
     onuserinput(value) {
-      if (!value.includes(this.$store.getters.GetUserObj.user.user_id)) {
-        value.push(this.$store.getters.GetUserObj.user.user_id);
+      if (!value.includes(this.$store.getters.GetUserObj.user?.user_id)) {
+        value.push(this.$store.getters.GetUserObj.user?.user_id);
       }
       this.userDetails = value;
       this.search = "";

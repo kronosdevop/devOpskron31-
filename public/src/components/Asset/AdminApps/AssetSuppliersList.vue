@@ -1046,12 +1046,14 @@ export default {
       this.tableLoadingdata = true;
       try {
         let result = await API.graphql(
-          graphqlOperation(get_supplier_transactions, {
+          graphqlOperation(get_supplier_transactions, { 
+            input: {
             supplier_id: supplierId,
             organization_id:
               this.$store.getters.GetUserObj.organization.organization_id,
             nextToken: null,
             limit: 15,
+            }
           })
         );
         this.tableLoadingdata = false;

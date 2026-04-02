@@ -55,6 +55,12 @@
       fixed-header="true"
       hide-default-footer
     >
+    <template v-slot:loading>
+      <v-row class="pa-4" align="center" justify="center">
+        <v-progress-circular indeterminate color="primary"/>
+      <div class="text-subtitle-2 mt-15  loader text-grey">Loading Tickets</div>
+      </v-row>
+    </template>
       <!--No data Text-->
       <template #no-data>
         <div class="text-center py-8">
@@ -563,6 +569,7 @@ export default {
   padding-bottom: 6px;
   cursor: pointer;
 }
+
 .dashboard-text:hover {
   transform: translateY(-6px) !important;
 }
@@ -603,5 +610,8 @@ export default {
   .pagination-controls {
     justify-content: center;
   }
+}
+.loader{
+  margin-left: -6%
 }
 </style>

@@ -388,7 +388,7 @@
             :loading="loading"
             v-show="formInfo.is_geo_enabled == true"
             class="text-capitalize ml-1 cardCss button-corner text-white"
-            >Action From Mobile Only</v-btn
+            >Submit</v-btn
           >
         </v-card-actions>
       </v-card>

@@ -100,21 +100,90 @@
           </v-btn>
         </v-toolbar>
 
-        <div v-if="section_value.length != 0">
-          <!-- <apexchart
+<div>          <!-- <apexchart
             :series="section_value"
             :options="chartOptions"
             :key="updatekey"
           /> -->
-          <ColoumnChart
+          <!-- <ColoumnChart
+
             :key="'chart_' + updatekey"
             :coloumndata="section_value[0].data"
             :chartId="'coloumnContainer_' + updatekey"
-          />
+          /> -->
+<div class="table-wrapper">
+  <v-data-table
+    :headers="headers"
+    :items="paginatedItems"
+    :loading="tableLoading"
+    hide-default-footer
+      fixed-header
+  height="320"
+    class="modern-data-table"
+  >
+<template #body.prepend>
+  <tr v-if="tableLoading">
+    <td :colspan="headers.length" class="loader-td">
+      <div class="loader-center">
+        <v-progress-circular
+          indeterminate
+          size="42"
+          width="3"
+          color="primary"
+        />
+        <div class="loader-text">Loading Groups…</div>
+      </div>
+    </td>
+  </tr>
+</template>
+  </v-data-table>
+
+  <div class="table-footer">
+    <div class="footer-info">
+      {{
+        totalItems === 0
+          ? "No Results"
+          : `Showing ${paginatedItems.length} of ${totalItems} records`
+      }}
+    </div>
+
+    <div class="pagination-controls">
+      <v-btn
+        :disabled="currentPage === 1"
+        variant="text"
+        size="small"
+        class="pagination-btn"
+        @click="currentPage--"
+      >
+        Previous
+      </v-btn>
+
+      <div class="page-numbers">
+        <v-btn
+          v-for="page in visiblePages"
+          :key="page"
+          size="small"
+          :class="page === currentPage ? 'active-page' : 'inactive-page'"
+          @click="currentPage = page"
+        >
+          {{ page }}
+        </v-btn>
+      </div>
+
+      <v-btn
+        :disabled="currentPage === pageCount"
+        variant="text"
+        size="small"
+        class="pagination-btn"
+        @click="currentPage++"
+      >
+        Next
+      </v-btn>
+    </div>
+  </div>
+</div>
         </div>
-        <div v-else class="center-container">
-          <span>No Records</span>
-        </div>
+       
       </v-card-text>
     </v-card>
     <ExportGroupAndCat
@@ -149,13 +218,17 @@ export default {
   },
   data() {
     return {
+    currentPage: 1,
+    itemsPerPage: 10,
+    totalItems: 0,
+
       formattedmonth: "",
       formattedyear: "",
       selectedData: "",
       monthlyTotal: "0",
       ExportreportDialog: false,
       datevalue: "",
-      SnackBarComponent: {},
+      SnackBarComponent: {},  
       section_value: [
         // {
         //   x: ["a", "b", "c"],
@@ -183,91 +256,32 @@ export default {
       ],
       itemyears: [],
       updatekey: 0,
-      chartOptions: {
-        chart: {
-          type: "bar",
-          height: 180,
-        },
-        series: [],
-        xaxis: {
-          categories: [],
-        },
-        yaxis: {
-          title: {
-            text: "Amount",
-          },
-        },
-        title: {
-          text: "Expenses by Group",
-          align: "left",
-          margin: 10,
-          offsetX: 0,
-          offsetY: 0,
-          floating: false,
-          style: {
-            fontSize: "18px",
-            fontWeight: "bold",
-            color: "#263238",
-          },
-        },
-        dataLabels: {
-          enabled: false,
-        },
-        legend: {
-          position: "right",
-          offsetY: 40,
-        },
-        plotOptions: {
-          bar: {
-            horizontal: false,
-            columnWidth: "55%",
-            endingShape: "rounded",
-          },
-        },
-        fill: {
-          type: "gradient",
-          gradient: {
-            shade: "light",
-            type: "vertical",
-            shadeIntensity: 0.25,
-            gradientIntensity: 0.75,
-            stops: [0, 100],
-          },
-        },
-        stroke: {
-          show: true,
-          width: 2,
-          colors: ["transparent"],
-        },
-        tooltip: {
-          y: {
-            formatter: function (val) {
-              return "$ " + val;
-            },
-          },
-        },
-        grid: {
-          row: {
-            colors: ["transparent"],
-            opacity: 0.5,
-          },
-        },
-        responsive: [
-          {
-            breakpoint: 480,
-            options: {
-              chart: {
-                width: 200,
-              },
-              legend: {
-                position: "bottom",
-              },
-            },
-          },
-        ],
-      },
+    headers:[
+      {title:"Group name", value:"group_name"},
+      {title:"Expense", value:"expense"},
+      {title:"Petty Cash" , value:"pettycash"},
+      {title:"Total" , value:"total"}
+    ],
+        tableLoading: false,
+    tableItems: [],  
+
     };
   },
+    watch: {
+      currentPage(newVal) {
+        const table = document.querySelector(".modern-data-table");
+        if (table) table.scrollIntoView({ behavior: "smooth", block: "start" });
+      },
+      tableData: {
+        handler(newVal) {
+          const maxPage = Math.ceil(this.totalItems / this.itemsPerPage);
+          if (this.currentPage > maxPage && maxPage > 0) {
+            this.currentPage = 1;
+          }
+        },
+        deep: true,
+      },
+    },
   mounted() {
     this.populateYearItems();
     this.setInitialFilters();
@@ -282,6 +296,29 @@ export default {
       this.updateDatedisplayMonth();
     },
   },
+computed: {
+  paginatedItems() {
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    const end = start + this.itemsPerPage;
+    return this.tableItems.slice(start, end);
+  },
+
+  pageCount() {
+    return Math.ceil(this.totalItems / this.itemsPerPage);
+  },
+
+  visiblePages() {
+    const delta = 2;
+    let start = Math.max(1, this.currentPage - delta);
+    let end = Math.min(this.pageCount, this.currentPage + delta);
+
+    const pages = [];
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    return pages;
+  },
+},
   methods: {
     exportreport() {
       // console.log("item", item)
@@ -375,6 +412,7 @@ export default {
       this.formattedyear = parseInt(this.yearfilter, 10);
     },
     async get_next() {
+        this.tableLoading = true; 
       await this.fecth_date();
       var data = this.$store.getters.GetUserObj;
 
@@ -403,6 +441,10 @@ export default {
         );
         let resultdata = JSON.parse(result.data.expense_reports_graph);
         if (resultdata.Status == "SUCCESS") {
+           this.tableItems = resultdata.data || [];
+  this.tableItems = resultdata.data || [];
+this.totalItems = this.tableItems.length;
+this.currentPage = 1;// reset page
           let response = resultdata.data;
           if (resultdata.data.length > 0) {
             this.section_value = [];
@@ -414,6 +456,8 @@ export default {
             ];
           
             this.updatekey++;
+                      this.tableItems = resultdata.data
+
             this.monthlyTotal = resultdata.monthly_total || "0";
             // console.log("Chart data updated:", this.section_value);
           } else {
@@ -429,6 +473,8 @@ export default {
           // console.log("API returned error status");
         }
       } catch (error) {
+          this.tableItems = [];
+
         console.log("error", error);
         this.SnackBarComponent = {
           SnackbarVmodel: true,
@@ -439,7 +485,9 @@ export default {
         };
         this.monthlyTotal = "0";
         this.section_value = [];
-      }
+      }finally {
+    this.tableLoading = false;
+  }
     },
     selectMonth(month) {
       this.monthfilter = month;
@@ -505,5 +553,104 @@ export default {
   color: white !important;
   background-color: #1e3e5c !important;
   border-radius: 10px !important;
+}
+.table-wrapper {
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Table itself */
+.modern-data-table {
+  background: white;
+}
+
+/* Header */
+.modern-data-table thead th {
+  background: #ffffff;
+  font-weight: 600;
+  font-size: 14px;
+  color: #222;
+  border-bottom: 1.5px solid #e0e0e0;
+  padding: 14px 12px;
+}
+
+.modern-data-table tbody tr {
+  height: 56px;
+  border-bottom: 1px solid #e6e6e6;
+}
+
+.modern-data-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+/* Cells */
+.modern-data-table tbody td {
+  font-size: 14px;
+  color: #222;
+  padding: 12px;
+}
+.table-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  border-top: 1px solid #e0e0e0;
+  background: #ffffff;
+}
+
+.footer-info {
+  font-size: 14px;
+  color: #666;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pagination-btn {
+  text-transform: none;
+  font-size: 14px;
+}
+
+.active-page {
+  background: #db4c77 !important;
+  color: white !important;
+  min-width: 36px;
+  height: 36px;
+}
+
+.inactive-page {
+  color: #666;
+  min-width: 36px;
+  height: 36px;
+}
+.modern-data-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: white;
+}
+.loader-td {
+  padding: 0 !important;
+  text-align: center;
+}
+
+.loader-center {
+  height: 300px;
+  display: flex;
+    /* margin-top: -5%; */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.loader-text {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #666;
 }
 </style>

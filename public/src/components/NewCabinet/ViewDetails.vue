@@ -56,7 +56,7 @@
             <v-divider
               v-show="
                 rowInfo.folder_created_by_email ==
-                $store.getters.GetUserObj.user.user_email_id
+                $store.getters.GetUserObj.user?.user_email_id
               "
               vertical
             >
@@ -64,7 +64,7 @@
             <v-col
               v-show="
                 rowInfo.folder_created_by_email ==
-                $store.getters.GetUserObj.user.user_email_id
+                $store.getters.GetUserObj.user?.user_email_id
               "
               cols="6"
             >
@@ -120,7 +120,7 @@
           <v-btn
             v-show="
               rowInfo.folder_created_by_email ==
-              $store.getters.GetUserObj.user.user_email_id
+              $store.getters.GetUserObj.user?.user_email_id
             "
             size="small"
             :loading="loading2"
@@ -189,8 +189,8 @@ export default {
   },
   methods: {
     onuserinput(value) {
-      if (!value.includes(this.$store.getters.GetUserObj.user.user_id)) {
-        value.push(this.$store.getters.GetUserObj.user.user_id);
+      if (!value.includes(this.$store.getters.GetUserObj.user?.user_id)) {
+        value.push(this.$store.getters.GetUserObj.user?.user_id);
       }
       this.userDetails = value;
       this.search = "";

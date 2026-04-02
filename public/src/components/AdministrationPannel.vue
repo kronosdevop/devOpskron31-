@@ -49,18 +49,6 @@
               @update:model-value="handleAppsSearchChange"
             />
           </div>
-
-          <!-- App Type Filter -->
-          <!-- <v-radio-group
-            v-model="appsToggleExclusive"
-            inline
-            color="primary"
-            class="apps-radio-group"
-            v-if="billingType !== 'FREE_TIER'"
-          >
-            <v-radio label="User Apps" value="apps"></v-radio>
-            <v-radio label="Admin Apps" value="restrictedApps"></v-radio>
-          </v-radio-group> -->
         </div>
 
         <!-- Audit Trail Filter Controls -->
@@ -90,19 +78,6 @@
             />
           </v-btn>
         </div>
-
-        <!-- Settings Controls -->
-        <!-- <div v-if="adminToggle === 'settings'" class="settings-controls">
-          <div class="current-plan-card" @click="openUpgradeDialog">
-            <div class="plan-info">
-              <div class="plan-label">Current Plan</div>
-              <div class="plan-name">{{ billingType }}</div>
-            </div>
-            <v-icon size="18" color="#DB4C77" class="upgrade-icon"
-              >mdi-chevron-right</v-icon
-            >
-          </div>
-        </div> -->
 
         <v-btn
           v-if="adminToggle === 'admins'"
@@ -595,7 +570,7 @@ export default {
       this.auditTempDateTo = currentDate;
       this.auditComputedDateDisplay = this.formatAuditDate(this.auditTempDate);
       this.auditDataDisplayFormatted = this.formatAuditDate(
-        this.auditTempDateTo
+        this.auditTempDateTo,
       );
       this.auditSelectStatusType = "ALL";
       this.auditSelectSourceType = "0";
@@ -610,7 +585,7 @@ export default {
     saveAuditDate() {
       if (this.auditTempDate) {
         this.auditComputedDateDisplay = this.formatAuditDate(
-          this.auditTempDate
+          this.auditTempDate,
         );
       }
       this.auditDatePicker = false;
@@ -619,7 +594,7 @@ export default {
     saveAuditDateTo() {
       if (this.auditTempDateTo) {
         this.auditDataDisplayFormatted = this.formatAuditDate(
-          this.auditTempDateTo
+          this.auditTempDateTo,
         );
       }
       this.auditDatePickerTo = false;

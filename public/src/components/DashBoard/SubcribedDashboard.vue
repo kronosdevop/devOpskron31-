@@ -75,7 +75,8 @@
                   size="32"
                   class="mb-4"
                 ></v-progress-circular>
-                <div class="text-body-2 text-grey">Loading dashboards...</div>
+                <div class="text-body-2 text-grey">Loading  Subscribed Dashboards
+...</div>
               </div>
             </template>
 
@@ -98,7 +99,7 @@
                       class="ml-2"
                       v-show="
                         item.dashboard_created_by ==
-                        $store.getters.GetUserObj.user.user_email_id
+                        $store.getters.GetUserObj.user?.user_email_id
                       "
                     >
                       mdi-account
@@ -158,7 +159,7 @@
               <div v-if="item.dashboard_type == 'CUSTOM'" class="d-flex align-center">
                 <v-tooltip location="top" v-if="
                   item.dashboard_created_by ==
-                  $store.getters.GetUserObj.user.user_email_id
+                  $store.getters.GetUserObj.user?.user_email_id
                 ">
                   <template v-slot:activator="{ props }">
                     <v-icon
@@ -175,7 +176,7 @@
                 </v-tooltip>
                 <v-tooltip location="top" v-if="
                   item.dashboard_created_by ==
-                  $store.getters.GetUserObj.user.user_email_id
+                  $store.getters.GetUserObj.user?.user_email_id
                 ">
                   <template v-slot:activator="{ props }">
                     <v-icon
@@ -191,7 +192,7 @@
                 </v-tooltip>
                 <span v-if="
                   item.dashboard_created_by !=
-                  $store.getters.GetUserObj.user.user_email_id
+                  $store.getters.GetUserObj.user?.user_email_id
                 " class="caption grey--text">-</span>
               </div>
               <div v-else class="d-flex align-center">

@@ -53,15 +53,22 @@
                   <v-dialog v-model="datePicker" persistent max-width="325">
                     <v-card>
                       <v-date-picker
-                          v-model="tempDate"
-                          :min="minDate"
-                          color="#DB4C77"
-                          class="primaryColor"
+                        v-model="tempDate"
+                        :min="minDate"
+                        color="#DB4C77"
+                        class="primaryColor"
                       ></v-date-picker>
-                      <v-card-actions>                        
-                      <v-spacer />
-                      <v-btn text color="primaryColor" @click="datePicker = false">Cancel</v-btn>
-                      <v-btn text color="primaryColor" @click="saveDate">OK</v-btn>
+                      <v-card-actions>
+                        <v-spacer />
+                        <v-btn
+                          text
+                          color="primaryColor"
+                          @click="datePicker = false"
+                          >Cancel</v-btn
+                        >
+                        <v-btn text color="primaryColor" @click="saveDate"
+                          >OK</v-btn
+                        >
                       </v-card-actions>
                     </v-card>
                   </v-dialog>
@@ -79,11 +86,7 @@
                   label="Start Time"
                   readonly
                 >
-                  <v-dialog
-                    v-model="startMenu"
-                    activator="parent"
-                    width="auto"
-                  >
+                  <v-dialog v-model="startMenu" activator="parent" width="auto">
                     <v-time-picker
                       v-if="startMenu"
                       v-model="startTime"
@@ -104,23 +107,30 @@
                   @click="datePickerTo = true"
                   :rules="[(v) => !!v || 'Required ']"
                   readonly
-                  >
-                    <v-dialog v-model="datePickerTo" persistent max-width="325">
-                      <v-card>
-                        <v-date-picker
-                          v-model="tempDateTo"
-                          :min="fromDate"
-                          color="#DB4C77"
-                          class="primaryColor"
-                        ></v-date-picker>
-                        <v-card-actions>
-                          <v-spacer/>
-                          <v-btn text color="primaryColor" @click="datePickerTo = false">Cancel</v-btn>
-                          <v-btn text color="primaryColor" @click="saveDateTo">OK</v-btn>
-                        </v-card-actions>
-                      </v-card>
-                    </v-dialog> 
-                  </v-text-field>
+                >
+                  <v-dialog v-model="datePickerTo" persistent max-width="325">
+                    <v-card>
+                      <v-date-picker
+                        v-model="tempDateTo"
+                        :min="fromDate"
+                        color="#DB4C77"
+                        class="primaryColor"
+                      ></v-date-picker>
+                      <v-card-actions>
+                        <v-spacer />
+                        <v-btn
+                          text
+                          color="primaryColor"
+                          @click="datePickerTo = false"
+                          >Cancel</v-btn
+                        >
+                        <v-btn text color="primaryColor" @click="saveDateTo"
+                          >OK</v-btn
+                        >
+                      </v-card-actions>
+                    </v-card>
+                  </v-dialog>
+                </v-text-field>
               </v-col>
               <v-col cols="6">
                 <v-text-field
@@ -152,7 +162,7 @@
                 </v-text-field>
               </v-col>
               <v-col class="mt-n1 ml-n1" cols="12">
-                <div class="text-left mt-n2 ml-2" style="font-size: 15px;">
+                <div class="text-left mt-n2 ml-2" style="font-size: 15px">
                   <span>Event Visibilty</span>
                 </div>
                 <v-row class="ml-1">
@@ -171,34 +181,35 @@
                     ></v-radio>
                   </v-radio-group>
                 </v-row>
-                  <v-autocomplete
-                    v-model="loaction"
-                    multiple
-                    v-if="locationupdate == 'RESTRICTED_LOCATIONS'"
-                    label="Location"
-                    :items="loactionitems"
-                    :search-input.sync="searchloc"
-                    :rules="
-                      locationupdate == 'RESTRICTED_LOCATIONS'
-                        ? [
-                            (v) =>
-                              v.length > 0 ||
-                              'At least one location is required',
-                          ]
-                        : []
-                    "
-                    hide-no-data
-                    style="max-width: 240px"
-                    class="mt-1"
-                    item-text="title"
-                    item-value="location_id"
-                    density="compact"
-                    variant="outlined"
-                    row="1"
-                  />
+                <v-autocomplete
+                  v-model="loaction"
+                  multiple
+                  v-if="locationupdate == 'RESTRICTED_LOCATIONS'"
+                  label="Location"
+                  :items="loactionitems"
+                  :search-input.sync="searchloc"
+                  :rules="
+                    locationupdate == 'RESTRICTED_LOCATIONS'
+                      ? [
+                          (v) =>
+                            v.length > 0 || 'At least one location is required',
+                        ]
+                      : []
+                  "
+                  hide-no-data
+                  style="max-width: 240px"
+                  class="mt-1"
+                  item-text="title"
+                  item-value="location_id"
+                  density="compact"
+                  variant="outlined"
+                  row="1"
+                />
               </v-col>
               <v-col cols="12">
-                <div class="text-left mt-1" style="font-size: 15px;"><span>Location</span></div>
+                <div class="text-left mt-1" style="font-size: 15px">
+                  <span>Location</span>
+                </div>
                 <v-radio-group
                   :rules="[(v) => !!v || 'Required ']"
                   v-model="locationSelection"
@@ -268,7 +279,8 @@
 import { edit_delete_events } from "@/graphql/mutations.js";
 import { get_location_details } from "@/mixins/GetLocations.js";
 import { API, graphqlOperation } from "aws-amplify";
-import { VTimePicker } from 'vuetify/labs/VTimePicker'
+import { VTimePicker } from 'vuetify/components'
+
 
 export default {
   components: {
@@ -345,16 +357,16 @@ export default {
       this.datePicker = false; // Close the date picker
     },
     saveDateTo() {
-      if(this.tempDateTo) {
-        this.toDate  = this.formatDate(this.tempDateTo);
+      if (this.tempDateTo) {
+        this.toDate = this.formatDate(this.tempDateTo);
       }
       this.datePickerTo = false;
     },
     formatDate(date) {
       const d = new Date(date);
       const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
       return `${year}-${month}-${day}`;
     },
     fetch_details() {
@@ -456,7 +468,7 @@ export default {
                   ? this.virtualAddress
                   : undefined,
             },
-          })
+          }),
         );
         var response = JSON.parse(result.data.edit_delete_events);
 

@@ -110,7 +110,7 @@
         <div class="table-footer">
           <div class="footer-info">
             {{
-              sortedAndPaginatedItems === 0
+              sortedAndPaginatedItems.length === 0
                 ? "No Results"
                 : `Showing ${sortedAndPaginatedItems.length} of ${totalItems} activities`
             }}
@@ -139,9 +139,10 @@
               class="pagination-btn"
               variant="text"
               size="small"
-              @click="currentPage = currentPage - 1"
-              >Next</v-btn
+              @click="currentPage = currentPage + 1"
             >
+              Next
+            </v-btn>
           </div>
         </div>
       </v-card-text>

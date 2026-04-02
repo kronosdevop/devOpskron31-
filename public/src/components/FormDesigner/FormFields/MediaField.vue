@@ -503,7 +503,7 @@ export default {
       await Auth.currentCredentials();
       const orgDetails = this.$store.getters.GetOrgDetails;
 
-      const userId = this.$store.getters.GetUserObj.user.user_id;
+      const userId = this.$store.getters.GetUserObj.user?.user_id;
 
       const key =
         "workflow" +
@@ -566,7 +566,7 @@ export default {
     //       "/" +
     //       deatils.organization.organization_id +
     //       "/" +
-    //       self.$store.getters.GetUserObj.user.user_id +
+    //       self.$store.getters.GetUserObj.user?.user_id +
     //       "/" +
     //       Date.now() +
     //       "/" +

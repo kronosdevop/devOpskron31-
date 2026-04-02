@@ -4,7 +4,8 @@ import { API, graphqlOperation } from "aws-amplify";
 export const GetAllCategories = {
   data: () => ({
     loading: false,
-    ListAllCategories: [],
+    ListCustomCategories: [],
+    ListDefaultCategories: [],
   }),
 
   methods: {
@@ -22,11 +23,13 @@ export const GetAllCategories = {
           result.data.create_list_edit_delete_splay_categories,
         );
         if (resultObj.Status === "SUCCESS") {
-          this.ListAllCategories = resultObj.data.filter((item) => item.repository_source != "CUSTOM");
+          this.ListCustomCategories = resultObj.data.custom_categories;
+          this.ListDefaultCategories = resultObj.data.default_categories;
         }
         this.loading = false;
       } catch (error) {
-        this.ListAllCategories = [];
+        this.ListCustomCategories = [];
+        this.ListDefaultCategories = [];
       } finally {
         this.loading = false;
       }

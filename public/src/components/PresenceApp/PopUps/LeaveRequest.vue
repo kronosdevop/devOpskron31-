@@ -213,14 +213,14 @@ export default {
       fromDateDetails: "",
       leaveTypesGlobal: [],
       headers: [
-        { title: "Leave  Type", value: "leave_type", sortable: false },
+        { title:"Leave Type", value:"leave_type", sortable: false },
 
         {
-          title: "Total",
-          value: "total_leaves",
+          title:"Total",
+          value:"total_leaves",
           sortable: false,
         },
-        { title: "Pending", value: "remaining_leaves", sortable: false },
+        { title:"Remaining", value:"remaining_leaves", sortable: false },
       ],
       tableData: [],
       allowedYears: [],
@@ -314,7 +314,7 @@ export default {
       const day = String(d.getDate()).padStart(2, "0");
       return `${year}-${month}-${day}`;
     },
-    
+
     formatDateLocal(date) {
       // Format date in local timezone to avoid UTC conversion issues with toISOString()
       // This ensures December 31 stays as December 31 regardless of timezone

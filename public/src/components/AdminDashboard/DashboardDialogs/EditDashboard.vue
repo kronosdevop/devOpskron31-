@@ -12,7 +12,7 @@
                   cols="12"
                   v-if="
                     $store.getters.Getdashboarditems.dashboard_created_by ==
-                    $store.getters.GetUserObj.user.user_email_id
+                    $store.getters.GetUserObj.user?.user_email_id
                   "
                 >
                   <v-text-field
@@ -133,7 +133,7 @@
           @click="edit_mutation()"
           v-show="
             $store.getters.Getdashboarditems.dashboard_created_by ==
-            $store.getters.GetUserObj.user.user_email_id
+            $store.getters.GetUserObj.user?.user_email_id
           "
           dark
           class="cardCss button-corner text-capitalize"
@@ -191,7 +191,7 @@ export default {
     this.member_qr = this.$store.getters.Getdashboarditems.dashboard_link;
     if (
       this.$store.getters.Getdashboarditems.dashboard_created_by !=
-      this.$store.getters.GetUserObj.user.user_email_id
+      this.$store.getters.GetUserObj.user?.user_email_id
     ) {
       this.isUserReadOnly = true;
     }

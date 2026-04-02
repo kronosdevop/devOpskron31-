@@ -43,8 +43,8 @@
             </div>
           </template>
 
-          <template v-slot:[`item.asset_verified_by`]="{ item }">
-            <span>{{ item.asset_verified_by }}</span>
+          <template v-slot:[`item.asset_verified_by_name`]="{ item }">
+            <span>{{ item.asset_verified_by_name }}</span>
           </template>
 
           <template v-slot:[`item.asset_verified_on`]="{ item }">
@@ -248,7 +248,7 @@ export default {
         },
         {
           title: "Verified By",
-          value: "asset_verified_by",
+          value: "asset_verified_by_name",
           sortable: false,
         },
         {

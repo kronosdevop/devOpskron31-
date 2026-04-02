@@ -1,12 +1,8 @@
 <template>
-  <CreateExternalTicketDialog
-    :DialogCreateExternalTicket="DialogCreateExternalTicket"
-    :screenshot-file="ScreenshotFile"
-    :org-details="orgDetails"
-    @clicked="DialogCreateExternalTicketEmit"
-  />
+  <CreateExternalTicketDialog :DialogCreateExternalTicket="DialogCreateExternalTicket" :screenshot-file="ScreenshotFile"
+    :org-details="orgDetails" @clicked="DialogCreateExternalTicketEmit" />
   <div class="presence-container">
-    <v-app-bar class="modern-header-section">
+    <v-app-bar class="modern-header-section" elevation="0">
       <div class="header-left">
         <div class="header-icon-container">
           <div class="header-icon-bg">
@@ -15,9 +11,7 @@
         </div>
         <div class="header-text">
           <span class="header-title">Attendance</span>
-          <span class="header-subtitle"
-            >Track your attendance and swipe logs</span
-          >
+          <span class="header-subtitle">Track your attendance and swipe logs</span>
         </div>
       </div>
       <v-spacer />
@@ -30,19 +24,12 @@
             </v-btn>
           </template>
         </v-tooltip>
-        <!-- Search Field - Only show for Scan Logs tab -->
-
         <!-- Single More Button with Dropdown -->
         <v-menu offset-y>
           <template v-slot:activator="{ props }">
-            <v-btn
-              class="action-btn menu-btn mr-3"
-              v-bind="props"
-              size="small"
-              v-if="
-                toggle_exclusive === 'logscan' 
-              "
-            >
+            <v-btn class="action-btn menu-btn mr-4" v-bind="props" size="small" v-if="
+              toggle_exclusive === 'logscan'
+            ">
               <v-icon>mdi-dots-vertical</v-icon>
               <span>Actions</span>
             </v-btn>
@@ -50,11 +37,7 @@
 
           <v-list density="compact">
             <!-- Apply Leave - Only show for Scan Logs tab -->
-            <v-list-item
-              @click="request_leave"
-              style="font-size: 12px"
-              v-if="toggle_exclusive === 'logscan'"
-            >
+            <v-list-item @click="request_leave" style="font-size: 12px" v-if="toggle_exclusive === 'logscan'">
               <template #prepend>
                 <v-icon size="small" color="green">mdi-calendar-plus</v-icon>
               </template>
@@ -62,16 +45,12 @@
             </v-list-item>
 
             <!-- Cancel Leave - Only show for Scan Logs tab -->
-            <v-list-item
-              v-if="
-                check == 1 &&
-                toggle_exclusive === 'logscan' &&
-                leavesArray.length != 0 &&
-                toggle_exclusive === 'logscan'
-              "
-              @click="cancel_leave"
-              style="font-size: 12px"
-            >
+            <v-list-item v-if="
+              check == 1 &&
+              toggle_exclusive === 'logscan' &&
+              leavesArray.length != 0 &&
+              toggle_exclusive === 'logscan'
+            " @click="cancel_leave" style="font-size: 12px">
               <template #prepend>
                 <v-icon size="small" color="red">mdi-calendar-remove</v-icon>
               </template>
@@ -79,11 +58,8 @@
             </v-list-item>
 
             <!-- Request ESA -->
-            <v-list-item
-              @click="request_esa"
-              style="font-size: 12px"
-              v-if="is_early_salary_enabled && toggle_exclusive === 'logscan'"
-            >
+            <v-list-item @click="request_esa" style="font-size: 12px"
+              v-if="is_early_salary_enabled && toggle_exclusive === 'logscan'">
               <template #prepend>
                 <v-icon size="small" color="orange">mdi-cash-fast</v-icon>
               </template>
@@ -91,11 +67,7 @@
             </v-list-item>
 
             <!-- Scan - Only show for Scan Logs tab -->
-            <v-list-item
-              v-if="toggle_exclusive === 'logscan'"
-              @click="openCamera()"
-              style="font-size: 12px"
-            >
+            <v-list-item v-if="toggle_exclusive === 'logscan'" @click="openCamera()" style="font-size: 12px">
               <template #prepend>
                 <v-icon size="small" color="blue">mdi-account</v-icon>
               </template>
@@ -103,7 +75,7 @@
             </v-list-item>
 
             <!-- Month Picker - Only show for Reports tab -->
-            
+
             <!-- Admin Presence -->
             <!-- <v-list-item
               v-if="adminAppExists"
@@ -121,49 +93,24 @@
     </v-app-bar>
 
     <!-- Month Picker Dialog -->
-    <v-menu
-      v-model="monthPicker"
-      :close-on-content-click="false"
-      persistent
-      max-width="350"
-      transition="scale-transition"
-      scroll-strategy="none"
-    >
+    <v-menu v-model="monthPicker" :close-on-content-click="false" persistent max-width="350"
+      transition="scale-transition" scroll-strategy="none">
       <v-card class="monthpicker ml-15">
         <v-card-text>
           <v-row>
             <v-col cols="12" sm="7" class="">
-              <span class="ml-6" style="font-size: 19px"
-                ><b>{{ datedisplayMonth }}</b></span
-              >
+              <span class="ml-6" style="font-size: 19px"><b>{{ datedisplayMonth }}</b></span>
             </v-col>
             <v-col>
-              <v-select
-                label="Select Year"
-                v-model="yearfilter"
-                :items="itemyears"
-                density="compact"
-                variant="outlined"
-                style="max-width: 100px"
-                class=""
-              ></v-select>
+              <v-select label="Select Year" v-model="yearfilter" :items="itemyears" density="compact" variant="outlined"
+                style="max-width: 100px" class=""></v-select>
             </v-col>
           </v-row>
 
           <v-row class="ml-n2" dense>
-            <v-col
-              v-for="(month, index) in monthNames"
-              :key="index"
-              cols="4"
-              class="d-flex justify-center"
-            >
-              <v-btn
-                class="ma-1"
-                :class="{ 'active-btn': month === monthfilter }"
-                density="compact"
-                :disabled="isMonthDisabled(index)"
-                @click="selectMonth(month)"
-              >
+            <v-col v-for="(month, index) in monthNames" :key="index" cols="4" class="d-flex justify-center">
+              <v-btn class="ma-1" :class="{ 'active-btn': month === monthfilter }" density="compact"
+                :disabled="isMonthDisabled(index)" @click="selectMonth(month)">
                 {{ month }}
               </v-btn>
             </v-col>
@@ -173,14 +120,8 @@
             <v-btn text class="ma-1" density="compact" @click="closedialog()">
               Cancel
             </v-btn>
-            <v-btn
-              color="primary"
-              text
-              class="ma-1 mr-8"
-              density="compact"
-              @click="saveSelection"
-              v-on:click="get_data(date1)"
-            >
+            <v-btn color="primary" text class="ma-1 mr-8" density="compact" @click="saveSelection"
+              v-on:click="get_data(date1)">
               Save
             </v-btn>
           </v-row>
@@ -193,15 +134,11 @@
         <v-tabs v-model="toggle_exclusive" mandatory class="modern-tab-toggle">
           <v-tab value="logscan" class="tab-btn"> Scan Logs </v-tab>
           <v-tab value="reportuser" class="tab-btn"> My Reports </v-tab>
-          <v-tab
-            value="leavesummary"
-            class="tab-btn"
-            v-if="
-              $store.getters.GetUserObj.organization &&
-              $store.getters.GetUserObj.organization.organization_id ==
-                '4a15f402-3e19-4d9b-83a5-429715785f72'
-            "
-          >
+          <v-tab value="leavesummary" class="tab-btn" v-if="
+            $store.getters.GetUserObj.organization &&
+            $store.getters.GetUserObj.organization.organization_id ==
+            '4a15f402-3e19-4d9b-83a5-429715785f72'
+          ">
             Leave Summary
           </v-tab>
           <v-tab value="adminstration" class="tab-btn" v-if="adminAppExists">
@@ -222,27 +159,13 @@
                 <v-row no-gutters>
                   <!-- Table Column -->
                   <v-col cols="8">
-                    <v-data-table
-                      :headers="headers"
-                      :items="sortedAndPaginatedItems"
-                      :loading="tableLoading"
-                      :items-per-page="200"
-                      :page="currentPage"
-                      :server-items-length="totalItems"
-                      hide-default-footer
-                      class="modern-data-table"
-                      density="comfortable"
-                      hover
-                      multi-sort
-                      fixed-header
-                      :height="tableHeight"
-                      @update:sort-by="handleSortChange"
-                    >
+                    <v-data-table :headers="headers" :items="sortedAndPaginatedItems" :loading="tableLoading"
+                      :items-per-page="200" :page="currentPage" :server-items-length="totalItems" hide-default-footer
+                      class="modern-data-table" density="comfortable" hover multi-sort fixed-header
+                      :height="tableHeight" @update:sort-by="handleSortChange">
                       <template v-slot:no-data>
                         <div class="text-center py-8">
-                          <v-icon size="64" color="grey-lighten-1" class="mb-4"
-                            >mdi-clock-outline</v-icon
-                          >
+                          <v-icon size="64" color="grey-lighten-1" class="mb-4">mdi-clock-outline</v-icon>
                           <div class="text-h6 text-grey mb-2">
                             No Swipe Logs Found
                           </div>
@@ -254,12 +177,8 @@
 
                       <template v-slot:loading>
                         <div class="text-center py-8">
-                          <v-progress-circular
-                            indeterminate
-                            color="primary"
-                            size="32"
-                            class="mb-4"
-                          ></v-progress-circular>
+                          <v-progress-circular indeterminate color="primary" size="32"
+                            class="mb-4"></v-progress-circular>
                           <div class="text-body-2 text-grey">
                             Loading swipe logs...
                           </div>
@@ -271,43 +190,38 @@
                         <v-tooltip bottom>
                           <template v-slot:activator="{ props }">
                             <div class="d-flex align-center" v-bind="props">
-                              <v-icon
-                                :color="
-                                  item.swipe_source == 'DATACORRECTION'
-                                    ? '#757575'
-                                    : item.swipe_source == 'PROXY'
+                              <v-icon :color="item.swipe_source == 'DATACORRECTION'
+                                  ? '#757575'
+                                  : item.swipe_source == 'PROXY'
                                     ? '#757575'
                                     : item.swipe_source == 'FACE'
-                                    ? '#757575'
-                                    : item.swipe_source == 'KIOSK'
-                                    ? '#757575'
-                                    : item.swipe_source == 'RFID'
-                                    ? '#757575'
-                                    : item.swipe_source == 'QR'
-                                    ? '#757575'
-                                    : item.swipe_source == 'WHATSAPP'
-                                    ? '#757575'
-                                    : ''
-                                "
-                                size="20"
-                                class="mr-2"
-                              >
+                                      ? '#757575'
+                                      : item.swipe_source == 'KIOSK'
+                                        ? '#757575'
+                                        : item.swipe_source == 'RFID'
+                                          ? '#757575'
+                                          : item.swipe_source == 'QR'
+                                            ? '#757575'
+                                            : item.swipe_source == 'WHATSAPP'
+                                              ? '#757575'
+                                              : ''
+                                " size="20" class="mr-2">
                                 {{
                                   item.swipe_source == "DATACORRECTION"
                                     ? "mdi-human-edit"
                                     : item.swipe_source == "PROXY"
-                                    ? "mdi-odnoklassniki"
-                                    : item.swipe_source == "FACE"
-                                    ? "mdi-face-recognition"
-                                    : item.swipe_source == "KIOSK"
-                                    ? "mdi-alpha-k-circle-outline"
-                                    : item.swipe_source == "RFID"
-                                    ? "mdi-card-account-details"
-                                    : item.swipe_source == "QR"
-                                    ? "mdi-qrcode"
-                                    : item.swipe_source == "WHATSAPP"
-                                    ? "mdi-whatsapp"
-                                    : ""
+                                      ? "mdi-odnoklassniki"
+                                      : item.swipe_source == "FACE"
+                                        ? "mdi-face-recognition"
+                                        : item.swipe_source == "KIOSK"
+                                          ? "mdi-alpha-k-circle-outline"
+                                          : item.swipe_source == "RFID"
+                                            ? "mdi-card-account-details"
+                                            : item.swipe_source == "QR"
+                                              ? "mdi-qrcode"
+                                              : item.swipe_source == "WHATSAPP"
+                                                ? "mdi-whatsapp"
+                                                : ""
                                 }}
                               </v-icon>
                               <span class="caption font-weight-medium">
@@ -315,18 +229,18 @@
                                   item.swipe_source == "DATACORRECTION"
                                     ? "Data Correction"
                                     : item.swipe_source == "PROXY"
-                                    ? "Proxy"
-                                    : item.swipe_source == "FACE"
-                                    ? "Face Recognition"
-                                    : item.swipe_source == "KIOSK"
-                                    ? "Kiosk"
-                                    : item.swipe_source == "RFID"
-                                    ? "Source: RFID"
-                                    : item.swipe_source == "QR"
-                                    ? "Source: QR"
-                                    : item.swipe_source == "WHATSAPP"
-                                    ? "Source: WhatsApp"
-                                    : ""
+                                      ? "Proxy"
+                                      : item.swipe_source == "FACE"
+                                        ? "Face Recognition"
+                                        : item.swipe_source == "KIOSK"
+                                          ? "Kiosk"
+                                          : item.swipe_source == "RFID"
+                                            ? "Source: RFID"
+                                            : item.swipe_source == "QR"
+                                              ? "Source: QR"
+                                              : item.swipe_source == "WHATSAPP"
+                                                ? "Source: WhatsApp"
+                                                : ""
                                 }}
                               </span>
                             </div>
@@ -340,14 +254,14 @@
                                 item.swipe_source == "DATACORRECTION"
                                   ? "Source: Data Correction"
                                   : item.swipe_source == "PROXY"
-                                  ? item.proxy_message || "Source: Proxy"
-                                  : item.swipe_source == "FACE"
-                                  ? "Source: FACE"
-                                  : item.swipe_source == "KIOSK"
-                                  ? "Source: KIOSK"
-                                  : item.swipe_source == "WHATSAPP"
-                                  ? "Source: WhatsApp"
-                                  : "Source: " + item.swipe_source
+                                    ? item.proxy_message || "Source: Proxy"
+                                    : item.swipe_source == "FACE"
+                                      ? "Source: FACE"
+                                      : item.swipe_source == "KIOSK"
+                                        ? "Source: KIOSK"
+                                        : item.swipe_source == "WHATSAPP"
+                                          ? "Source: WhatsApp"
+                                          : "Source: " + item.swipe_source
                               }}
                             </div>
                           </div>
@@ -393,14 +307,8 @@
                       <!-- Geo Location -->
                       <template v-slot:[`item.swipe_lat`]="{ item }">
                         <div class="d-flex align-center justify-center">
-                          <v-btn
-                            icon
-                            size="small"
-                            variant="text"
-                            color="primary"
-                            @click="get_location(item)"
-                            class="cursor-pointer"
-                          >
+                          <v-btn icon size="small" variant="text" color="primary" @click="get_location(item)"
+                            class="cursor-pointer">
                             <v-icon size="18">mdi-map-marker</v-icon>
                           </v-btn>
                         </div>
@@ -417,47 +325,24 @@
                         }}
                       </div>
                       <div class="pagination-controls">
-                        <v-btn
-                          :disabled="currentPage === 1"
-                          variant="text"
-                          size="small"
-                          class="pagination-btn"
-                          @click="currentPage = currentPage - 1"
-                          style="color: #666 !important"
-                        >
+                        <v-btn :disabled="currentPage === 1" variant="text" size="small" class="pagination-btn"
+                          @click="currentPage = currentPage - 1" style="color: #666 !important">
                           Previous
                         </v-btn>
                         <div class="page-numbers">
-                          <v-btn
-                            v-for="page in visiblePages"
-                            :key="page"
-                            :variant="
-                              page === currentPage ? 'elevated' : 'text'
-                            "
-                            size="small"
-                            :class="
-                              page === currentPage
+                          <v-btn v-for="page in visiblePages" :key="page" :variant="page === currentPage ? 'elevated' : 'text'
+                            " size="small" :class="page === currentPage
                                 ? 'active-page'
                                 : 'inactive-page'
-                            "
-                            @click="currentPage = page"
-                            :style="
-                              page === currentPage
+                              " @click="currentPage = page" :style="page === currentPage
                                 ? 'background: #DB4C77 !important; color: white !important;'
                                 : 'color: #666 !important;'
-                            "
-                          >
+                              ">
                             {{ page }}
                           </v-btn>
                         </div>
-                        <v-btn
-                          :disabled="currentPage === pageCount"
-                          variant="text"
-                          size="small"
-                          class="pagination-btn"
-                          @click="currentPage = currentPage + 1"
-                          style="color: #666 !important"
-                        >
+                        <v-btn :disabled="currentPage === pageCount" variant="text" size="small" class="pagination-btn"
+                          @click="currentPage = currentPage + 1" style="color: #666 !important">
                           Next
                         </v-btn>
                       </div>
@@ -470,15 +355,9 @@
                       <v-card-text class="pa-2 mt-n4">
                         <v-row class="justify-center">
                           <v-col cols="12" class="my-1 px-1">
-                            <v-date-picker
-                              v-model="alldays"
-                              width="100%"
-                              @update:picker-date="updatePickedMonth"
-                              color="#DB4C77"
-                              :events="eventsFunction"
-                              style="min-height: 380px; height: auto"
-                              :event-color="eventColorFunction"
-                            ></v-date-picker>
+                            <v-date-picker v-model="alldays" width="100%" @update:picker-date="updatePickedMonth"
+                              color="#DB4C77" :events="eventsFunction" style="min-height: 380px; height: auto"
+                              :event-color="eventColorFunction"></v-date-picker>
                           </v-col>
 
                           <!-- Attendance Summary Cards -->
@@ -487,20 +366,13 @@
                               <v-card flat class="summary-card" outlined>
                                 <v-row no-gutters class="align-center pa-1">
                                   <v-col cols="auto">
-                                    <v-avatar
-                                      color="green"
-                                      size="10"
-                                      class="mr-1"
-                                    ></v-avatar>
+                                    <v-avatar color="green" size="10" class="mr-1"></v-avatar>
                                   </v-col>
                                   <v-col>
                                     <span class="text-caption">Present</span>
                                   </v-col>
                                   <v-col cols="auto">
-                                    <span
-                                      class="text-caption font-weight-bold"
-                                      >{{ presentDays }}</span
-                                    >
+                                    <span class="text-caption font-weight-bold">{{ presentDays }}</span>
                                   </v-col>
                                 </v-row>
                               </v-card>
@@ -508,20 +380,13 @@
                               <v-card flat class="summary-card" outlined>
                                 <v-row no-gutters class="align-center pa-1">
                                   <v-col cols="auto">
-                                    <v-avatar
-                                      color="red"
-                                      size="10"
-                                      class="mr-1"
-                                    ></v-avatar>
+                                    <v-avatar color="red" size="10" class="mr-1"></v-avatar>
                                   </v-col>
                                   <v-col>
                                     <span class="text-caption">Absent</span>
                                   </v-col>
                                   <v-col cols="auto">
-                                    <span
-                                      class="text-caption font-weight-bold"
-                                      >{{ absentDays }}</span
-                                    >
+                                    <span class="text-caption font-weight-bold">{{ absentDays }}</span>
                                   </v-col>
                                 </v-row>
                               </v-card>
@@ -533,20 +398,13 @@
                               <v-card flat class="summary-card" outlined>
                                 <v-row no-gutters class="align-center pa-1">
                                   <v-col cols="auto">
-                                    <v-avatar
-                                      color="orange"
-                                      size="10"
-                                      class="mr-1"
-                                    ></v-avatar>
+                                    <v-avatar color="orange" size="10" class="mr-1"></v-avatar>
                                   </v-col>
                                   <v-col>
                                     <span class="text-caption">Holiday</span>
                                   </v-col>
                                   <v-col cols="auto">
-                                    <span
-                                      class="text-caption font-weight-bold"
-                                      >{{ holidaysDays }}</span
-                                    >
+                                    <span class="text-caption font-weight-bold">{{ holidaysDays }}</span>
                                   </v-col>
                                 </v-row>
                               </v-card>
@@ -554,20 +412,13 @@
                               <v-card flat class="summary-card" outlined>
                                 <v-row no-gutters class="align-center pa-1">
                                   <v-col cols="auto">
-                                    <v-avatar
-                                      color="primary"
-                                      size="10"
-                                      class="mr-1"
-                                    ></v-avatar>
+                                    <v-avatar color="primary" size="10" class="mr-1"></v-avatar>
                                   </v-col>
                                   <v-col>
                                     <span class="text-caption">Leaves</span>
                                   </v-col>
                                   <v-col cols="auto">
-                                    <span
-                                      class="text-caption font-weight-bold"
-                                      >{{ leaveDays }}</span
-                                    >
+                                    <span class="text-caption font-weight-bold">{{ leaveDays }}</span>
                                   </v-col>
                                 </v-row>
                               </v-card>
@@ -586,7 +437,8 @@
     </div>
 
     <div class="text-left" v-if="toggle_exclusive === 'reportuser'">
-      <UserReports :key="monthpick" :monthvalue="monthvalue"   @open-month-picker="monthPicker = true" />
+      <UserReports :key="monthpick" :monthvalue="monthvalue" :user-id="$store.getters.GetReportieData?.user_id"
+        @open-month-picker="monthPicker = true" />
     </div>
 
     <div class="text-left" v-if="toggle_exclusive === 'leavesummary'">
@@ -597,44 +449,27 @@
     </div>
 
     <div v-if="componentCheck == 1">
-      <UserSwipeLoc
-        :viewSwipeLocation="viewSwipeLocation"
-        :rowInfo="rowInfo"
-        v-on:errorMsg="error_info"
-        v-on:successMsg="success_info"
-        @clicked="viewSwipeLocation = false"
-      />
+      <UserSwipeLoc :viewSwipeLocation="viewSwipeLocation" :rowInfo="rowInfo" v-on:errorMsg="error_info"
+        v-on:successMsg="success_info" @clicked="viewSwipeLocation = false" />
     </div>
     <div v-if="componentCheck == 2">
-      <LeaveRequest
-        :leaveRequestDialog="leaveRequestDialog"
-        v-on:errorMsg="error_info"
-        v-on:successMsg="success_info"
-        @clicked="leaveRequestDialog = false"
-      />
+      <LeaveRequest :leaveRequestDialog="leaveRequestDialog" v-on:errorMsg="error_info" v-on:successMsg="success_info_lunch"
+        @clicked="leaveRequestDialog = false" />
     </div>
     <div v-if="componentCheck == 3">
-      <EarlyAccessRequest
-        :requestDialog="requestDialog"
-        v-on:errorMsg="error_info"
-        v-on:successMsg="success_info"
-        @clicked="requestDialog = false"
-      />
+      <EarlyAccessRequest :requestDialog="requestDialog" v-on:errorMsg="error_info" v-on:successMsg="success_info"
+        @clicked="requestDialog = false" />
     </div>
     <div v-if="componentCheck == 4">
-      <UserScan
-        :scanLog="scanLog"
-        @clicked="scanLog = false"
-        v-on:errorMsg="error_info"
-        v-on:successMsg="success_info"
-      />
+      <UserScan :scanLog="scanLog" @clicked="scanLog = false" v-on:errorMsg="error_info"
+        v-on:successMsg="success_info" />
     </div>
     <div v-if="componentCheck == 5">
-      <CancelLeave
-        :leaveCancelation="leaveCancelation"
-        :leavesArray="leavesArray"
-        @clicked="leaveCancelation = false"
-      />
+      <CancelLeave :leaveCancelation="leaveCancelation" :leavesArray="leavesArray"
+        @clicked="leaveCancelation = false" />
+    </div>
+    <div v-if="componentCheck == 6">
+      <LunchCountApply :lunchCountDialog="lunchCountDialog" @clicked="lunchCountDialog = false"  />
     </div>
   </div>
 </template>
@@ -661,7 +496,7 @@ import { list_all_swipes, get_presence_dashboard } from "@/graphql/queries.js";
 import axios from "axios";
 import html2canvas from "html2canvas";
 import CreateExternalTicketDialog from "../Tickets/CreateExternalTicketDialog.vue";
-
+import LunchCountApply from "./PopUps/LunchCountApply.vue";
 export default {
   components: {
     UserSwipeLoc,
@@ -674,6 +509,7 @@ export default {
     LeaveSummary,
     AppAdminprezence,
     CreateExternalTicketDialog,
+    LunchCountApply,
   },
   mixins: [getData],
   data() {
@@ -798,6 +634,7 @@ export default {
         bucket_name: "stichh-medias",
         region: "us-east-1",
       },
+      lunchCountDialog: false,
     };
   },
   async created() {
@@ -1122,6 +959,20 @@ export default {
       };
       this.scanLog = false;
       this.requestDialog = false;
+      this.leaveRequestDialog = false;
+      this.fetch_swipes_v2();
+      this.updateTotalItems();
+    },
+    success_info_lunch(val) {
+      this.SnackBarComponent = {
+        SnackbarVmodel: true,
+        SnackbarColor: "green",
+        SnackbarText: val,
+        timeout: 5000,
+        Top: true,
+      };
+      this.componentCheck = 6;
+      this.lunchCountDialog = true;
       this.leaveRequestDialog = false;
       this.fetch_swipes_v2();
       this.updateTotalItems();
@@ -1652,9 +1503,10 @@ export default {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transform: translateY(-1px);
 }
-.monthpicker{
+
+.monthpicker {
   margin-top: 60%;
-  left:55%;
+  left: 55%;
 }
 
 /* Responsive Design */

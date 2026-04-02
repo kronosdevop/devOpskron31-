@@ -84,7 +84,7 @@ export default {
           graphqlOperation(delete_broadcast_channel, {
             input: {
               team_id: this.dashboarditems.team_id,
-              user_email_id: this.$store.getters.GetUserObj.user.user_email_id,
+              user_email_id: this.$store.getters.GetUserObj.user?.user_email_id,
             },
           })
         );

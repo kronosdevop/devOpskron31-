@@ -101,13 +101,13 @@
               <div class="d-flex align-center">
                 <v-tooltip location="top" v-if="
                 item.client_id !=
-                  $store.getters.GetUserObj.user.user_email_id &&
+                  $store.getters.GetUserObj.user?.user_email_id &&
                 item.client_id !=
                   $store.getters.GetdashboardDetails.dashboard_created_by &&
                 $store.getters.GetdashboardDetails.dashboard_security !=
                   'OPEN' &&
                 $store.getters.GetdashboardDetails.dashboard_created_by ==
-                  $store.getters.GetUserObj.user.user_email_id
+                  $store.getters.GetUserObj.user?.user_email_id
                 ">
                   <template v-slot:activator="{ props }">
                     <v-icon

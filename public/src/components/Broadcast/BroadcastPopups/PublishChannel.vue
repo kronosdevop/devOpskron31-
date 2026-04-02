@@ -346,7 +346,7 @@ export default {
           "/" +
           deatils.organization.organization_id +
           "/" +
-          self.$store.getters.GetUserObj.user.user_id +
+          self.$store.getters.GetUserObj.user?.user_id +
           "/" +
           Date.now() +
           "/" +
@@ -522,7 +522,7 @@ export default {
         let result = await API.graphql(
           graphqlOperation(list_broadcast_channels, {
             input: {
-              user_email_id: this.$store.getters.GetUserObj.user.user_email_id,
+              user_email_id: this.$store.getters.GetUserObj.user?.user_email_id,
             },
           })
         );
@@ -561,7 +561,7 @@ export default {
         let result = await API.graphql(
           graphqlOperation(get_particular_broadcast_details, {
             input: {
-              user_email_id: this.$store.getters.GetUserObj.user.user_email_id,
+              user_email_id: this.$store.getters.GetUserObj.user?.user_email_id,
               team_id: this.channels,
             },
           })

@@ -701,7 +701,7 @@ export const connecttoMQTTMethod = {
         async signing_out(msg_sent_by) {
             try {
                 // Sign out from AWS Amplify Auth
-                await Auth.signOut({ global: true });
+                await Auth.signOut();
             } catch (error) {
                 console.error("Error signing out from Auth:", error);
             }

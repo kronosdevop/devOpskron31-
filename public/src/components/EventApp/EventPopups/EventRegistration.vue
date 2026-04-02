@@ -130,8 +130,8 @@ export default {
             " - " +
             this.fetch_value(this.rowInfo.info.to_date);
           this.user_email_id =
-            this.$store.getters.GetUserObj.user.user_email_id;
-          this.user_name = this.$store.getters.GetUserObj.user.full_user_name;
+            this.$store.getters.GetUserObj.user?.user_email_id;
+          this.user_name = this.$store.getters.GetUserObj.user?.full_user_name;
           // console.log(this.rowInfo.info);
         }
       },

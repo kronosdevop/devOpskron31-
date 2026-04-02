@@ -17,7 +17,7 @@
             <v-icon color="white" size="24">mdi-chart-line</v-icon>
           </div>
         </div>
-        <div class="header-text"> 
+        <div class="header-text">
           <span class="header-title">Workflows</span>
           <span class="header-subtitle"
             >Track and analyze workflow transactions</span
@@ -27,14 +27,14 @@
       <v-spacer />
       <div class="header-actions">
         <v-text-field
-  v-model="globalSearch"
-  label="Search WorkFlows"
-  prepend-inner-icon="mdi-magnify"
-  density="compact"
-  variant="outlined"
-  hide-details
-  style="width: 200px"
-/>
+          v-model="globalSearch"
+          label="Search WorkFlows"
+          prepend-inner-icon="mdi-magnify"
+          density="compact"
+          variant="outlined"
+          hide-details
+          style="width: 200px"
+        />
 
         <!--Screenshot Button-->
         <v-tooltip text="Take a screenshot and raise a ticket">
@@ -48,6 +48,7 @@
         <!-- Filter Button - Only show for All Transactions tab -->
         <v-btn
           v-if="toggle_exclusive == 'alltransactions'"
+          class="mr-4"
           :class="
             activeFiltersCount > 0
               ? 'action-btn filter-btn active'
@@ -84,7 +85,7 @@
             hide-selected
           /> -->
           <v-btn
-            class="action-btn filter-btn"
+            class="action-btn filter-btn mr-4"
             size="small"
             @click="showFilterDrawer = true"
             style="margin-right: 12px"
@@ -106,7 +107,7 @@
         <!-- Generate Report Button - Only show for Report Builder tab -->
         <v-btn
           v-if="toggle_exclusive == 'reportsTransactions'"
-          class="action-btn generate-btn"
+          class="action-btn generate-btn mr-4"
           @click="generate_report()"
           size="small"
         >
@@ -142,6 +143,22 @@
             System Approvals
           </v-tab>
         </v-tabs>
+        <v-spacer />
+        <v-tooltip text="Refresh Reports" location="bottom">
+          <template #activator="{ props }">
+            <v-icon
+              v-bind="props"
+              color="primary"
+              size="large"
+              class="mr-4"
+              v-if="toggle_exclusive == 'reportsTransactions'"
+              @click="refreshReports"
+              style="cursor: pointer"
+            >
+              mdi-refresh
+            </v-icon>
+          </template>
+        </v-tooltip>
       </template>
     </v-toolbar>
 
@@ -367,7 +384,7 @@
                 :fixed-header="true"
                 :headers="modernHeaders"
                 :height="windowHeight"
-                 :search = "globalSearch"
+                :search="globalSearch"
                 :items="filteredTableData"
                 :loading="tableLoading"
                 :items-per-page="itemsPerPage"
@@ -671,8 +688,11 @@
     </div>
 
     <div v-if="toggle_exclusive == 'reportsTransactions'">
-      <AllReports  :globalSearch="globalSearch"
- :key="reportKey" />
+      <AllReports
+        ref="allReportsRef"
+        :globalSearch="globalSearch"
+        :key="reportKey"
+      />
     </div>
     <!-- <div class="text-left" v-if="toggle_exclusive == 'approvals'">
       <ApprovalsList />
@@ -692,7 +712,7 @@
       <KnockoffWrkflow :globalSearch="globalSearch" />
     </div>
     <div class="text-left" v-if="toggle_exclusive == 'systemApprovals'">
-      <ApprovalsList  :globalSearch="globalSearch"/>
+      <ApprovalsList :globalSearch="globalSearch" />
     </div>
   </div>
 </template>
@@ -838,7 +858,7 @@ export default {
       itemsPerPage: 20,
       isFetching: false,
       windowHeight: 0,
-    globalSearch: "",
+      globalSearch: "",
 
       // Aging Reports Data Properties
       agingUserselect: "ALL",
@@ -884,7 +904,6 @@ export default {
     this.initAgingReportsData();
   },
   watch: {
-  
     currentPage() {
       this.updatePageItems();
     },
@@ -912,7 +931,6 @@ export default {
     },
   },
   computed: {
-  
     modernHeaders() {
       return [
         { title: "Workflow Name/ID", key: "workflow_name", sortable: false },
@@ -931,23 +949,24 @@ export default {
       ];
     },
     filteredTableData() {
-  if (!this.globalSearch || this.globalSearch.trim() === "") {
-    return this.tableData;
-  }
+      if (!this.globalSearch || this.globalSearch.trim() === "") {
+        return this.tableData;
+      }
 
-  const search = this.globalSearch.toLowerCase();
+      const search = this.globalSearch.toLowerCase();
 
-  return this.tableData.filter(row =>
-    Object.values(row).some(val =>
-      val !== null &&
-      val !== undefined &&
-      String(val).toLowerCase().includes(search)
-    )
-  );
-},
+      return this.tableData.filter((row) =>
+        Object.values(row).some(
+          (val) =>
+            val !== null &&
+            val !== undefined &&
+            String(val).toLowerCase().includes(search)
+        )
+      );
+    },
 
     totalCount() {
-    return this.filteredTableData.length;
+      return this.filteredTableData.length;
     },
     startItem() {
       return (this.currentPage - 1) * this.itemsPerPage + 1;
@@ -1125,6 +1144,11 @@ export default {
       this.paginatedItems = [];
       this.next_token = null;
       this.get_transaction();
+    },
+    refreshReports() {
+      if (this.$refs.allReportsRef) {
+        this.$refs.allReportsRef.fetch_records();
+      }
     },
     fetch_user_name(value) {
       var name = "";

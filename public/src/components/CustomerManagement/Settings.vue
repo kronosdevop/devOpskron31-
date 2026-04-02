@@ -53,7 +53,7 @@
                       size="32"
                       class="mb-4"
                     ></v-progress-circular>
-                    <div class="text-body-2 grey--text">Loading members...</div>
+                    <div class="text-body-2 text-grey">Loading members...</div>
                   </div>
                 </template>
 

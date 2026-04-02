@@ -109,9 +109,9 @@
                 >
               </v-list-item>
 
-              <v-divider v-if="item.checklist_created_by == $store.getters.GetUserObj.user.user_id" />
+              <v-divider v-if="item.checklist_created_by == $store.getters.GetUserObj.user?.user_id" />
 
-              <v-list-item @click.stop="Edit_checklist(item)" class="py-2" v-if="item.checklist_created_by == $store.getters.GetUserObj.user.user_id">
+              <v-list-item @click.stop="Edit_checklist(item)" class="py-2" v-if="item.checklist_created_by == $store.getters.GetUserObj.user?.user_id">
                 <template #prepend>
                   <v-icon icon="mdi-pencil" size="small" color="blue" />
                 </template>
@@ -120,9 +120,9 @@
                 >
               </v-list-item>
 
-                <v-divider v-if="item.checklist_created_by == $store.getters.GetUserObj.user.user_id" />
+                <v-divider v-if="item.checklist_created_by == $store.getters.GetUserObj.user?.user_id" />
 
-              <v-list-item @click.stop="Deactive_checklist(item)" class="py-2" v-if="item.checklist_created_by == $store.getters.GetUserObj.user.user_id">
+              <v-list-item @click.stop="Deactive_checklist(item)" class="py-2" v-if="item.checklist_created_by == $store.getters.GetUserObj.user?.user_id">
                 <template #prepend>
                   <v-icon icon="mdi-delete" size="small" color="red" />
                 </template>
@@ -253,7 +253,7 @@ export default {
     },
   },
   async created() {
-    // console.log(this.$store.getters.GetUserObj.user.user_id)
+    // console.log(this.$store.getters.GetUserObj.user?.user_id)
     this.windowHeight = window.innerHeight - 250;
     this.fetch_Checklists();
     this.fetch_user_list();

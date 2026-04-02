@@ -7,7 +7,11 @@
             :search="searchQuery"
             :headers="timeSheetHeaders"
             :fixed-header="fixed"
-            :height="adminAppExists? CommonVuetifyObj.height - 258:CommonVuetifyObj.height - 185"
+            :height="
+              adminAppExists
+                ? CommonVuetifyObj.height - 258
+                : CommonVuetifyObj.height - 185
+            "
             :items="paginatedItems"
             :loading="tableLoading"
             hide-default-footer
@@ -137,7 +141,10 @@
                     <v-list-item
                       @click.stop="edit_data(item)"
                       style="font-size: 12px"
-                      v-if="item.timesheet_status == 'INPROGRESS'"
+                      v-if="
+                        item.timesheet_status == 'INPROGRESS' ||
+                        item.timesheet_status == 'DRAFT'
+                      "
                       ><div class="d-flex align-center">
                         <v-icon size="small" color="blue">mdi-pencil</v-icon>
                         <v-list-item-title>Edit Timesheet</v-list-item-title>
@@ -147,7 +154,10 @@
                     <v-list-item
                       @click.stop="open_delete(item)"
                       style="font-size: 12px"
-                      v-if="item.timesheet_status == 'INPROGRESS'"
+                      v-if="
+                        item.timesheet_status == 'INPROGRESS' ||
+                        item.timesheet_status == 'DRAFT'
+                      "
                     >
                       <div class="d-flex align-center">
                         <v-icon size="small" color="red">mdi-delete</v-icon>
@@ -160,7 +170,10 @@
                     <v-list-item
                       @click.stop="view_timesheet(item)"
                       style="font-size: 12px"
-                      v-if="item.timesheet_status != 'INPROGRESS'"
+                      v-if="
+                        item.timesheet_status != 'INPROGRESS' ||
+                        item.timesheet_status != 'DRAFT'
+                      "
                     >
                       <div class="d-flex align-center">
                         <v-icon size="small" color="primary">mdi-eye</v-icon>
@@ -337,14 +350,13 @@ export default {
       nextToken: null,
       currentPage: 1,
       itemsPerPage: 20,
-      paginatedItems: [],
+      // paginatedItems: [],
       totalItems: 0,
       windowHeight: 0,
     };
   },
   async created() {
     await this.fetch_admin_apps();
-  
 
     await this.fetch_usertimelist();
   },
@@ -547,22 +559,25 @@ export default {
       this.$router.push("/UserlevelApp");
     },
     edit_data(item) {
+      console.log("item", item);
       this.timesheetitems = item;
       this.componentCheck = 4;
       this.timesheetEdition = true;
     },
-    getStatusColor(status) {
+    getStatusTextColor(status) {
       switch (status) {
         case "APPROVED":
-          return "green";
+          return "text-green";
         case "INPROGRESS":
-          return "orange";
+          return "text-orange";
         case "REJECTED":
-          return "red";
+          return "text-red";
         case "WITHDRAWN":
-          return "blue";
+          return "text-primary";
+        case "DRAFT":
+          return "text-purple"; // NEW
         default:
-          return "grey";
+          return "";
       }
     },
     getStatusIcon(status) {
@@ -575,22 +590,26 @@ export default {
           return "mdi-close-circle";
         case "WITHDRAWN":
           return "mdi-undo";
+        case "DRAFT":
+          return "mdi-file-document-edit"; // NEW ICON
         default:
           return "mdi-help-circle";
       }
     },
-    getStatusTextColor(status) {
+    getStatusColor(status) {
       switch (status) {
         case "APPROVED":
-          return "text-green";
+          return "green";
         case "INPROGRESS":
-          return "text-orange";
+          return "orange";
         case "REJECTED":
-          return "text-red";
+          return "red";
         case "WITHDRAWN":
-          return "text-primary";
+          return "blue";
+        case "DRAFT":
+          return "purple"; // NEW
         default:
-          return "";
+          return "grey";
       }
     },
     view_timesheet(item) {
@@ -639,7 +658,7 @@ export default {
           this.tableLoading = false;
         }
       } catch (error) {
-        console.log(error)
+        console.log(error);
         this.timeRecords = [];
         this.tableLoading = false;
         this.SnackBarComponent = {

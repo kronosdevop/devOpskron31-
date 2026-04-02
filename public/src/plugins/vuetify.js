@@ -5,7 +5,7 @@ import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 
 // Import VTimePicker from labs
-import { VTimePicker } from 'vuetify/labs/VTimePicker'
+import { VTimePicker } from 'vuetify/components'
 import { VDateInput } from 'vuetify/labs/VDateInput';
 
 export default createVuetify({

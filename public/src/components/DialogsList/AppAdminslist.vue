@@ -141,7 +141,7 @@
               
                 <v-tooltip
                   location="top"
-                  v-if="item.user_type != 'OWNER' && item.user_type != 'ADMIN'"
+                  v-if="item.user_type != 'OWNER'"
                 >
                   <template v-slot:activator="{ props }">
                     <v-btn

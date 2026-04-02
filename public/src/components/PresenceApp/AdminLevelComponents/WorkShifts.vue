@@ -38,6 +38,12 @@
           :fixed-header="true"
           :height="windowHeight"
         >
+        <template v-slot:loading>
+            <div class="text-center">
+                    <v-progress-circular indeterminate color="primary" size="32" class="mt-6" />
+                    <div class="text-subtitle-2 mt-4 text-grey">Loading WorkShifts</div>
+                  </div>      
+                  </template>
           <template #no-data>
             <div class="text-center py-8">
               <v-icon size="64" color="grey-lighten-1" class="mb-4">

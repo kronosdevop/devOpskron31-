@@ -234,9 +234,9 @@ export default {
       if (!this.selectedFile) return;
       await Auth.currentCredentials();
       const orgDetails1 = this.$store.getters.GetOrgDetails;
-      const userId = this.$store.getters.GetUserObj.user.user_id;
+      const userId = this.$store.getters.GetUserObj.user?.user_id;
 
-      // const userId = this.$store.getters.GetUserObj.user.user_id;
+      // const userId = this.$store.getters.GetUserObj.user?.user_id;
 
       const key = `broadcast/${
         orgDetails1.organization.organization_id
@@ -328,7 +328,7 @@ export default {
           "/" +
           deatils.organization.organization_id +
           "/" +
-          self.$store.getters.GetUserObj.user.user_id +
+          self.$store.getters.GetUserObj.user?.user_id +
           "/" +
           Date.now() +
           "/" +

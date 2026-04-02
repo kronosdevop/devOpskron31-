@@ -10,7 +10,7 @@
               <v-icon
                 v-show="
                   $store.getters.GetdashboardDetails.dashboard_created_by ==
-                    $store.getters.GetUserObj.user.user_email_id &&
+                    $store.getters.GetUserObj.user?.user_email_id &&
                   $store.getters.GetdashboardDetails.dashboard_type !=
                     'STANDARD'
                 "

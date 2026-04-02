@@ -11,8 +11,8 @@
                   class="ml-4 mt-n2"
                   color="primary"
                   v-if="
-                    projData.project_created_by ==
-                    $store.getters.GetUserObj.user.user_email_id
+                    (projData.project_created_by ==
+      $store.getters.GetUserObj.user?.user_email_id || isProjectAdmin)
                   "
                   @click="edit_project()"
                   >mdi-pencil</v-icon
@@ -340,6 +340,17 @@ export default {
         : "Not Enabled";
     this.fetch_project_list();
   },
+    computed: {
+  isProjectAdmin() {
+    const userEmail = this.$store.getters.GetUserObj.user?.user_email_id;
+
+    if (!this.projData.project_visible_members) return false;
+
+    return this.projData.project_visible_members.some(
+      member => member.email === userEmail && member.role === "Admin"
+    );
+  }
+},
   methods: {
     async fetch_project_list() {
       try {

@@ -1,15 +1,27 @@
 <template>
   <div>
     <v-card flat>
-      <v-overlay v-model="overlay">
-        <v-progress-circular indeterminate size="44" color="primaryColor" />
-        <span class="ml-2" style="color: white">Loading...</span>
+      <v-overlay
+        v-model="overlay"
+        class="custom-overlay d-flex align-center justify-center"
+        persistent
+      >
+        <div class="loader-container">
+          <v-progress-circular
+            indeterminate
+            size="50"
+            width="4"
+            color="primary"
+          ></v-progress-circular>
+
+          <div class="loader-text">Loading data...</div>
+        </div>
       </v-overlay>
       <SnackBar :SnackBarComponent="SnackBarComponent" />
     </v-card>
     <v-card-text>
       <v-row no-gutters v-if="phasesDataList.length > 0">
-        <v-col cols="8">
+        <v-col cols="12">
           <v-expansion-panels
             v-model="expanded"
             @update:model-value="handlePanelChange"
@@ -39,8 +51,9 @@
                       <v-icon
                         color="primary"
                         v-if="
-                          projData.project_created_by ==
-                            $store.getters.GetUserObj.user.user_email_id &&
+                          (projData.project_created_by ==
+                            $store.getters.GetUserObj.user?.user_email_id ||
+                            isProjectAdmin) &&
                           new Date() <= new Date(item.phase_end_date) &&
                           projData.project_progress == 'LIVE'
                         "
@@ -53,7 +66,8 @@
                       @click.stop="edit_Phase(item)"
                       v-if="
                         projData.project_created_by ==
-                        $store.getters.GetUserObj.user.user_email_id
+                          $store.getters.GetUserObj.user?.user_email_id ||
+                        isProjectAdmin
                       "
                       >mdi-pencil</v-icon
                     >
@@ -63,7 +77,8 @@
                       color="red"
                       v-if="
                         projData.project_created_by ==
-                        $store.getters.GetUserObj.user.user_email_id
+                          $store.getters.GetUserObj.user?.user_email_id ||
+                        isProjectAdmin
                       "
                       >mdi-delete</v-icon
                     >
@@ -83,6 +98,28 @@
                     class="elevation-1 mt-3 dtwidth"
                     @click:row="hadle_row_click"
                   >
+                    <template #[`item.task_created_on`]="{ item }">
+                      <span>{{ formatDisplay(item.task_created_on) }} </span>
+                    </template>
+
+                    <template #[`item.task_name`]="{ item }">
+                      <v-tooltip
+                        location="bottom"
+                        content-class="small-tooltip"
+                      >
+                        <template #activator="{ props }">
+                          <span v-bind="props" class="task-name-truncate">
+                            {{
+                              item.task_name && item.task_name.length > 30
+                                ? item.task_name.substring(0, 30) + "..."
+                                : item.task_name
+                            }}
+                          </span>
+                        </template>
+
+                        <span>{{ item.task_name }}</span>
+                      </v-tooltip>
+                    </template>
                     <template #[`item.assign_to`]="{ item }">
                       <span v-text="fetch_name(item.assign_to)"></span>
                     </template>
@@ -91,54 +128,40 @@
                         v-text="formatDisplayDate(item.task_completion_date)"
                       ></span>
                     </template>
+
                     <template #[`item.task_priority`]="{ item }">
-                      <span
-                        v-if="item.task_priority === 'high'"
-                        class="green--text text-capitalize"
-                      >
-                        High
-                      </span>
-                      <span
-                        v-else-if="item.task_priority === 'low'"
-                        class="red--text text-capitalize"
-                      >
-                        Low
-                      </span>
-                      <span
-                        v-else-if="item.task_priority === 'medium'"
-                        class="blue--text text-capitalize"
-                      >
-                        Medium
-                      </span>
-                    </template>
-                    <template #[`item.task_progress_status`]="{ item }">
-                      <span
-                        v-if="item.task_progress_status === 'COMPLETED'"
-                        class="green--text text-capitalize"
-                      >
-                        Completed
-                      </span>
-                      <span
-                        v-if="
-                          item.task_progress_status === 'INPROGRESS' ||
-                          item.task_progress_status === 'ASSIGNED'
+                      <v-chip
+                        size="small"
+                        :color="
+                          item.task_priority === 'high'
+                            ? 'green'
+                            : item.task_priority === 'medium'
+                            ? 'blue'
+                            : 'red'
                         "
-                        class="purple--text text-capitalize"
+                        variant="tonal"
                       >
-                        Inprogress
-                      </span>
-                      <span
-                        v-if="item.task_progress_status === 'HOLD'"
-                        class="red--text text-capitalize"
+                        {{ item.task_priority }}
+                      </v-chip>
+                    </template>
+
+                    <template #[`item.task_progress_status`]="{ item }">
+                      <v-chip
+                        size="small"
+                        :color="
+                          item.task_progress_status === 'COMPLETED'
+                            ? 'green'
+                            : item.task_progress_status === 'INPROGRESS' ||
+                              item.task_progress_status === 'ASSIGNED'
+                            ? 'orange'
+                            : item.task_progress_status === 'HOLD'
+                            ? 'red'
+                            : 'yellow'
+                        "
+                        variant="tonal"
                       >
-                        Hold
-                      </span>
-                      <span
-                        v-if="item.task_progress_status === 'WITHDRAWN'"
-                        class="yellow--text text-capitalize"
-                      >
-                        Withdrawn
-                      </span>
+                        {{ item.task_progress_status }}
+                      </v-chip>
                     </template>
                     <template #[`item.actions`]="{ item }">
                       <v-icon
@@ -254,6 +277,12 @@ export default {
     DeletePhase,
   },
   mixins: [get_all_org_users],
+  props: {
+    selectedFilterPhase: {
+      type: String,
+      default: "ALL",
+    },
+  },
 
   data() {
     return {
@@ -278,12 +307,6 @@ export default {
           sortable: false,
           class: "my-header-style",
         },
-        // {
-        //   text: "Task Description",
-        //   value: "task_description",
-        //   sortable: false,
-        //   class: "my-header-style",
-        // },
         {
           text: "Assign To",
           value: "assign_to",
@@ -291,8 +314,14 @@ export default {
           class: "my-header-style",
         },
         {
-          text: "Status",
+          text: "Priority",
           value: "task_priority",
+          sortable: false,
+          class: "my-header-style",
+        },
+        {
+          text: "Initiated On",
+          value: "task_created_on",
           sortable: false,
           class: "my-header-style",
         },
@@ -322,14 +351,37 @@ export default {
       viewPhaseDialog: false,
     };
   },
+
   async created() {
-    var Projecctdetails = JSON.parse(localStorage.getItem("projectInfo"));
+    const Projecctdetails = JSON.parse(localStorage.getItem("projectInfo"));
     this.projData = Projecctdetails;
+
     await this.project_phase_list();
+    await this.applyFilterToAllPhases();
     await this.get_all_org_users();
+
     this.getTimesheetHeaders();
-    // this.fetch_user_list();
-    // this.overlay = true;
+  },
+
+  watch: {
+    selectedFilterPhase: {
+      handler() {
+        this.applyFilterToAllPhases();
+      },
+      immediate: true,
+    },
+  },
+
+  computed: {
+    isProjectAdmin() {
+      const userEmail = this.$store.getters.GetUserObj.user?.user_email_id;
+
+      if (!this.projData.project_visible_members) return false;
+
+      return this.projData.project_visible_members.some(
+        (member) => member.email === userEmail && member.role === "Admin",
+      );
+    },
   },
   methods: {
     formatDisplayDate(date) {
@@ -340,6 +392,14 @@ export default {
       const year = d.getFullYear();
       return `${day}-${month}-${year}`;
     },
+    formatDisplay(timestamp) {
+      if (!timestamp) return "-";
+      const date = new Date(timestamp * 1000);
+      const day = String(date.getDate()).padStart(2, "0");
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const year = date.getFullYear();
+      return `${day}-${month}-${year}`;
+    },
     getTimesheetHeaders() {
       this.projetHeaders = [
         {
@@ -348,12 +408,6 @@ export default {
           sortable: false,
           class: "my-header-style",
         },
-        // {
-        //   text: "Task Description",
-        //   value: "task_description",
-        //   sortable: false,
-        //   class: "my-header-style",
-        // },
         {
           title: "Assign To",
           key: "assign_to",
@@ -361,8 +415,14 @@ export default {
           class: "my-header-style",
         },
         {
-          title: "Status",
+          title: "Priority",
           key: "task_priority",
+          sortable: false,
+          class: "my-header-style",
+        },
+        {
+          title: "Initiated On",
+          value: "task_created_on",
           sortable: false,
           class: "my-header-style",
         },
@@ -382,7 +442,8 @@ export default {
 
       if (
         this.projData.project_created_by ==
-        this.$store.getters.GetUserObj.user.user_email_id
+          this.$store.getters.GetUserObj.user?.user_email_id ||
+        this.isProjectAdmin
       ) {
         this.projetHeaders.push({
           title: "Actions",
@@ -451,24 +512,13 @@ export default {
     get_updatedate(date) {
       return formatdisplayDate(date);
     },
+
     handlePanelChange(newIndex) {
-      // console.log("newIndex", newIndex);
-      // console.log("this.phasesDataList", this.phasesDataList);
-      // console.log("this.selectedPhase", this.selectedPhase);
       this.viewPhaseDialog = false;
+
       if (newIndex !== null) {
         this.selectedPhase = this.phasesDataList[newIndex];
-        // console.log("this.selectedPhase", this.selectedPhase);
-        this.list_tasks_data(this.selectedPhase);
       }
-    },
-
-    fetchPhaseTasks(value) {
-      // console.log(value, "dfff");
-    },
-
-    fetch_task_details(selectedphase) {
-      // console.log(selectedphase);
     },
 
     async success_info(value) {
@@ -500,42 +550,45 @@ export default {
       this.list_tasks_data(this.selectedPhase);
     },
 
-    async list_tasks_data(value) {
-      // console.log("value", value.phase_id);
+    async applyFilterToAllPhases() {
+      for (const phase of this.phasesDataList) {
+        await this.list_tasks_data(phase);
+      }
+    },
+
+    async list_tasks_data(phase) {
+      if (!phase || !phase.phase_id) return;
+
       this.overlay = true;
+
       try {
         let result = await API.graphql(
           graphqlOperation(create_list_edit_phase_tasks, {
             input: {
-              phase_id:
-                value == undefined ? this.phaseItem.phase_id : value.phase_id,
+              phase_id: phase.phase_id,
               action_type: "LIST",
+              filter: this.selectedFilterPhase,
             },
-          })
+          }),
         );
-        this.overlay = false;
-        var response = JSON.parse(result.data.create_list_edit_phase_tasks);
-        if (response.Status == "SUCCESS") {
-          // console.log("response", response);
-          // this.priorityitem = response.data[0].task_priority;
-          const phaseIndex = this.phasesDataList.findIndex(
-            (phase) => phase.phase_id === value.phase_id
+
+        const response = JSON.parse(result.data.create_list_edit_phase_tasks);
+
+        if (response.Status === "SUCCESS") {
+          const index = this.phasesDataList.findIndex(
+            (p) => p.phase_id === phase.phase_id,
           );
-          // console.log("phaseIndex", phaseIndex);
-          if (phaseIndex !== -1) {
-            // console.log("this.phasesDataList[phaseIndex]", this.phasesDataList[phaseIndex]);
-            // Use direct assignment for Vue 3 reactivity
-            this.phasesDataList[phaseIndex] = {
-              ...this.phasesDataList[phaseIndex],
+
+          if (index !== -1) {
+            this.phasesDataList[index] = {
+              ...this.phasesDataList[index],
               tasks: response.data,
             };
-            // console.log("Updated phase with tasks:", this.phasesDataList[phaseIndex]);
           }
-          // console.log("this.phasesDataList", this.phasesDataList);
         }
-        this.overlay = false;
-      } catch (error) {
-        this.tableLoading = false;
+      } catch (e) {
+        console.error(e);
+      } finally {
         this.overlay = false;
       }
     },
@@ -571,7 +624,7 @@ export default {
               project_id: this.projData.project_id,
               action_type: "LIST",
             },
-          })
+          }),
         );
 
         this.phasesDataList = [];
@@ -597,6 +650,7 @@ export default {
   },
 };
 </script>
+
 <style scoped>
 .v-data-table__wrapper > table > thead > tr > th {
   background-color: initial !important;
@@ -611,5 +665,42 @@ export default {
   width: 100%;
   text-align: center;
   font-size: 20px;
+}
+.task-name-truncate {
+  display: inline-block;
+  max-width: 240px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+:deep(.small-tooltip) {
+  max-width: 30% !important;
+  font-size: 14px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  white-space: normal;
+  line-height: 1.3;
+}
+.custom-overlay {
+  backdrop-filter: blur(3px);
+}
+
+.loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: white;
+  padding: 24px 32px;
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  min-width: 180px;
+}
+
+.loader-text {
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #555;
 }
 </style>

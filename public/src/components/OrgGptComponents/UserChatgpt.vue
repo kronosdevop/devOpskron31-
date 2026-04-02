@@ -142,11 +142,11 @@ export default {
     this.chatMSG = [];
     await this.get_Org_details();
 
-    this.username = this.$store.getters.GetUserObj.user.first_name;
+    this.username = this.$store.getters.GetUserObj.user?.first_name;
     this.orgApiKey = this.orgDetails.organization.team_api_key;
-    this.userEmail = this.$store.getters.GetUserObj.user.user_email_id;
+    this.userEmail = this.$store.getters.GetUserObj.user?.user_email_id;
     this.team_id = this.orgDetails.organization.organization_team_id;
-    this.fullname = this.$store.getters.GetUserObj.user.full_user_name;
+    this.fullname = this.$store.getters.GetUserObj.user?.full_user_name;
     this.session_id = this.$store.getters.GetUserObj.session_id;
     this.list_gpt();
   },

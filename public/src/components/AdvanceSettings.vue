@@ -60,9 +60,9 @@
     </div>
   </div>
 </template>
+
 <script>
 /* eslint-disable */
-
 // Imports
 import CategoryItemsub from "@/components/SettingsComponents/CategoryItemsub.vue";
 import MasterLocations from "@/components/SettingsComponents/MasterLocations.vue";
@@ -73,13 +73,13 @@ import TeamDetails from "@/components/SettingsComponents/TeamDetails.vue";
 import APISettings from "@/components/SettingsComponents/APISettings.vue";
 import AppThemeInfo from "@/components/SettingsComponents/AppThemeInfo.vue";
 import AdminsList from "@/components/SettingsComponents/AdminsList.vue";
+import Advert from "@/components/SettingsComponents/Advert.vue";
 import MemberManagement from "@/components/SettingsComponents/MemberManagement.vue";
 import MasterRoles from "@/components/SettingsComponents/MasterRoles.vue";
 import MasterTerritories from "@/components/SettingsComponents/MasterTerritories.vue";
 import ProductServices from "@/components/SettingsComponents/ProductServices.vue";
 import AssetSuppliersList from "@/components/Asset/AdminApps/AssetSuppliersList.vue";
 import MaterialList from "@/components/MaterialManagement/MaterialList.vue";
-// import MaterialUnit from "@/components/MaterialManagement/MaterialUnit.vue";
 import CustomersMasters from "@/components/SettingsComponents/CustomersMasters.vue";
 import OrganizationEntity from "./SettingsComponents/OrganizationEntity.vue";
 import ApprovalsList from "@/components/SettingsDialogs/ApprovalsList.vue";
@@ -94,6 +94,7 @@ export default {
     AdminsList,
     TeamDetails,
     APISettings,
+    Advert,
     HolidayList,
     AppThemeInfo,
     MemberManagement,
@@ -102,7 +103,6 @@ export default {
     ProductServices,
     AssetSuppliersList,
     MaterialList,
-    // MaterialUnit,
     CustomersMasters,
     CategoryItemsub,
     OrganizationEntity,
@@ -148,27 +148,6 @@ export default {
           value: "locations",
           component: "MasterLocations",
         },
-        // {
-        //   title: "Product/Services",
-        //   description: "Define your products and service offerings",
-        //   icon: "mdi-cube-outline",
-        //   value: "products",
-        //   component: "CategoryItemsub"
-        // },
-        // {
-        //   title: "Suppliers/Vendors",
-        //   description: "Manage vendor relationships and supplier information",
-        //   icon: "mdi-truck-delivery",
-        //   value: "suppliers",
-        //   component: "AssetSuppliersList"
-        // },
-        // {
-        //   title: "Unit",
-        //   description: "Configure measurement units and standards",
-        //   icon: "mdi-scale-balance",
-        //   value: "unit",
-        //   component: "MaterialUnit"
-        // },
         {
           title: "Prefix Management",
           description: "Manage prefixes for different document types",
@@ -176,6 +155,14 @@ export default {
           value: "prefixes",
           component: "PrefixManagement",
         },
+        // {
+        //   title: "Advert",
+        //   description:
+        //     "Advertise new features, product upgrades, team changes and more ",
+        //   icon: "mdi-bullhorn",
+        //   value: "advert",
+        //   component: "Advert",
+        // },
       ],
     };
   },
@@ -187,7 +174,7 @@ export default {
     // Check if vendor bulk back is enabled and open suppliers component
     if (this.$store.getters.Getvendorbulkback == true) {
       this.openComponent(
-        this.settingsCards.find((card) => card.value === "suppliers")
+        this.settingsCards.find((card) => card.value === "suppliers"),
       );
     }
   },

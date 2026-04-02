@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div @click="handleUpload" :style="'cursor : pointer;'" class="ml-3">
+    <div @click="handleUpload" :style="'cursor : pointer;'" class="">
       <input
         ref="excel-upload-input"
         class="excel-upload-input"

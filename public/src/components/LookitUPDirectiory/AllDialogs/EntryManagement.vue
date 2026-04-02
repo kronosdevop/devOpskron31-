@@ -351,6 +351,11 @@ export default {
   },
 
   methods: {
+    safeMatch(value, searchTerm) {
+  if (value === null || value === undefined) return false;
+  return String(value).toLowerCase().includes(searchTerm);
+},
+
     async fetch_directory_details() {
       try {
         let result = await API.graphql(
@@ -911,71 +916,60 @@ export default {
     },
   },
   computed: {
-    filteredItems() {
-      let filteredData = this.tableData;
+   filteredItems() {
+  let filteredData = this.tableData;
 
-      // Apply dropdown filter first
-      if (this.filterBy && this.filterBy !== "All" && this.filterEnabled) {
-        // Find the filter field from directory design template
-        const filterField = this.directoryInfo.directory_design_template?.find(
-          field => field.displayLabel.toLowerCase() === this.directoryInfo.filter_by?.toLowerCase()
-        );
-        
-        if (filterField) {
-          const filterKey = filterField.original_key;
-          filteredData = filteredData.filter((entry) => {
-            return entry[filterKey] === this.filterBy;
-          });
-        }
-      }
+  // ---------------- FIX: DROPDOWN FILTER ----------------
+  if (this.filterBy && this.filterBy !== "All" && this.filterEnabled) {
+    const filterField =
+      this.directoryInfo.directory_design_template?.find(
+        field =>
+          field.displayLabel.toLowerCase() ===
+          this.directoryInfo.filter_by?.toLowerCase()
+      );
 
-      // Apply search filter
-      if (!this.searchlist || this.searchlist.trim() === "") {
-        return filteredData;
-      }
-      
-      const searchTerm = this.searchlist.toLowerCase().trim();
-      return filteredData.filter((entry) => {
-        // Search in entry title (first field)
-        const titleKey = this.directoryInfo.directory_template?.[0]?.key;
-        if (titleKey && entry[titleKey]?.toLowerCase().includes(searchTerm)) {
-          return true;
-        }
+    if (filterField) {
+      const filterKey = filterField.original_key;
+      filteredData = filteredData.filter(
+        entry => entry[filterKey] === this.filterBy
+      );
+    }
+  }
 
-        // Search in created by
-        const createdBy = this.fethc_names(entry.created_by);
-        if (createdBy?.toLowerCase().includes(searchTerm)) {
-          return true;
-        }
+  if (!this.searchlist || this.searchlist.trim() === "") {
+    return filteredData;
+  }
 
-        // Search in created date
-        const createdDate = this.get_date(entry.created_on);
-        if (createdDate?.toLowerCase().includes(searchTerm)) {
-          return true;
-        }
+  const searchTerm = this.searchlist.toLowerCase().trim();
 
-        // Search in summary fields if they exist
-        if (this.directoryInfo.summary_field_1) {
-          const summary1Key = this.modify_summary_one(
-            this.directoryInfo.summary_field_1
-          );
-          if (entry[summary1Key]?.toLowerCase().includes(searchTerm)) {
-            return true;
-          }
-        }
+  return filteredData.filter((entry) => {
+    const titleKey = this.directoryInfo.directory_template?.[0]?.key;
 
-        if (this.directoryInfo.summary_field_2) {
-          const summary2Key = this.modify_summary_one(
-            this.directoryInfo.summary_field_2
-          );
-          if (entry[summary2Key]?.toLowerCase().includes(searchTerm)) {
-            return true;
-          }
-        }
+    // Title
+    if (this.safeMatch(entry[titleKey], searchTerm)) return true;
 
-        return false;
-      });
-    },
+    // Created By
+    if (this.safeMatch(this.fethc_names(entry.created_by), searchTerm)) return true;
+
+    // Created Date
+    if (this.safeMatch(this.get_date(entry.created_on), searchTerm)) return true;
+
+    // Summary Field 1
+    if (this.directoryInfo.summary_field_1) {
+      const key1 = this.modify_summary_one(this.directoryInfo.summary_field_1);
+      if (this.safeMatch(entry[key1], searchTerm)) return true;
+    }
+
+    // Summary Field 2
+    if (this.directoryInfo.summary_field_2) {
+      const key2 = this.modify_summary_one(this.directoryInfo.summary_field_2);
+      if (this.safeMatch(entry[key2], searchTerm)) return true;
+    }
+
+    return false;
+  });
+},
+
     totalCount() {
       return this.filteredItems.length;
     },
@@ -1015,9 +1009,10 @@ export default {
     },
   },
   watch: {
-    searchlist() {
-      this.currentPage = 1;
+    searchlist(){
+      this.currentPage = 1
     },
+    
     filterBy() {
       this.currentPage = 1;
     },

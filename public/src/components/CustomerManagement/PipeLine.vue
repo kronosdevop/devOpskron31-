@@ -1,17 +1,10 @@
 <template>
   <div>
+        <OverlayComp :overlay="overlay" />
+
     <SnackBar :SnackBarComponent="SnackBarComponent" />
 
-    <!-- Loading State -->
-    <v-overlay :model-value="loading" class="align-center justify-center">
-      <v-progress-circular
-        color="primary"
-        indeterminate
-        size="64"
-      ></v-progress-circular>
-      <div class="text-h6 mt-4 text-white">Loading leads...</div>
-    </v-overlay>
-
+   
     <v-card flat class="overflow-y-auto" :height="windowHeight">
       <v-card-text>
         <!-- Action Bar -->
@@ -511,6 +504,7 @@
 <script>
 import { list_crm_leads } from "@/graphql/queries.js";
 import { API, graphqlOperation } from "aws-amplify";
+import OverlayComp from "@/components/OverlayComp.vue";
 import SnackBar from "@/components/SnackBar.vue";
 import AddLeadDialog from "./Dialogs/AddLeadDialog.vue";
 import LeadDetailsDialog from "./Dialogs/LeadDetailsDialog.vue";
@@ -523,6 +517,7 @@ export default {
     AddLeadDialog,
     LeadDetailsDialog,
     DragConfirmDialog,
+    OverlayComp
   },
   props: {
     leadData: {
@@ -571,7 +566,7 @@ export default {
       // Pagination
       currentPage: 1,
       itemsPerPage: 20,
-
+overlay :false,
       // SnackBar Component
       SnackBarComponent: {},
     };
@@ -655,7 +650,7 @@ export default {
   },
   methods: {
     async fetch_crm_leads() {
-      this.loading = true;
+      this.overlay = true;
       try {
         let result = await API.graphql(graphqlOperation(list_crm_leads, {}));
         let response = JSON.parse(result.data.list_crm_leads);
@@ -676,7 +671,7 @@ export default {
           Top: true,
         };
       } finally {
-        this.loading = false;
+        this.overlay = false;
       }
     },
     processApiResponse(apiData) {

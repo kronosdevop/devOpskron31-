@@ -166,7 +166,7 @@
     </div>
 
     <!-- Recent Awards Dialog -->
-    <v-dialog v-model="showDialog" max-width="600px">
+    <!-- <v-dialog v-model="showDialog" max-width="600px">
       <v-card>
         <v-card-title class="d-flex align-center">
           <v-icon class="mr-3" color="primary">mdi-trophy</v-icon>
@@ -197,13 +197,13 @@
                       award.award_reason || "No Reason available"
                     }}
                   </span>
-              </v-tooltip>
+              </v-tooltip> -->
               <!-- <template v-slot:append>
                 <v-chip color="success" variant="outlined" size="small">
                   {{ award.award_reason || "Category" }}
                 </v-chip>
               </template> -->
-            </v-list-item>
+            <!-- </v-list-item>
           </v-list>
           <div v-else class="text-center py-8">
             <v-icon size="48" color="grey lighten-1" class="mb-4"
@@ -217,18 +217,25 @@
           <v-btn color="primary" @click="showDialog = false">Close</v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
+    </v-dialog> -->
+    <AwardDialog :recentAward="recentAward" @close="recentAward = false" :items="selectedItem"/>
   </div>
 </template>
 
 <script>
 import { API, graphqlOperation } from "aws-amplify";
 import { get_awards_and_leaderboard } from "@/graphql/mutations";
+import AwardDialog from "@/components/RewardsManagement/ConfigurationComponents/AwardDialog.vue";
 
 export default {
+  components: {
+    AwardDialog,
+  },
   data() {
     return {
+      selectedItem: null,
       searchQuery: "",
+      recentAward: false,
       showDialog: false,
       selectedEmployee: "",
       recentAwards: [],
@@ -302,6 +309,10 @@ export default {
     await this.fetchLeaderboard();
   },
   methods: {
+    showRecentAwards(click, value) {
+  this.selectedItem = value.item;   
+  this.recentAward = true;
+},
     async fetchLeaderboard() {
       try {
         this.tableLoading = true;
@@ -324,12 +335,7 @@ export default {
         console.error("Failed to fetch leaderboard:", error);
       }
     },
-    showRecentAwards(click, value) {
-      // console.log(value.item);
-      this.selectedEmployee = value.item.winner_name;
-      this.recentAwards = value.item.recent_awards || [];
-      this.showDialog = true;
-    },
+ 
   },
 };
 </script>

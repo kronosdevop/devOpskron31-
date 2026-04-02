@@ -297,9 +297,7 @@ export default {
   computed: {
     filteredCategories() {
       if (!this.search) return this.ListAllCategories;
-
       const s = this.search.toLowerCase();
-
       return this.ListAllCategories.filter(
         (item) =>
           item.category_name.toLowerCase().includes(s) ||

@@ -40,7 +40,7 @@
                     <v-icon
                       color="primary"
                       v-if="
-                        $store.getters.GetUserObj.user.user_id ==
+                        $store.getters.GetUserObj.user?.user_id ==
                         selectedChat.team_owner_id
                       "
                       size="small"
@@ -93,7 +93,7 @@
                   variant="flat"
                   v-if="
                     selectedChat.team_owner_id !=
-                    $store.getters.GetUserObj.user.user_id
+                    $store.getters.GetUserObj.user?.user_id
                   "
                   class="cardCss text-capitalize"
                 >
@@ -122,7 +122,7 @@
                 <v-spacer />
                 <v-btn
                   v-if="
-                    $store.getters.GetUserObj.user.user_id ==
+                    $store.getters.GetUserObj.user?.user_id ==
                     selectedChat.team_owner_id
                   "
                   color="primary"
@@ -143,13 +143,13 @@
                     <!-- <v-icon
                       color="red"
                       v-show="
-                        $store.getters.GetUserObj.user.user_id ==
+                        $store.getters.GetUserObj.user?.user_id ==
                         selectedChat.team_owner_id
                       "
                       small
                       v-if="
                         selectedChat.team_owner_id != chat &&
-                        $store.getters.GetUserObj.user.user_id != chat
+                        $store.getters.GetUserObj.user?.user_id != chat
                       "
                       >mdi-delete</v-icon
                     > -->
@@ -285,7 +285,7 @@ export default {
     );
     this.allusers = this.allusers.filter(
       (user) =>
-        user.user_email_id !== this.$store.getters.GetUserObj.user.user_email_id
+        user.user_email_id !== this.$store.getters.GetUserObj.user?.user_email_id
     );
 
     this.allusers = this.allusers.filter(

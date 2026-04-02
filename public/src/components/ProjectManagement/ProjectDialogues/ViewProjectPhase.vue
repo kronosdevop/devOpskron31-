@@ -1,121 +1,240 @@
-  <template>
-    <!-- eslint-disable -->
-    <div>
-      <v-dialog
-        :model-value="viewPhaseDialog"
-        @update:model-value="$emit('update:viewPhaseDialog', $event)"
-        persistent
-        max-width="500"
-        transition="dialog-top-transition"
-      >
-        <v-card>
-          <v-toolbar flat density="compact" class="navBar">
-            <v-toolbar-title class="text-black ml-2">
-              <div class="custom-title">
-                Task Details
-              </div>
-            </v-toolbar-title>
-            <v-spacer />
-            <v-icon class="icon-class" @click="close_dialog()">mdi-close</v-icon>
-          </v-toolbar>
-          <v-card-text class="mt-4">
-            <p><strong>Task Name : </strong> {{ viewItem.task_name }}</p>
-            <p>
-              <strong>Task Description : </strong> {{ viewItem.task_description }}
-            </p>
-            <p>
-              <strong>Task Assigned By : </strong>
-              {{ fetch_name(viewItem.task_created_by) }}
-            </p>
-            <p>
-              <strong>Task Assigned To : </strong>
-              {{ fetch_name(viewItem.assign_to) }}
-            </p>
-            <p><strong>Task Status : </strong> {{ viewItem.task_priority }}</p>
-            <p>
-              <strong>Task Due Date : </strong>
-              {{ viewItem.task_completion_date }}
-            </p>
-            <p>
-              <strong>Task Progression : </strong>
-              {{
-                viewItem.task_completion_percentage == undefined
-                  ? 0
-                  : viewItem.task_completion_percentage
-              }}
-            </p>
-            <p><strong>Attachments:</strong></p>
-            <div v-if="images.length">
-              <v-row dense>
-                <v-col v-for="(attachment, index) in images" :key="index" cols="6">
-                  <!-- Image files -->
-                  <div v-if="isImageFile(attachment.url)">
-                    <v-img
-                      :src="attachment.url"
-                      contain
-                      max-width="100%"
-                      class="my-2"
-                      height="100"
-                      alt="Attachment Image"
-                    />
-                  </div>
-                  <!-- PDF files -->
-                  <div v-else-if="isPdfFile(attachment.url)" class="my-2">
-                    <v-card variant="outlined" class="pdf-card">
-                      <v-card-text class="text-center pa-4">
-                        <v-icon size="48" color="red" class="mb-2">mdi-file-pdf-box</v-icon>
-                        <div class="text-caption">{{ attachment.filename }}</div>
-                      </v-card-text>
-                      <v-card-actions class="justify-center pa-2">
-                        <v-btn
-                          size="small"
-                          color="primary"
-                          variant="text"
-                          @click="openFile(attachment.url)"
-                        >
-                          View PDF
-                        </v-btn>
-                      </v-card-actions>
-                    </v-card>
-                  </div>
-                  <!-- Other files -->
-                  <div v-else class="my-2">
-                    <v-card variant="outlined" class="file-card">
-                      <v-card-text class="text-center pa-4">
-                        <v-icon size="48" color="grey" class="mb-2">mdi-file</v-icon>
-                        <div class="text-caption">{{ attachment.filename }}</div>
-                      </v-card-text>
-                      <v-card-actions class="justify-center pa-2">
-                        <v-btn
-                          size="small"
-                          color="primary"
-                          variant="text"
-                          @click="openFile(attachment.url)"
-                        >
-                          Download
-                        </v-btn>
-                      </v-card-actions>
-                    </v-card>
-                  </div>
-                </v-col>
-              </v-row>
-            </div>
-            <p v-else>No attachments</p>
-          </v-card-text>
-          <v-card-actions class="justify-end">
-            <v-btn
-              @click="close_dialog()"
-              dark
-              class="text-capitalize cardCss button-corner"
-            >
-              Close
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-    </div>
-  </template>
+<template>
+  <!-- eslint-disable -->
+  <v-dialog
+    :model-value="viewPhaseDialog"
+    @update:model-value="$emit('update:viewPhaseDialog', $event)"
+    persistent
+    max-width="650"
+    transition="dialog-bottom-transition"
+  >
+    <v-card class="task-card">
 
+      <!-- HEADER -->
+      <v-toolbar density="comfortable" class="navBar">
+        <v-icon class="ml-4">mdi-format-list-checks</v-icon>
+        <v-toolbar-title class="font-weight-bold">
+          Task Details
+        </v-toolbar-title>
+
+        <v-spacer />
+
+        <v-btn icon variant="text" @click="close_dialog">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </v-toolbar>
+
+      <v-divider></v-divider>
+
+      <!-- CONTENT -->
+      <v-card-text class="pa-6">
+
+        <!-- Task Name -->
+        <v-row class="mb-3">
+          <v-col cols="12">
+            <div class="task-title">
+              {{ viewItem.task_name }}
+            </div>
+          </v-col>
+        </v-row>
+
+        <!-- Assigned Info -->
+        <v-row dense>
+
+          <v-col cols="12" md="6">
+            <v-card variant="tonal" class="info-card">
+              <v-icon color="primary">mdi-account-plus</v-icon>
+              <div>
+                <div class="info-label">Assigned By</div>
+                <div class="info-value">
+                  {{ fetch_name(viewItem.task_created_by) }}
+                </div>
+              </div>
+            </v-card>
+          </v-col>
+
+          <v-col cols="12" md="6">
+            <v-card variant="tonal" class="info-card">
+              <v-icon color="success">mdi-account-check</v-icon>
+              <div>
+                <div class="info-label">Assigned To</div>
+                <div class="info-value">
+                  {{ fetch_name(viewItem.assign_to) }}
+                </div>
+              </div>
+            </v-card>
+          </v-col>
+
+        </v-row>
+
+        <!-- Status + Date -->
+        <v-row dense class="mt-3">
+
+          <v-col cols="12" md="6">
+            <v-card variant="tonal" class="info-card">
+              <v-icon color="orange">mdi-flag</v-icon>
+
+              <div>
+                <div class="info-label">Priority</div>
+
+                <v-chip
+                  color="orange"
+                  variant="flat"
+                  size="small"
+                >
+                  {{ viewItem.task_priority }}
+                </v-chip>
+
+              </div>
+            </v-card>
+          </v-col>
+
+          <v-col cols="12" md="6">
+            <v-card variant="tonal" class="info-card">
+              <v-icon color="red">mdi-calendar</v-icon>
+
+              <div>
+                <div class="info-label">Due Date</div>
+                <div class="info-value">
+                  {{ viewItem.task_completion_date }}
+                </div>
+              </div>
+            </v-card>
+          </v-col>
+
+        </v-row>
+
+        <!-- Progress -->
+        <v-row class="mt-5">
+
+          <v-col cols="12">
+            <div class="info-label mb-2">
+              Task Progress
+            </div>
+
+            <v-progress-linear
+              :model-value="viewItem.task_completion_percentage || 0"
+              color="green"
+              height="12"
+              rounded
+            >
+              <template v-slot:default>
+                {{ viewItem.task_completion_percentage || 0 }} %
+              </template>
+            </v-progress-linear>
+          </v-col>
+
+        </v-row>
+
+        <!-- Attachments -->
+        <v-row class="mt-6">
+          <v-col cols="12">
+            <div class="attachment-title">
+              <v-icon class="mr-2">mdi-paperclip</v-icon>
+              Attachments
+            </div>
+          </v-col>
+        </v-row>
+
+        <v-row v-if="images.length" dense>
+
+          <v-col
+            v-for="(attachment, index) in images"
+            :key="index"
+            cols="6"
+            md="4"
+          >
+
+            <!-- IMAGE -->
+            <v-card
+              v-if="isImageFile(attachment.url)"
+              class="attachment-card"
+              @click="openFile(attachment.url)"
+            >
+              <v-img
+                :src="attachment.url"
+                height="120"
+                cover
+              />
+
+              <v-card-subtitle class="text-truncate">
+                {{ attachment.filename }}
+              </v-card-subtitle>
+            </v-card>
+
+            <!-- PDF -->
+            <v-card
+              v-else-if="isPdfFile(attachment.url)"
+              class="attachment-card"
+              @click="openFile(attachment.url)"
+            >
+              <v-card-text class="text-center">
+
+                <v-icon size="50" color="red">
+                  mdi-file-pdf-box
+                </v-icon>
+
+                <div class="file-name">
+                  {{ attachment.filename }}
+                </div>
+
+              </v-card-text>
+            </v-card>
+
+            <!-- OTHER -->
+            <v-card
+              v-else
+              class="attachment-card"
+              @click="openFile(attachment.url)"
+            >
+              <v-card-text class="text-center">
+
+                <v-icon size="50">
+                  mdi-file
+                </v-icon>
+
+                <div class="file-name">
+                  {{ attachment.filename }}
+                </div>
+
+              </v-card-text>
+            </v-card>
+
+          </v-col>
+
+        </v-row>
+
+        <v-row v-else>
+          <v-col>
+            <v-alert
+              type="info"
+              variant="tonal"
+            >
+              No attachments available
+            </v-alert>
+          </v-col>
+        </v-row>
+
+      </v-card-text>
+
+      <v-divider></v-divider>
+
+      <!-- FOOTER -->
+      <v-card-actions class="justify-end pa-4">
+
+        <v-btn
+          color="primary"
+          variant="flat"
+          rounded
+          @click="close_dialog"
+        >
+          Close
+        </v-btn>
+
+      </v-card-actions>
+
+    </v-card>
+  </v-dialog>
+</template>
 <script>
 /* eslint-disable */
 import { get_all_org_users } from "@/mixins/GetUsersDropdown.js";
@@ -196,52 +315,60 @@ export default {
 
 
 <style scoped>
-.v-img {
-  border-radius: 8px;
-  border: 1px solid #ccc;
+.task-card{
+border-radius:14px;
 }
 
-.custom-title {
-  font-weight: 600;
-  font-size: 1.1rem;
+.task-title{
+font-size:20px;
+font-weight:600;
+color:#333;
 }
 
-.icon-class {
-  cursor: pointer;
-  transition: color 0.2s ease;
+.info-card{
+display:flex;
+gap:12px;
+align-items:center;
+padding:14px;
+border-radius:10px;
 }
 
-.icon-class:hover {
-  color: #f44336;
+.info-label{
+font-size:12px;
+color:#888;
 }
 
-.navBar {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+.info-value{
+font-size:14px;
+font-weight:500;
 }
 
-.cardCss {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+.attachment-title{
+font-weight:600;
+font-size:16px;
+display:flex;
+align-items:center;
 }
 
-.button-corner {
-  border-radius: 8px;
+.attachment-card{
+cursor:pointer;
+border-radius:10px;
+transition:0.25s;
 }
 
-.pdf-card, .file-card {
-  transition: transform 0.2s ease-in-out;
-  cursor: pointer;
+.attachment-card:hover{
+transform:translateY(-4px);
+box-shadow:0 6px 18px rgba(0,0,0,0.1);
 }
 
-.pdf-card:hover, .file-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+.file-name{
+font-size:12px;
+margin-top:6px;
+word-break:break-all;
 }
 
-.pdf-card {
-  border-color: #f44336;
-}
-
-.file-card {
-  border-color: #9e9e9e;
+.navBar{
+background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+color:white;
 }
 </style>

@@ -7,6 +7,8 @@ export const get_all_org_users = {
   }),
   methods: {
     async get_all_org_users() {
+            this.orgUsers = [];
+
       var data = this.$store.getters.GetUserObj;
       try {
         let result = await API.graphql(
@@ -20,10 +22,9 @@ export const get_all_org_users = {
             },
           })
         );
-        this.orgUsers = [];
         var response = JSON.parse(result.data.all_users_of_organization);
 
-        this.orgUsers = response.data;
+        this.orgUsers = response.data || [];
       } catch (error) {}
     },
   },

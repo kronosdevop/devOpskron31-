@@ -33,7 +33,7 @@
         </v-btn>
 
         <!-- Back Button -->
-        <v-btn class="action-btn back-btn" @click="back_call()">
+        <v-btn class="mr-7" @click="back_call()" color="primary" variant="flat">
           <v-icon>mdi-step-backward</v-icon>
           <span>Back</span>
         </v-btn>
@@ -120,7 +120,7 @@ export default {
     isUserDashboardCreator() {
       return (
         this.dashboardDetails.dashboard_created_by ===
-        this.$store.getters.GetUserObj.user.user_email_id
+        this.$store.getters.GetUserObj.user?.user_email_id
       );
     },
     visibleTabs() {
@@ -141,7 +141,7 @@ export default {
           condition:
             this.dashboardDetails.dashboard_publish_type !== "FEED" &&
             this.dashboardDetails.dashboard_created_by ===
-              this.$store.getters.GetUserObj.user.user_email_id,
+              this.$store.getters.GetUserObj.user?.user_email_id,
         },
         { name: "API", component: "DashboardApi", condition: true },
 
@@ -214,7 +214,6 @@ export default {
 
 /* Action Button Styles */
 .action-btn {
-  background: #db4c77 !important;
   color: white !important;
   border: none !important;
   box-shadow: 0 2px 8px rgba(219, 76, 119, 0.3) !important;
@@ -238,13 +237,7 @@ export default {
   background: #c2185b !important;
 }
 
-.back-btn {
-  background: #757575 !important;
-}
 
-.back-btn:hover {
-  background: #616161 !important;
-}
 
 /* Main Container Styles */
 div {

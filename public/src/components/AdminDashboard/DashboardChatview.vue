@@ -96,7 +96,7 @@
                   color="primaryColor"
                   v-if="
                     dashboarditems.dashboard_created_by ==
-                      $store.getters.GetUserObj.user.user_email_id &&
+                      $store.getters.GetUserObj.user?.user_email_id &&
                     dashboarditems.dashboard_publish_type == 'DASHBOARD' &&
                     dashboarditems.dashboard_level != 'STANDARD'
                   "
@@ -146,7 +146,7 @@
                     color="primaryColor"
                     v-if="
                       dashboarditems.dashboard_created_by ==
-                        $store.getters.GetUserObj.user.user_email_id &&
+                        $store.getters.GetUserObj.user?.user_email_id &&
                       dashboarditems.dashboard_publish_type == 'DASHBOARD' &&
                       dashboarditems.dashboard_level != 'STANDARD'
                     "
@@ -187,7 +187,7 @@
                       cols="12"
                       v-if="
                         dashboarditems.dashboard_created_by ==
-                        $store.getters.GetUserObj.user.user_email_id
+                        $store.getters.GetUserObj.user?.user_email_id
                       "
                     >
                       <v-text-field
@@ -290,7 +290,7 @@
                         block
                         v-show="
                           dashboarditems.dashboard_created_by ==
-                          $store.getters.GetUserObj.user.user_email_id
+                          $store.getters.GetUserObj.user?.user_email_id
                         "
                         class="cardCss text-capitalize mt-5"
                       >
@@ -348,7 +348,7 @@
                             color="red"
                             v-if="
                               item.client_id !=
-                                $store.getters.GetUserObj.user.user_email_id &&
+                                $store.getters.GetUserObj.user?.user_email_id &&
                               item.client_id !=
                                 dashboarditems.dashboard_created_by
                             "
@@ -683,7 +683,7 @@ export default {
       this.isUserReadOnly = false;
       if (
         this.dashboarditems.dashboard_created_by !=
-        this.$store.getters.GetUserObj.user.user_email_id
+        this.$store.getters.GetUserObj.user?.user_email_id
       ) {
         this.isUserReadOnly = true;
       }

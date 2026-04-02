@@ -1,240 +1,238 @@
 <template>
-  <div>
-    <!-- eslint-disable -->
-    <v-dialog :model-value="assignByMeDialog" @update:model-value="$emit('update:assignByMeDialog', $event)"
-      persistent
-      max-width="900"
-      transition="dialog-top-transition"
-    >
-      <v-card class="modern-dialog">
-        <v-card-title class="modern-title-row dense-toolbar">
-          <div class="modern-title-wrap">
-            <span class="modern-title">{{ rowInfo.task_name }}</span>
-          </div>
-          <v-spacer />
-          <v-btn icon variant="text" size="small" @click="close_dialog()" class="close-btn dense-close-btn">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-        </v-card-title>
-        <v-divider />
-        <!-- Modern Dense Toolbar/Header -->
+  <v-dialog
+    :model-value="assignByMeDialog"
+    @update:model-value="$emit('update:assignByMeDialog', $event)"
+    persistent
+    max-width="950"
+  >
+    <v-card class="modern-dialog">
+      <!-- HEADER -->
+      <v-card-title class="modern-title-row dense-toolbar">
+        <div class="modern-title-wrap">
+          <span class="modern-title mt-3">{{ rowInfo.task_name }}</span>
+        </div>
+        <v-spacer />
+        <v-btn
+          icon
+          variant="text"
+          size="small"
+          @click="close_dialog()"
+          class="close-btn dense-close-btn"
+        >
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </v-card-title>
+      <v-divider />
 
-       
-        <v-card-text class="modern-card-text">
-          <v-row>
-            <!-- Left: Task Details -->
-            <v-col cols="12" md="6" class="modern-info-col">
-              <div class="section-header mb-2">Task Details</div>
-              <div class="modern-info-list mb-6">
-                <div class="modern-info-row mb-2">
-                  <v-icon class="mr-2 info-icon" size="18">mdi-account-multiple</v-icon>
-                  <span class="modern-label">Assigned to:</span>
-                  <span class="modern-value">
-                    {{ rowInfo.task_type == "ALL_MEMBERS" ? "All Members" : rowInfo.task_assign_to.join(", ") }}
-                  </span>
-                </div>
-                <div class="modern-info-row mb-2">
-                  <v-icon class="mr-2 info-icon" size="18">mdi-calendar</v-icon>
-                  <span class="modern-label">Assigned On:</span>
-                  <span class="modern-value">{{ taskAssignedOn }}</span>
-                </div>
-                <div class="modern-info-row mb-2">
-                  <v-icon class="mr-2 info-icon" size="18">mdi-repeat</v-icon>
-                  <span class="modern-label">Type:</span>
-                  <v-chip x-small :color="rowInfo.enabled_recursion ? 'primary' : 'info'" text-color="white" class="ml-2">
-                    {{ rowInfo.enabled_recursion ? 'Recurring Task' : 'One Time' }}
-                  </v-chip>
-                </div>
-                <div v-if="rowInfo.enabled_recursion == true" class="modern-info-row mb-2">
-                  <v-icon class="mr-2 info-icon" size="18">mdi-calendar-clock</v-icon>
-                  <span class="modern-label">Frequency:</span>
-                  <span class="modern-value">{{ display_frequency_info(rowInfo.task_recursion_frequency) }}</span>
-                </div>
-                <div class="modern-info-row mb-2">
-                  <v-icon class="mr-2 info-icon" size="18">mdi-calendar-check</v-icon>
-                  <span class="modern-label">Completion Date:</span>
-                  <span class="modern-value">{{ taskCompletion }}</span>
-                </div>
-                <div class="modern-info-row mb-2">
-                  <v-icon class="mr-2 info-icon" size="18">mdi-calendar-star</v-icon>
-                  <span class="modern-label">Target Completion:</span>
-                  <span class="modern-value">{{ targetCompletionDate }}</span>
-                </div>
-                <div class="modern-info-row mb-2">
-                  <v-icon class="mr-2 info-icon" size="18">mdi-flag</v-icon>
-                  <span class="modern-label">Status:</span>
-                  <v-chip x-small :color="getStatusColor(rowInfo.task_progress_status)" text-color="white" class="ml-2">
-                    {{ rowInfo.task_progress_status }}
-                  </v-chip>
-                </div>
+      <v-card-text>
+        <!-- MAIN GRID -->
+        <v-row>
+          <!-- LEFT: TASK DETAILS -->
+          <v-col cols="12" md="6">
+            <v-card class="section-card">
+              <div class="section-header">📋 Task Details</div>
+
+              <div class="info-row">
+                <v-icon size="18">mdi-account</v-icon>
+                <span>Assigned:</span>
+                <b>
+                  {{
+                    rowInfo.task_type == "ALL_MEMBERS"
+                      ? "All Members"
+                      : rowInfo.task_assign_to.join(", ")
+                  }}
+                </b>
               </div>
-              <div v-if="rowInfo.task_progress_status == 'ASSIGNED' || rowInfo.task_progress_status == 'HOLD'" class="mb-2">
-                <label class="modern-label"><b>Change Status</b></label>
-                <v-select variant="outlined" density="compact" class="mt-2" :items="fetchStatus" v-model="taskStatus" ></v-select>
+
+              <div class="info-row">
+                <v-icon size="18">mdi-calendar</v-icon>
+                <span>Assigned On:</span>
+                <b>{{ taskAssignedOn }}</b>
               </div>
-              <div v-if="taskStatus == 'INPROGRESS'" class="mb-2">
-                <label class="modern-label"><b>Completion %</b></label>
-                <v-progress-linear v-model="taskPercentage" class="mt-3 mr-3" color="primary" disabled height="20" style="border-radius: 12px">
-                  <template #default="{ value }">
-                    <strong>{{ percentageNumber }}%</strong>
-                  </template>
-                </v-progress-linear>
+
+              <div class="info-row">
+                <v-icon size="18">mdi-repeat</v-icon>
+                <span>Type:</span>
+                <v-chip size="small" color="primary">
+                  {{ rowInfo.enabled_recursion ? "Recurring" : "One Time" }}
+                </v-chip>
               </div>
-              <div v-if="rowInfo.task_progress_status !== 'COMPLETED' && rowInfo.task_progress_status !== 'WITHDRAWN' && rowInfo.task_progress_status !== 'INPROGRESS'" class="mt-4">
-                <v-btn small color="primary" class="mr-2" :loading="loading" @click="hold_withdraw_action(taskStatus)">
-                  Submit
+
+              <div class="info-row">
+                <v-icon size="18">mdi-flag</v-icon>
+                <span>Status:</span>
+                <v-chip
+                  size="small"
+                  :color="getStatusColor(rowInfo.task_progress_status)"
+                >
+                  {{ rowInfo.task_progress_status }}
+                </v-chip>
+              </div>
+
+              <div class="info-row">
+                <v-icon size="18">mdi-calendar-check</v-icon>
+                <span>Completion:</span>
+                <b>{{ taskCompletion }}</b>
+              </div>
+
+              <div class="info-row">
+                <v-icon size="18">mdi-calendar-star</v-icon>
+                <span>Target:</span>
+                <b>{{ targetCompletionDate }}</b>
+              </div>
+            </v-card>
+          </v-col>
+
+          <!-- RIGHT: PROGRESS -->
+          <v-col cols="12" md="6" v-if="rowInfo.task_type == 'ALL_MEMBERS'">
+            <v-card class="section-card">
+              <div class="section-header">📊 Progress</div>
+
+              <div
+                v-for="user in inProgressTasks"
+                :key="user.task_id"
+                class="user-progress"
+              >
+                <div class="d-flex justify-space-between">
+                  <span>{{ user.task_assign_to_name }}</span>
+                  <b>{{ user.task_completion_percentage }}%</b>
+                </div>
+
+                <v-progress-linear
+                  :model-value="user.task_completion_percentage"
+                  height="6"
+                  class="mt-1"
+                />
+
+                <v-btn
+                  size="x-small"
+                  color="error"
+                  class="mt-2"
+                  @click="withdrawTask(user)"
+                >
+                  Withdraw
                 </v-btn>
               </div>
-            </v-col>
-            <v-divider vertical class="mx-2" />
-            <!-- Right: Progress Section for ALL_MEMBERS -->
-            <v-col v-show="rowInfo.task_type == 'ALL_MEMBERS'" cols="12" md="6" class="modern-progress-col">
-              <div class="section-header mb-2">Progress</div>
-              <v-expansion-panels class="mt-2" multiple>
-                <!-- In Progress Panel -->
-                <v-expansion-panel>
-                  <v-expansion-panel-title>
-                    <b style="font-size: 13px">Pending on ({{ inProgressTasks.length }} Users)</b>
-                  </v-expansion-panel-title>
-                  <v-expansion-panel-text>
-                    <v-list v-if="inProgressTasks.length">
-                      <v-list-item v-for="user in inProgressTasks" :key="user.task_assign_to">
-                        <v-list-item-content>
-                          <v-row justify="space-between" align="center">
-                            <v-col cols="8">
-                              <v-list-item-title>{{ user.task_assign_to_name }}</v-list-item-title>
-                            </v-col>
-                            <v-col cols="4" class="text-right">
-                              <span class="progress-text">{{ user.task_completion_percentage }}%</span>
-                            </v-col>
-                          </v-row>
-                          <v-progress-linear :model-value="user.task_completion_percentage" color="primary" height="8" class="mt-2" />
-                          <v-btn color="success" class="mt-2 custom-withdraw-btn text-capitalize" @click="withdrawTask(user)" size="x-small">
-                            Withdraw
-                          </v-btn>
-                        </v-list-item-content>
-                      </v-list-item>
-                    </v-list>
-                    <p v-else class="ml-4">No In Progress Tasks</p>
-                  </v-expansion-panel-text>
-                </v-expansion-panel>
-                <!-- Completed Panel -->
-                <v-expansion-panel>
-                  <v-expansion-panel-title>
-                    <b style="font-size: 13px">Completed by ({{ completedTasks.length }} Users)</b>
-                  </v-expansion-panel-title>
-                  <v-expansion-panel-text>
-                    <v-list v-if="completedTasks.length">
-                      <v-list-item v-for="(user, index) in completedTasks" :key="user.task_assign_to">
-                        <template #prepend>
-                          <v-icon color="green">mdi-check-circle</v-icon>
-                        </template>
-                        <v-list-item-content>
-                          <v-list-item-title class="font-weight-medium">{{ user.task_assign_to_name }}</v-list-item-title>
-                          <v-list-item-subtitle>
-                            <v-icon size="small" color="grey">mdi-calendar-check</v-icon>
-                            Completed On:
-                            <b>{{ fetch_org_format(user.task_completed_on) || fetch_org_format(user.task_completion_date) }}</b>
-                          </v-list-item-subtitle>
-                        </v-list-item-content>
-                        <v-divider v-if="index !== completedTasks.length - 1" class="mt-2 mb-2"></v-divider>
-                      </v-list-item>
-                    </v-list>
-                    <p v-else class="ml-4">No Completed Tasks</p>
-                  </v-expansion-panel-text>
-                </v-expansion-panel>
-              </v-expansion-panels>
-            </v-col>
-          </v-row>
-          
-          <!-- Attachments Section -->
-          <v-row v-if="attachments.length > 0" class="mt-4">
-            <v-col cols="12">
-              <div class="section-header mb-3">
-                <v-icon class="mr-2" size="18">mdi-paperclip</v-icon>
-                Task Attachments ({{ attachments.length }})
+            </v-card>
+          </v-col>
+        </v-row>
+
+        <!-- ATTACHMENTS -->
+        <v-row v-if="attachments.length" class="mt-4">
+          <v-col cols="6">
+            <v-card class="section-card">
+              <div class="section-header">
+                📎 Attachments ({{ attachments.length }})
               </div>
+
               <div class="attachments-grid">
                 <div
-                  v-for="(attachment, index) in attachments"
-                  :key="index"
+                  v-for="(attachment, i) in attachments"
+                  :key="i"
                   class="attachment-card"
                 >
-                  <div class="attachment-content">
-                    <div class="attachment-preview">
-                      <v-img
-                        v-if="isImageFile(attachment.fileName)"
-                        :src="attachment.presignedUrl"
-                        :alt="attachment.fileName"
-                        width="80"
-                        height="80"
-                        cover
-                        class="attachment-image"
-                      />
-                      <div v-else class="attachment-icon">
-                        <v-icon size="40" color="primary">mdi-file</v-icon>
-                      </div>
-                    </div>
-                    <div class="attachment-name">{{ attachment.fileName }}</div>
-                    <div class="attachment-actions">
-                      <v-btn
-                        size="x-small"
-                        variant="text"
-                        color="primary"
-                        @click="downloadAttachment(attachment)"
-                        class="download-btn"
-                      >
-                        <v-icon size="16">mdi-download</v-icon>
-                        Download
-                      </v-btn>
-                      <v-btn
-                        v-if="isImageFile(attachment.fileName)"
-                        size="x-small"
-                        variant="text"
-                        color="secondary"
-                        @click="previewImage(attachment)"
-                        class="preview-btn"
-                      >
-                        <v-icon size="16">mdi-eye</v-icon>
-                        Preview
-                      </v-btn>
-                    </div>
+                  <v-img
+                    v-if="isImageFile(attachment.fileName)"
+                    :src="attachment.presignedUrl"
+                    height="100"
+                    cover
+                    class="rounded"
+                  />
+
+                  <v-icon v-else size="40">mdi-file</v-icon>
+
+                  <div class="attachment-name">
+                    {{ attachment.fileName }}
+                  </div>
+
+                  <div class="text-center mt-2">
+                    <v-btn
+                      size="x-small"
+                      @click="downloadAttachment(attachment)"
+                    >
+                      Download
+                    </v-btn>
+
+                    <v-btn
+                      v-if="isImageFile(attachment.fileName)"
+                      size="x-small"
+                      class="ml-2"
+                      @click="previewImage(attachment)"
+                    >
+                      View
+                    </v-btn>
                   </div>
                 </div>
               </div>
-            </v-col>
-          </v-row>
-        </v-card-text>
-        <v-divider />
-        <!-- Actions Footer -->
-        <v-card-actions v-if="rowInfo.task_progress_status == 'INPROGRESS'" class="modern-footer-actions">
-          <v-spacer />
-          <v-btn
-            color="error"
-            variant="flat"
-            size="small"
-            :loading="loading1"
-            class="modern-btn compact-btn mr-2"
-            @click="hold_withdraw_action('HOLD')"
-          >
-          
-            Hold
-          </v-btn>
-          <v-btn
-            color="success"
-            variant="flat"
-            size="small"
-            :loading="loading2"
-            class="modern-btn compact-btn"
-            @click="hold_withdraw_action('WITHDRAWN')"
-          >
-           
-            Withdraw
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </div>
+            </v-card>
+          </v-col>
+
+          <!-- COMMENTS -->
+          <v-col cols="16">
+            <v-card class="section-card">
+              <div class="section-header">
+                💬 Comments ({{ fetchComments.length }})
+              </div>
+
+              <div class="comments-wrapper">
+                <!-- ✅ If comments exist -->
+                <template v-if="fetchComments.length">
+                  <div
+                    v-for="(comment, i) in fetchComments"
+                    :key="i"
+                    class="comment-bubble"
+                  >
+                    <div class="comment-header">
+                      <b>{{ comment.commented_by_name }}</b>
+                      <span>{{ fetch_date(comment.commented_on) }}</span>
+                    </div>
+
+                    <div class="comment-body">
+                      {{ comment.comment_texts }}
+                    </div>
+                  </div>
+                </template>
+
+                <!-- ❌ If no comments -->
+                <div v-else class="no-comments">
+                  <v-icon size="28" color="grey">mdi-comment-outline</v-icon>
+                  <div>No comments yet</div>
+                </div>
+              </div>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-card-text>
+      <v-divider />
+      <!-- Actions Footer -->
+      <v-card-actions
+        v-if="rowInfo.task_progress_status == 'INPROGRESS'"
+        class="modern-footer-actions"
+      >
+        <v-spacer />
+        <v-btn
+          color="error"
+          variant="flat"
+          size="small"
+          :loading="loading1"
+          class="modern-btn compact-btn mr-2"
+          @click="hold_withdraw_action('HOLD')"
+        >
+          Hold
+        </v-btn>
+        <v-btn
+          color="success"
+          variant="flat"
+          size="small"
+          :loading="loading2"
+          class="modern-btn compact-btn"
+          @click="hold_withdraw_action('WITHDRAWN')"
+        >
+          Withdraw
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 <script>
 /*eslint-disable*/
@@ -254,7 +252,6 @@ export default {
   },
   data() {
     return {
-      taskName: "",
       taskDescription: "",
       taskAssignedOn: "",
       taskAssignBy: "",
@@ -526,58 +523,47 @@ export default {
 
     async fetch_task_details() {
       try {
+        this.attachments = [];
+        this.fetchComments = [];
+
         let result = await API.graphql(
           graphqlOperation(get_particular_task_details, {
-            input: {
-              task_id: this.rowInfo.main_task_id,
-            },
+            input: { task_id: this.rowInfo.main_task_id },
           })
         );
-        this.fetchComments = [];
-        var response = JSON.parse(result.data.get_particular_task_details);
-        // var res =
-        // console.log("response", response.data[0]);
-        this.imageregularUrl = [];
 
-        if (response.Status == "SUCCESS") {
-          this.assignedTasks = response.data[0].assigned_tasks;
-          this.taskDescription = response.data[0].task_description;
-          this.taskName = response.data[0].task_name;
-          this.taskAssignedOn = this.fetch_value(
-            response.data[0].task_created_on
-          );
+        const response = JSON.parse(result.data.get_particular_task_details);
+
+        if (response.Status === "SUCCESS") {
+          const data = response.data[0];
+
+          // ✅ FIXED ARRAYS
+          this.assignedTasks = Object.values(data.assigned_tasks || {});
+          this.fetchComments = Object.values(data.task_comments || {});
+
+          this.taskDescription = data.task_description;
+          this.taskName = data.task_name;
+          this.taskAssignedOn = this.fetch_value(data.task_created_on);
           this.taskCompletion = this.fetch_org_format(
-            response.data[0].task_completion_date
+            data.task_completion_date
           );
-          this.taskStatus = response.data[0].task_progress_status;
-          this.taskPercentage =
-            response.data[0].task_completion_percentage != undefined
-              ? response.data[0].task_completion_percentage
-              : 0;
-          this.percentageNumber =
-            response.data[0].task_completion_percentage != undefined
-              ? response.data[0].task_completion_percentage
-              : 0;
-          this.targetCompletionDate =
-            response.data[0].task_completed_on != undefined
-              ? this.fetch_org_format(
-                  fetch_org_formaresponse.data[0].task_completed_on
-                )
-              : "-";
-          // console.log(this.percentageNumber);
-          this.fetchComments =
-            response.data[0].task_comments == undefined
-              ? []
-              : response.data[0].task_comments;
-          this.taskAssignBy = response.data[0].task_assign_to_name;
+          this.taskStatus = data.task_progress_status;
 
-          // Process attachments and generate presigned URLs
-          var attachmentsKeys = response.data[0].attachments_keys || [];
-          if (attachmentsKeys.length > 0) {
-            await this.processAttachments(attachmentsKeys);
+          this.taskPercentage = data.task_completion_percentage || 0;
+          this.percentageNumber = data.task_completion_percentage || 0;
+
+          this.targetCompletionDate = data.task_completed_on
+            ? this.fetch_org_format(data.task_completed_on)
+            : "-";
+
+          // ✅ Attachments (FIXED)
+          if (data.attachments_keys?.length) {
+            this.processAttachments(data.attachments_keys);
           }
         }
-      } catch (error) {}
+      } catch (error) {
+        console.error(error);
+      }
     },
 
     async processAttachments(attachmentsKeys) {
@@ -603,13 +589,23 @@ export default {
 
     extractFileNameFromKey(key) {
       // Extract filename from S3 key
-      const parts = key.split('/');
+      const parts = key.split("/");
       return parts[parts.length - 1] || key;
     },
 
     isImageFile(fileName) {
-      const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.svg'];
-      const extension = fileName.toLowerCase().substring(fileName.lastIndexOf('.'));
+      const imageExtensions = [
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".gif",
+        ".bmp",
+        ".webp",
+        ".svg",
+      ];
+      const extension = fileName
+        .toLowerCase()
+        .substring(fileName.lastIndexOf("."));
       return imageExtensions.includes(extension);
     },
 
@@ -631,7 +627,7 @@ export default {
 
     previewImage(attachment) {
       // Open image in new tab for preview
-      window.open(attachment.presignedUrl, '_blank');
+      window.open(attachment.presignedUrl, "_blank");
     },
 
     s3convert(urls) {
@@ -669,19 +665,19 @@ export default {
     },
     getStatusColor(status) {
       switch (status) {
-        case 'COMPLETED':
-          return 'green';
-        case 'INPROGRESS':
-          return 'orange';
-        case 'HOLD':
-          return 'red';
-        case 'WITHDRAWN':
-        case 'WITHDRAW':
-          return 'primary';
-        case 'ASSIGNED':
-          return 'brown';
+        case "COMPLETED":
+          return "green";
+        case "INPROGRESS":
+          return "orange";
+        case "HOLD":
+          return "red";
+        case "WITHDRAWN":
+        case "WITHDRAW":
+          return "primary";
+        case "ASSIGNED":
+          return "brown";
         default:
-          return 'grey';
+          return "grey";
       }
     },
   },
@@ -691,7 +687,7 @@ export default {
 .modern-dialog {
   border-radius: 14px;
   background: #fff;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
 }
 .modern-title-row {
   font-size: 1.2rem;
@@ -734,147 +730,102 @@ export default {
 .modern-card-text {
   padding: 24px 24px 12px 24px;
 }
-.section-header {
-  font-size: 1.08rem;
+/* HEADER */
+.dialog-header {
   font-weight: 600;
-  color: #1976d2;
-  margin-bottom: 8px;
-  letter-spacing: 0.5px;
-}
-.modern-info-list {
-  background: none;
-  border-radius: 0;
-  padding: 0 0 10px 0;
-  margin-bottom: 18px;
-  box-shadow: none;
-}
-.modern-info-row {
-  display: flex;
-  align-items: center;
-  margin-bottom: 6px;
-  font-size: 1rem;
-}
-.info-icon {
-  color: #1976d2;
-}
-.modern-label {
-  font-weight: 500;
-  color: #444;
-  margin-right: 6px;
-  min-width: 110px;
-}
-.modern-value {
-  color: #222;
-  font-weight: 500;
-  word-break: break-word;
-}
-.modern-progress-col {
-  background: none;
-  border-radius: 0;
-  padding: 0 0 10px 0;
-  margin-bottom: 18px;
-  box-shadow: none;
-}
-.progress-text {
-  font-weight: 500;
-  font-size: 14px;
-  color: #1976d2;
-}
-.custom-withdraw-btn {
-  width: 85px !important;
-  min-width: 85px !important;
-  max-width: 85px !important;
-  font-size: 12px;
-}
-.modern-footer-actions {
-  background: #f8fafd;
-  border-top: 1px solid #eee;
-  border-radius: 0 0 14px 14px;
-  padding: 12px 24px;
-}
-.modern-footer-btn {
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 1rem;
-  min-width: 120px;
+  font-size: 16px;
 }
 
-/* Attachments Styles */
+.dialog-title {
+  font-weight: 600;
+}
+
+/* SECTION CARD */
+.section-card {
+  padding: 16px;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* SECTION TITLE */
+.section-header {
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #1976d2;
+}
+
+/* INFO ROW */
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+/* PROGRESS */
+.user-progress {
+  margin-bottom: 12px;
+}
+
+/* ATTACHMENTS */
 .attachments-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 16px;
-  margin-top: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
 }
 
 .attachment-card {
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-  padding: 12px;
-  transition: all 0.2s ease;
+  padding: 10px;
+  border-radius: 10px;
+  background: #fafafa;
+  text-align: center;
+  transition: 0.2s;
 }
 
 .attachment-card:hover {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  transform: translateY(-1px);
-}
-
-.attachment-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-
-.attachment-preview {
-  display: flex;
-  justify-content: center;
-}
-
-.attachment-image {
-  border-radius: 6px;
-  object-fit: cover;
-}
-
-.attachment-icon {
-  width: 80px;
-  height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f5f5f5;
-  border-radius: 6px;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
 .attachment-name {
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #222;
-  text-align: center;
-  word-break: break-all;
-  line-height: 1.3;
-  white-space: normal;
-  overflow-wrap: break-word;
-  max-width: 100%;
+  font-size: 12px;
+  margin-top: 6px;
+  word-break: break-word;
 }
 
-.attachment-actions {
+/* COMMENTS */
+.comments-wrapper {
   display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.download-btn,
-.preview-btn {
-  font-size: 0.8rem;
-  min-width: auto;
-  padding: 4px 8px;
-  height: 24px;
+.comment-bubble {
+  background: #eef4ff;
+  padding: 10px;
+  border-radius: 12px;
+  max-width: 80%;
 }
 
-.download-btn:hover,
-.preview-btn:hover {
-  background: rgba(25, 118, 210, 0.1);
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #666;
+}
+
+.comment-body {
+  margin-top: 4px;
+  font-size: 14px;
+}
+.no-comments {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 120px;
+  color: #999;
+  font-size: 14px;
+  gap: 6px;
 }
 </style>
