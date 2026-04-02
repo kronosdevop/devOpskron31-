@@ -3,10 +3,10 @@ const path = require('path');
 
 const app = express();
 
-// Serve static frontend
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/', (req, res) => {
+// 🔥 THIS IS THE FIX
+app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
