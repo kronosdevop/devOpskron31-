@@ -12,6 +12,7 @@ import VueApexCharts from "vue3-apexcharts";
 import { Loader } from "@googlemaps/js-api-loader";
 import { initiateLocalCacheDB } from "./db.js";
 import disableDevtool from "disable-devtool";
+import '@mdi/font/css/materialdesignicons.css'
 
 disableDevtool({
   disableMenu: true,
