@@ -1,0 +1,10 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  RewriteRule ^api/walllabs_create$ https://pt8lbf5drh.execute-api.us-east-1.amazonaws.com/dev/walllabs_create [P,L]
+
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>
